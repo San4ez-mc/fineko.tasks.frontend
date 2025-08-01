@@ -1,0 +1,52 @@
+.login-form {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 320px;
+}
+.login-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.login-form .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+.login-form input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.login-form button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.login-form .telegram-btn {
+    background: #2AABEE;
+}
+.login-form .error {
+    color: #e53935;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.login-form .success {
+    color: #2e7d32;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.login-form .forgot-link {
+    margin-top: 10px;
+    text-align: center;
+}
+.login-form .forgot-link a {
+    color: #1976d2;
+    text-decoration: none;
+}

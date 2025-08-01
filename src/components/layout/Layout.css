@@ -1,0 +1,32 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Область хедера + сайдбара + контенту */
+.layout-body {
+    display: flex;
+    flex: 1;
+    transition: all 0.3s ease;
+    padding-top: 0;
+}
+
+/* Контент */
+.layout-content {
+    flex: 1;
+    padding: 20px;
+    background: #fff;
+    transition: all 0.3s ease;
+    min-height: 100vh;
+}
+
+/* Якщо меню закрите – відступ мінімальний (60px) */
+.layout-body.collapsed-sidebar .layout-content {
+    margin-left: 60px;
+}
+
+/* Якщо меню відкрите – контент звужується (220px) */
+.layout-body.with-sidebar .layout-content {
+    margin-left: 220px;
+}

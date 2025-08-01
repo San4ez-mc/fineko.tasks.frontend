@@ -1,0 +1,295 @@
+/* === Заголовок зі стрілками === */
+.daily-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.date-title {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+    flex-grow: 1;
+    color: #333;
+}
+
+.date-arrow {
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    font-size: 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.date-arrow:hover {
+    background: #e55600;
+}
+
+/* === Список задач === */
+.tasks-table {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* === Картка задачі === */
+.task-card {
+    background: #fff;
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid #eee;
+    transition: all 0.2s ease;
+}
+
+.task-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Виконана задача */
+.task-card.task-done {
+    opacity: 0.7;
+}
+
+.task-card.task-done .task-title {
+    text-decoration: line-through;
+    color: #777;
+}
+
+/* === Верхня частина задачі === */
+.task-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.task-complete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #bbb;
+    transition: color 0.2s;
+}
+
+.task-complete-btn:hover {
+    color: #ff6600;
+}
+
+.task-complete-btn.completed {
+    color: #28a745;
+    /* зелена іконка виконано */
+}
+
+.task-title {
+    flex-grow: 1;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: #333;
+}
+
+.toggle-description {
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.toggle-description:hover {
+    background: #e55600;
+}
+
+/* === Розгорнута частина задачі === */
+.task-details {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #ddd;
+}
+
+/* Опис задачі */
+.task-description {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: vertical;
+}
+
+/* === Поля в один рядок === */
+.task-fields-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.task-fields-row label {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    color: #444;
+    flex: 1 1 calc(33% - 12px);
+}
+
+.task-fields-row input,
+.task-fields-row select {
+    padding: 8px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 13px;
+    background: #fafafa;
+    transition: border 0.2s;
+}
+
+.task-fields-row input:focus,
+.task-fields-row select:focus {
+    outline: none;
+    border-color: #ff6600;
+}
+
+/* === Коментарі === */
+.task-comments {
+    margin-top: 10px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.task-comments h4 {
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.comment-item {
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+.comment-replies {
+    margin-left: 15px;
+    margin-top: 5px;
+    padding-left: 10px;
+    border-left: 2px solid #ddd;
+}
+
+.comment-reply {
+    font-size: 13px;
+    color: #555;
+    padding: 4px 0;
+}
+
+/* Додавання нового коментаря */
+.add-comment {
+    display: flex;
+    margin-top: 12px;
+    gap: 8px;
+}
+
+.add-comment input {
+    flex-grow: 1;
+    padding: 8px;
+    font-size: 13px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.add-comment button {
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.add-comment button:hover {
+    background: #e55600;
+}
+
+/* === Сумарний час === */
+.tasks-summary {
+    margin-top: 20px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+
+.task-type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    min-width: max-content;
+    margin-left: 4px;
+    /* невеликий відступ від дати */
+}
+
+.task-timer-info {
+    font-size: 12px;
+    color: #333;
+    background: #eef6ff;
+    /* світло-блакитний фон */
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid #cce0ff;
+    margin-right: 6px;
+    /* відступ перед датою */
+}
+
+.task-due-date {
+    font-size: 12px;
+    color: #666;
+    margin-right: 4px;
+    /* щоб не злипалось із типом */
+}
+
+.react-datepicker__month-container {
+    position: fixed;
+    /* робимо попап */
+    top: 50%;
+    /* по центру вертикально */
+    left: 50%;
+    /* по центру горизонтально */
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    /* поверх інших елементів */
+
+    background: #fff;
+    /* фон попапу */
+    border: 1px solid #ddd;
+    /* рамка */
+    border-radius: 8px;
+    /* заокруглення */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    /* тінь */
+    padding: 10px;
+}

@@ -1,0 +1,54 @@
+.add-task-row-inline {
+    display: inline-block;
+    position: relative;
+}
+
+.add-task-inline-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #666;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: color 0.2s ease;
+}
+
+.add-task-inline-btn:hover {
+    color: #000;
+    /* темніша при наведенні */
+}
+
+.add-task-inline-form {
+    margin-top: 6px;
+}
+
+.add-task-inline-form input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.add-task-dropdown {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ddd;
+    width: 250px;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 10;
+    margin-top: 4px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.add-task-dropdown .dropdown-item {
+    padding: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.add-task-dropdown .dropdown-item:hover {
+    background: #f3f3f3;
+}
