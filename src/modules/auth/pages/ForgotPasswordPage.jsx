@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../../../config";
 import AuthLayout from "../../../components/layout/AuthLayout/AuthLayout";
 import "./LoginPage.css";
 
@@ -16,7 +17,7 @@ export default function ForgotPasswordPage() {
         setMessage("");
         try {
             const res = await axios.post(
-                "https://tasks.fineko.space/api/auth/request-password-reset",
+                `${API_BASE_URL}/auth/request-password-reset`,
                 { email }
             );
             if (res.data && res.data.success) {

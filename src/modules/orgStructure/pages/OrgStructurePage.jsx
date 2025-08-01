@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../../components/layout/Layout";
 import axios from "axios";
+import { API_BASE_URL } from "../../../config";
 
 export default function OrgStructurePage() {
     const [tree, setTree] = useState([]);
@@ -10,10 +11,10 @@ export default function OrgStructurePage() {
             try {
                 const [posRes, userRes] = await Promise.all([
                     axios.get(
-                        "https://tasks.fineko.space/api/position"
+                        `${API_BASE_URL}/position`
                     ),
                     axios.get(
-                        "https://tasks.fineko.space/api/user"
+                        `${API_BASE_URL}/user`
                     ),
                 ]);
                 const positions = posRes.data;
