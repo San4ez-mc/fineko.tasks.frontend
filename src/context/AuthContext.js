@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 const AuthContext = createContext(null);
 
@@ -22,7 +23,7 @@ export function AuthProvider({ children }) {
   const login = async (username, password) => {
     try {
       const res = await axios.post(
-        "https://tasks.fineko.space/api/auth/login",
+        `${API_BASE_URL}/auth/login`,
         { username, password },
         {
           withCredentials: true,
@@ -42,7 +43,7 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await axios.post(
-        "https://tasks.fineko.space/api/auth/logout",
+        `${API_BASE_URL}/auth/logout`,
         {},
         {
           withCredentials: true,

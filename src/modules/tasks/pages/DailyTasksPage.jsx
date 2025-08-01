@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Layout from "../../../components/layout/Layout";
 import "./DailyTasksPage.css";
 import axios from "axios";
+import { API_BASE_URL } from "../../../config";
 
 import TaskFilters from "../components/TaskFilters";
 import TaskItem from "../components/TaskItem";
@@ -32,7 +33,7 @@ export default function DailyTasksPage() {
 
         axios
             .get(
-                `https://tasks.fineko.space/api/task/filter?${params.toString()}`
+                `${API_BASE_URL}/task/filter?${params.toString()}`
             )
             .then((res) => {
                 if (res.data && res.data.tasks) {
@@ -66,7 +67,7 @@ export default function DailyTasksPage() {
     const deleteTask = async (id) => {
         try {
             await axios.delete(
-                `https://tasks.fineko.space/api/task/delete?id=${id}`
+                `${API_BASE_URL}/task/delete?id=${id}`
             );
             setTasks((prev) => prev.filter((task) => task.id !== id));
         } catch (err) {
@@ -80,7 +81,7 @@ export default function DailyTasksPage() {
     const updateTaskField = async (id, field, value) => {
         try {
             const res = await axios.patch(
-                `https://tasks.fineko.space/api/task/update-field?id=${id}`,
+                `${API_BASE_URL}/task/update-field?id=${id}`,
                 { field, value }
             );
 
