@@ -2,13 +2,10 @@ import axios from 'axios';
 
 const client = axios.create({
     baseURL: 'https://api.tasks.fineko.space',
-    withCredentials: true, // важливо для cookie-сесії
-    headers: {
-        'Content-Type': 'application/json',
-    },
+    withCredentials: true,
+    headers: { 'Content-Type': 'application/json' },
 });
 
-// Перехоплювач для зручнішого дебагу
 client.interceptors.response.use(
     (r) => r,
     (err) => {

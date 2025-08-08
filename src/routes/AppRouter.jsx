@@ -1,5 +1,6 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
 import HomePage from "../pages/HomePage";
 import DailyTasksPage from "../modules/tasks/pages/DailyTasksPage";
 import ResultsPage from "../modules/results/pages/ResultsPage";
@@ -9,9 +10,8 @@ import LoginPage from "../modules/auth/pages/LoginPage";
 import ForgotPasswordPage from "../modules/auth/pages/ForgotPasswordPage";
 import ResetPasswordPage from "../modules/auth/pages/ResetPasswordPage";
 import NotFound from "../pages/NotFound";
+
 import { useAuth } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
-import ResultsPage from '../pages/ResultsPage';
 
 export default function AppRouter() {
     const { user } = useAuth();
@@ -22,23 +22,17 @@ export default function AppRouter() {
     return (
         <Router>
             <Routes>
+                {/* Публічні */}
                 <Route path="/auth" element={<LoginPage />} />
                 <Route path="/auth/forgot" element={<ForgotPasswordPage />} />
                 <Route path="/auth/reset/:token" element={<ResetPasswordPage />} />
+
+                {/* Приватні */}
                 <Route
                     path="/"
                     element={
                         <RequireAuth>
                             <HomePage />
-                        </RequireAuth>
-                    }
-                />
-                <Route path="/results" element={<ResultsPage />} />
-                <Route
-                    path="/tasks"
-                    element={
-                        <RequireAuth>
-                            <DailyTasksPage />
                         </RequireAuth>
                     }
                 />
@@ -51,6 +45,14 @@ export default function AppRouter() {
                     }
                 />
                 <Route
+                    path="/tasks"
+                    element={
+                        <RequireAuth>
+                            <DailyTasksPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
                     path="/org-structure"
                     element={
                         <RequireAuth>
@@ -58,7 +60,6 @@ export default function AppRouter() {
                         </RequireAuth>
                     }
                 />
-
                 <Route
                     path="/telegram-group"
                     element={
@@ -67,6 +68,7 @@ export default function AppRouter() {
                         </RequireAuth>
                     }
                 />
+
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>

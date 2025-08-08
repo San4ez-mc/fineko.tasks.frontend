@@ -1,172 +1,228 @@
-import React, { useEffect, useState } from "react";
-import Layout from "../../../components/layout/Layout";
-import axios from "axios";
-import { API_BASE_URL } from "../../../config";
-import "../../tasks/components/TaskItem.css";
-import "../../tasks/components/TaskFilters.css";
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+    getResults, getResult, createResult, updateResult, deleteResult, toggleResultComplete,
+} from '../api/results';
+import Pagination from '../../../shared/components/Pagination';
+import FiltersBar from '../../../shared/components/FiltersBar';
 
-// --- ResultFilters ---
-function ResultFilters({ filters, onChange, search, onSearchChange }) {
-    return (
-        <div className="task-filters-wrapper">
-            <div className="filters-row">
-                <input
-                    className="filter-select"
-                    type="text"
-                    placeholder="Пошук по назві/опису"
-                    value={search}
-                    onChange={e => onSearchChange(e.target.value)}
-                    style={{ minWidth: 200 }}
-                />
-                <input
-                    className="filter-select"
-                    type="date"
-                    value={filters.deadline || ""}
-                    onChange={e => onChange({ ...filters, deadline: e.target.value })}
-                />
-                <select
-                    className="filter-select"
-                    value={filters.creator || ""}
-                    onChange={e => onChange({ ...filters, creator: e.target.value })}
-                >
-                    <option value="">Всі автори</option>
-                    <option value="1">User 1</option>
-                    <option value="2">User 2</option>
-                </select>
-                <select
-                    className="filter-select"
-                    value={filters.sort || ""}
-                    onChange={e => onChange({ ...filters, sort: e.target.value })}
-                >
-                    <option value="">Без сортування</option>
-                    <option value="asc">За типом ↑</option>
-                    <option value="desc">За типом ↓</option>
-                </select>
-            </div>
-        </div>
-    );
-}
-
-// --- ResultItem ---
-function ResultItem({ result, expanded, onToggleExpand, onCreateTask, onToggleComplete }) {
-    return (
-        <div className={`task-card ${result.isCompleted ? "task-done" : ""}`}>
-            <div className="task-header">
-                <button
-                    className={`task-complete-btn ${result.isCompleted ? "completed" : ""}`}
-                    style={{ background: "none" }}
-                    onClick={() => onToggleComplete(result.id)}
-                >
-                    <span style={{ fontSize: 20 }}>✔</span>
-                </button>
-                <div className="task-title small-font task-title-center" style={{ flex: 1, textDecoration: result.isCompleted ? "line-through" : "none" }}>
-                    {result.title}
-                </div>
-                <div className="task-right-meta">
-                    {result.deadline && (
-                        <span className="task-due-date">До {result.deadline}</span>
-                    )}
-                    <button className="toggle-description" onClick={() => onToggleExpand(result.id)}>
-                        {expanded ? "▲" : "▼"}
-                    </button>
-                </div>
-            </div>
-            {expanded && (
-                <div className="task-details">
-                    <div style={{ marginBottom: 8, color: "#555" }}>{result.description}</div>
-                    <div style={{ marginBottom: 8, color: "#888" }}><b>Очікуваний результат:</b> {result.expected_result}</div>
-                    {/* Підрезультати (підготовка) */}
-                    {/* <div>Subresults тут...</div> */}
-                    <button className="task-timer-btn" style={{ marginRight: 10 }} onClick={() => onCreateTask(result)}>
-                        Створити задачу з результату
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-}
+const initialForm = { title: '', description: '', expected_result: '', deadline: '', parent_id: null };
 
 export default function ResultsPage() {
-    const [results, setResults] = useState([]);
+    const [list, setList] = useState([]);
+    const [pagination, setPagination] = useState({ page: 1, pageCount: 1, pageSize: 25, totalCount: 0 });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [filters, setFilters] = useState({ deadline: "", creator: "", sort: "" });
-    const [search, setSearch] = useState("");
-    const [expandedId, setExpandedId] = useState(null);
-    const [creatingTask, setCreatingTask] = useState(null);
+    const [createForm, setCreateForm] = useState(initialForm);
+    const [expanded, setExpanded] = useState({});
+    const [editingId, setEditingId] = useState(null);
+    const [editForm, setEditForm] = useState(initialForm);
+    const [filters, setFilters] = useState({ q: '', status: '' });
 
-    // Локальний статус завершення (тимчасово, поки немає на бекенді)
-    const [completedIds, setCompletedIds] = useState([]);
-
-    useEffect(() => {
+    const fetchPage = async (page = 1) => {
         setLoading(true);
-        const params = new URLSearchParams();
-        if (filters.deadline) params.append("date", filters.deadline);
-        if (filters.creator) params.append("creator", filters.creator);
-        if (filters.sort) params.append("sort", filters.sort);
-        axios
-            .get(`${API_BASE_URL}/result/index?${params.toString()}`)
-            .then((res) => {
-                setResults(res.data?.results || []);
-                setLoading(false);
-            })
-            .catch((err) => {
-                setError("Помилка завантаження результатів");
-                setLoading(false);
-            });
-    }, [filters]);
-
-    // Пошук по назві/опису
-    const filteredResults = results
-        .map(r => ({ ...r, isCompleted: completedIds.includes(r.id) }))
-        .filter(r =>
-        (!search ||
-            r.title?.toLowerCase().includes(search.toLowerCase()) ||
-            r.description?.toLowerCase().includes(search.toLowerCase())
-        )
-        );
-
-    // --- Дії ---
-    const handleToggleExpand = (id) => {
-        setExpandedId(expandedId === id ? null : id);
+        try {
+            const data = await getResults({ page, q: filters.q || undefined, status: filters.status || undefined });
+            setList(data.items || []);
+            setPagination(data.pagination || {});
+        } finally { setLoading(false); }
     };
-    const handleCreateTask = (result) => {
-        setCreatingTask(result);
-        alert(`Відкрити форму створення задачі для результату: ${result.title}`);
+
+    useEffect(() => { fetchPage(1); /* eslint-disable-line */ }, []);
+    const refreshCurrent = () => fetchPage(pagination.page || 1);
+
+    const onFiltersSubmit = () => fetchPage(1);
+    const onFiltersReset = () => { setFilters({ q: '', status: '' }); fetchPage(1); };
+    const onFiltersChange = (patch) => setFilters((s) => ({ ...s, ...patch }));
+
+    const onCreate = async (e) => {
+        e.preventDefault();
+        if (!createForm.title.trim()) return;
+        await createResult({
+            title: createForm.title.trim(),
+            description: createForm.description || null,
+            expected_result: createForm.expected_result || null,
+            deadline: createForm.deadline || null,
+            parent_id: createForm.parent_id || null,
+        });
+        setCreateForm(initialForm);
+        if (createForm.parent_id) setExpanded((s) => ({ ...s, [createForm.parent_id]: true }));
+        refreshCurrent();
     };
-    const handleToggleComplete = (id) => {
-        setCompletedIds((prev) => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+
+    const onDelete = async (id) => {
+        if (!window.confirm('Видалити результат?')) return;
+        await deleteResult(id);
+        refreshCurrent();
+    };
+
+    const onToggle = async (r) => {
+        await toggleResultComplete(r.id, !r.is_completed);
+        refreshCurrent();
+    };
+
+    const openEdit = (r) => {
+        setEditingId(r.id);
+        setEditForm({
+            title: r.title || '',
+            description: r.description || '',
+            expected_result: r.expected_result || '',
+            deadline: r.deadline || '',
+            parent_id: r.parent_id || null,
+        });
+    };
+    const cancelEdit = () => { setEditingId(null); setEditForm(initialForm); };
+    const saveEdit = async () => { await updateResult(editingId, editForm); setEditingId(null); refreshCurrent(); };
+
+    const toggleExpand = async (id) => {
+        const next = !expanded[id];
+        setExpanded((s) => ({ ...s, [id]: next }));
+        if (next) { try { await getResult(id); } catch (_) { } }
     };
 
     return (
-        <Layout>
-            <h2>Список результатів</h2>
-            <ResultFilters
-                filters={filters}
-                onChange={setFilters}
-                search={search}
-                onSearchChange={setSearch}
+        <div style={{ padding: 20, maxWidth: 1100, margin: '0 auto' }}>
+            <h1 style={{ marginBottom: 12 }}>Результати</h1>
+
+            <FiltersBar
+                q={filters.q}
+                status={filters.status}
+                onChange={onFiltersChange}
+                onSubmit={onFiltersSubmit}
+                onReset={onFiltersReset}
             />
-            {loading && <p>Завантаження результатів...</p>}
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            <div className="tasks-table">
-                {!loading && filteredResults.length === 0 && <p>Немає результатів</p>}
-                {filteredResults.map((result) => (
-                    <ResultItem
-                        key={result.id}
-                        result={result}
-                        expanded={expandedId === result.id}
-                        onToggleExpand={handleToggleExpand}
-                        onCreateTask={handleCreateTask}
-                        onToggleComplete={handleToggleComplete}
-                    />
-                ))}
-            </div>
-        </Layout>
+
+            {/* Створення */}
+            <form onSubmit={onCreate} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
+                <input type="text" placeholder="Назва *" value={createForm.title}
+                    onChange={(e) => setCreateForm((s) => ({ ...s, title: e.target.value }))} required />
+                <input type="text" placeholder="Опис" value={createForm.description}
+                    onChange={(e) => setCreateForm((s) => ({ ...s, description: e.target.value }))} />
+                <input type="text" placeholder="Очікуваний результат" value={createForm.expected_result}
+                    onChange={(e) => setCreateForm((s) => ({ ...s, expected_result: e.target.value }))} />
+                <input type="date" value={createForm.deadline}
+                    onChange={(e) => setCreateForm((s) => ({ ...s, deadline: e.target.value }))} />
+                <select value={createForm.parent_id || ''}
+                    onChange={(e) => setCreateForm((s) => ({ ...s, parent_id: e.target.value ? Number(e.target.value) : null }))}>
+                    <option value="">Без батька</option>
+                    {list.map((r) => <option key={r.id} value={r.id}>{`#${r.id} ${r.title}`}</option>)}
+                </select>
+                <button type="submit" style={{ gridColumn: '1 / -1' }}>Додати</button>
+            </form>
+
+            {/* Таблиця */}
+            {loading ? <p>Завантаження...</p> : (
+                <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '100%' }}>
+                    <thead>
+                        <tr style={{ background: '#fafafa' }}>
+                            <th style={{ width: 60 }}>ID</th>
+                            <th>Назва</th>
+                            <th style={{ width: 120 }}>Дедлайн</th>
+                            <th style={{ width: 140 }}>Задачі (вик/всього)</th>
+                            <th style={{ width: 100 }}>Статус</th>
+                            <th style={{ width: 280 }}>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {list.map((r) => (
+                            <React.Fragment key={r.id}>
+                                <tr>
+                                    <td>#{r.id}</td>
+                                    <td>
+                                        <button onClick={() => toggleExpand(r.id)} style={{ marginRight: 8 }}>
+                                            {expanded[r.id] ? '▾' : '▸'}
+                                        </button>
+                                        {r.title}
+                                    </td>
+                                    <td>{r.deadline || '—'}</td>
+                                    <td>{`${r.tasks_done}/${r.tasks_total}`}</td>
+                                    <td>{r.is_completed ? '✅ Виконано' : '❌ Активний'}</td>
+                                    <td>
+                                        <button onClick={() => onToggle(r)}>{r.is_completed ? 'Зняти виконання' : 'Позначити виконаним'}</button>
+                                        <button onClick={() => openEdit(r)} style={{ marginLeft: 8 }}>Редагувати</button>
+                                        <button onClick={() => onDelete(r.id)} style={{ marginLeft: 8, color: 'crimson' }}>Видалити</button>
+                                    </td>
+                                </tr>
+
+                                {expanded[r.id] && (
+                                    <tr>
+                                        <td colSpan={6} style={{ background: '#fcfcff' }}>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                                <div>
+                                                    <h4 style={{ margin: '8px 0' }}>Деталі</h4>
+                                                    <div><b>Опис:</b> {r.description || '—'}</div>
+                                                    <div><b>Очікуваний результат:</b> {r.expected_result || '—'}</div>
+                                                    <div><b>Дедлайн:</b> {r.deadline || '—'}</div>
+                                                    <div><b>Підрезультатів:</b> {r.children_count}</div>
+                                                </div>
+                                                <div>
+                                                    <h4 style={{ margin: '8px 0' }}>Додати підрезультат</h4>
+                                                    <SubresultInlineForm parentId={r.id} onAdded={refreshCurrent} />
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+
+                                {editingId === r.id && (
+                                    <tr>
+                                        <td colSpan={6} style={{ background: '#fff9f2' }}>
+                                            <h4 style={{ margin: '8px 0' }}>Редагувати результат</h4>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 140px 1fr', gap: 8 }}>
+                                                <input type="text" placeholder="Назва *" value={editForm.title}
+                                                    onChange={(e) => setEditForm((s) => ({ ...s, title: e.target.value }))} />
+                                                <input type="text" placeholder="Опис" value={editForm.description}
+                                                    onChange={(e) => setEditForm((s) => ({ ...s, description: e.target.value }))} />
+                                                <input type="text" placeholder="Очікуваний результат" value={editForm.expected_result}
+                                                    onChange={(e) => setEditForm((s) => ({ ...s, expected_result: e.target.value }))} />
+                                                <input type="date" value={editForm.deadline || ''}
+                                                    onChange={(e) => setEditForm((s) => ({ ...s, deadline: e.target.value }))} />
+                                                <select value={editForm.parent_id || ''}
+                                                    onChange={(e) => setEditForm((s) => ({ ...s, parent_id: e.target.value ? Number(e.target.value) : null }))}>
+                                                    <option value="">Без батька</option>
+                                                    {list.filter(x => x.id !== r.id).map((x) => (
+                                                        <option key={x.id} value={x.id}>{`#${x.id} ${x.title}`}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div style={{ marginTop: 10 }}>
+                                                <button onClick={saveEdit}>Зберегти</button>
+                                                <button onClick={cancelEdit} style={{ marginLeft: 8 }}>Скасувати</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+
+            <Pagination page={pagination.page} pageCount={pagination.pageCount} onChange={(p) => fetchPage(p)} />
+        </div>
     );
 }
 
-// --- Стилі Asana ---
-// Для швидкого старту використовуйте TaskItem.css/TaskFilters.css, або додайте імпорт тут:
-// import "../../tasks/components/TaskItem.css";
-// import "../../tasks/components/TaskFilters.css";
+function SubresultInlineForm({ parentId, onAdded }) {
+    const [form, setForm] = useState({ title: '', description: '', expected_result: '', deadline: '' });
+    const createSub = async (e) => {
+        e.preventDefault();
+        if (!form.title.trim()) return;
+        await createResult({
+            title: form.title.trim(),
+            description: form.description || null,
+            expected_result: form.expected_result || null,
+            deadline: form.deadline || null,
+            parent_id: parentId,
+        });
+        setForm({ title: '', description: '', expected_result: '', deadline: '' });
+        onAdded?.();
+    };
+    return (
+        <form onSubmit={createSub} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr 1fr auto', gap: 8 }}>
+            <input type="text" placeholder="Назва *" value={form.title} onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))} required />
+            <input type="text" placeholder="Опис" value={form.description} onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))} />
+            <input type="text" placeholder="Очікуваний результат" value={form.expected_result} onChange={(e) => setForm((s) => ({ ...s, expected_result: e.target.value }))} />
+            <input type="date" value={form.deadline} onChange={(e) => setForm((s) => ({ ...s, deadline: e.target.value }))} />
+            <button type="submit">Додати</button>
+        </form>
+    );
+}
