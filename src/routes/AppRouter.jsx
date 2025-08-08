@@ -11,6 +11,7 @@ import ResetPasswordPage from "../modules/auth/pages/ResetPasswordPage";
 import NotFound from "../pages/NotFound";
 import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
+import ResultsPage from '../pages/ResultsPage';
 
 export default function AppRouter() {
     const { user } = useAuth();
@@ -32,6 +33,7 @@ export default function AppRouter() {
                         </RequireAuth>
                     }
                 />
+                <Route path="/results" element={<ResultsPage />} />
                 <Route
                     path="/tasks"
                     element={
