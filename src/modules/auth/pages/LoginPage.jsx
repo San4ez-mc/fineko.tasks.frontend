@@ -14,11 +14,16 @@ export default function LoginPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const ok = await login(username, password);
-        if (ok) {
-            navigate("/");
-        } else {
-            setError("Невірний логін або пароль");
+        try {
+            const user = await login({ username, password }); // ✅ передаємо як об’єкт
+            if (user) {
+                navigate("/results"); // або на потрібну стартову сторінку
+            } else {
+                setError("Невірний логін або пароль");
+            }
+        } catch (err) {
+            console.error(err);
+            setError("Помилка авторизації");
         }
     };
 
