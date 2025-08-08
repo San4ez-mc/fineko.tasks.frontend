@@ -244,3 +244,18 @@ RTK Query/React Query для кешу списків (коли з’являть
 
 Тести критичних екранів.
 
+## Конфігурація середовища (API, ключі, посилання)
+
+Усі базові посилання, API-ендпоінти, токени, ключі до сторонніх сервісів зберігаються централізовано в одному файлі.
+
+**Файл:** `src/config/env.js`
+
+**Приклад вмісту:**
+```js
+const config = {
+  apiBaseUrl: "https://api.tasks.fineko.space",
+  // telegramBotToken: "...",
+  // threadsApiKey: "...",
+};
+
+export default config;

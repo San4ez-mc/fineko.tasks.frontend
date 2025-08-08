@@ -1,59 +1,24 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
-import { API_BASE_URL } from "../config";
+import React, { createContext, useContext, useState } from "react";
+import api from "../services/api";
 
 const AuthContext = createContext(null);
 
-
 export function AuthProvider({ children }) {
-
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored));
-      } catch (e) {
-        console.error("Failed to parse stored user", e);
-      }
-    }
-  }, []);
-
-  const login = async (username, password) => {
-    try {
-      const res = await axios.post(
-        `${API_BASE_URL}/auth/login`,
-        { username, password },
-        {
-          withCredentials: true,
-        }
-      );
-      if (res.data && res.data.success) {
-        setUser(res.data.user);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        return true;
-      }
-    } catch (e) {
-      console.error("Login error", e);
-    }
-    return false;
+  const login = async ({ username, password }) => {
+    const { data } = await api.post("/auth/login", { username, password });
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
+    setUser(data.user);
+    return data.user;
   };
 
-  const logout = async () => {
-    try {
-      await axios.post(
-        `${API_BASE_URL}/auth/logout`,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
-    } catch (e) {
-      // ignore
-    }
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     setUser(null);
-    localStorage.removeItem("user");
+    // опційно редірект на /login
   };
 
   return (
@@ -61,9 +26,6 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);
