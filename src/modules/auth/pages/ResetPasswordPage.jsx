@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { API_BASE_URL } from "../../../config/env";
+import { API_BASE_URL } from "../../../config";
 import AuthLayout from "../../../components/layout/AuthLayout/AuthLayout";
 import "./LoginPage.css";
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../../config/env"; // джерело правди
+import { API_BASE_URL } from "../../config"; // джерело правди
 
 // ВАЖЛИВО: без withCredentials (кукі не шлемо)
 const client = axios.create({
