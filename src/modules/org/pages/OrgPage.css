@@ -1,0 +1,75 @@
+.org-layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  height: 100%;
+}
+
+.org-left {
+  padding: 12px;
+  border-right: 1px solid var(--border);
+}
+
+.org-canvas {
+  position: relative;
+  overflow: auto;
+  background: var(--bg);
+}
+
+.org-canvas-inner {
+  transform-origin: 0 0;
+}
+
+.org-node {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 10px;
+  min-width: 220px;
+  margin: 8px;
+}
+
+.org-node .title {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.org-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.org-filters .rf-search {
+  flex: 1 1 100%;
+}
+
+.org-table td .btn.ghost {
+  padding: 0;
+}
+
+.product-value {
+  resize: vertical;
+}
+
+.zoom-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+}
+
+.is-highlighted {
+  outline: 2px solid var(--blue);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue) 15%, transparent);
+}
+
+.droppable-ok {
+  outline: 2px dashed #10B981;
+}
+
+.droppable-deny {
+  outline: 2px dashed #EF4444;
+}

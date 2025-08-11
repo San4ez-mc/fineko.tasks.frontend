@@ -117,7 +117,7 @@ export default function Sidebar({
                         </li>
                         <li>
                             <NavLink
-                                to="/org-structure"
+                                to="/org"
                                 className={({ isActive }) =>
                                     isActive ? "active" : ""
                                 }
