@@ -75,11 +75,13 @@ export default function Layout({ children }) {
                 className="sidebar-handle left-handle"
                 aria-label="Toggle left sidebar"
                 onClick={toggleLeft}
+                type="button"
             />
             <button
                 className="sidebar-handle right-handle"
                 aria-label="Toggle right sidebar"
                 onClick={toggleRight}
+                type="button"
             />
         </div>
     );
