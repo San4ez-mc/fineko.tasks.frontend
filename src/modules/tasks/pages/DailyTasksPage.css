@@ -7,6 +7,64 @@
     margin-bottom: 20px;
 }
 
+/* === Шапка сторінки з заголовком та діями === */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.page-header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-header-title h1 {
+    margin: 0;
+    font-size: var(--fz-h);
+    color: var(--text);
+}
+
+.page-header-assignee {
+    font-size: var(--fz-base);
+    color: var(--text-muted);
+}
+
+.page-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.page-header-actions button {
+    font-size: var(--fz-base);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.page-header-actions .btn-add {
+    background: var(--primary);
+    color: #fff;
+}
+
+.page-header-actions .btn-add:hover {
+    opacity: 0.9;
+}
+
+.page-header-actions .btn-move {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.page-header-actions .btn-move:hover {
+    background: var(--bg);
+}
+
 .date-title {
     font-size: 22px;
     font-weight: 600;
