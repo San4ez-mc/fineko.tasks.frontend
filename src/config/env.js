@@ -18,4 +18,5 @@ export const API_BASE_URL = raw.replace(/\/+$/, "");
 // Можеш додати тут інші конфіги за потреби, напр. таймаути тощо.
 // export const REQUEST_TIMEOUT_MS = 20000;
 
-export default { API_BASE_URL };
+const env = { API_BASE_URL };
+export default env;

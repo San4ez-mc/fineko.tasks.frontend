@@ -120,17 +120,6 @@ export default function DailyTasksPage() {
     }, [selectedDate]);
 
     /**
-     * ✅ Локальне оновлення поля без бекенду (використовуємо для попереднього перегляду)
-     */
-    const updateTaskLocal = (id, field, value) => {
-        setTasks((prev) =>
-            prev.map((task) =>
-                task.id === id ? { ...task, [field]: value } : task
-            )
-        );
-    };
-
-    /**
      * ✅ Перемикаємо статус виконання задачі (бекенд-оновлення)
      */
     const toggleTaskCompletion = (id) => {
