@@ -5,6 +5,7 @@ import HomePage from "../pages/HomePage";
 import DailyTasksPage from "../modules/tasks/pages/DailyTasksPage";
 import ResultsPage from "../modules/results/pages/ResultsPage";
 import TemplatesPage from "../modules/templates/pages/TemplatesPage";
+import BusinessProcessesPage from "../modules/processes/pages/BusinessProcessesPage";
 import OrgPage from "../modules/org/pages/OrgPage";
 import TelegramGroupPage from "../modules/telegram/pages/TelegramGroupPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
@@ -58,6 +59,14 @@ export default function AppRouter() {
                     element={
                         <RequireAuth>
                             <DailyTasksPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/business-processes"
+                    element={
+                        <RequireAuth>
+                            <BusinessProcessesPage />
                         </RequireAuth>
                     }
                 />
