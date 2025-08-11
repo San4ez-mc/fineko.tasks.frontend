@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { API_BASE_URL } from "../../../config";
+import { API_BASE_URL } from "../../../config/env";
 import AuthLayout from "../../../components/layout/AuthLayout/AuthLayout";
 import "./LoginPage.css";
 
@@ -21,9 +21,7 @@ export default function ForgotPasswordPage() {
                 { email }
             );
             if (res.data && res.data.success) {
-                setMessage(
-                    "Лист із посиланням для відновлення паролю надіслано."
-                );
+                setMessage("Лист із посиланням для відновлення паролю надіслано.");
             } else {
                 setError(res.data.message || "Сталася помилка");
             }

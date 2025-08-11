@@ -17,7 +17,7 @@ export default function LoginPage() {
         try {
             const user = await login({ username, password }); // ✅ передаємо як об’єкт
             if (user) {
-                navigate("/results"); // або на потрібну стартову сторінку
+                navigate("/home"); // або на потрібну стартову сторінку
             } else {
                 setError("Невірний логін або пароль");
             }

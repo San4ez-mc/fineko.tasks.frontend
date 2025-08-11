@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Layout from '../../../components/layout/Layout.jsx';
 import {
     getResults, getResult, createResult, updateResult, deleteResult, toggleResultComplete,
 } from '../api/results';
 import Pagination from '../../../shared/components/Pagination';
 import FiltersBar from '../../../shared/components/FiltersBar';
+import './ResultsPage.css';
 
 const initialForm = { title: '', description: '', expected_result: '', deadline: '', parent_id: null };
 
@@ -79,125 +81,170 @@ export default function ResultsPage() {
     };
 
     return (
-        <div style={{ padding: 20, maxWidth: 1100, margin: '0 auto' }}>
-            <h1 style={{ marginBottom: 12 }}>Результати</h1>
+        <Layout>
+            <div className="results-page">
+                <div className="results-page__header">
+                    <h1>Результати</h1>
+                </div>
 
-            <FiltersBar
-                q={filters.q}
-                status={filters.status}
-                onChange={onFiltersChange}
-                onSubmit={onFiltersSubmit}
-                onReset={onFiltersReset}
-            />
+                <div className="results-page__filters">
+                    <FiltersBar
+                        q={filters.q}
+                        status={filters.status}
+                        onChange={onFiltersChange}
+                        onSubmit={onFiltersSubmit}
+                        onReset={onFiltersReset}
+                    />
+                </div>
 
-            {/* Створення */}
-            <form onSubmit={onCreate} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
-                <input type="text" placeholder="Назва *" value={createForm.title}
-                    onChange={(e) => setCreateForm((s) => ({ ...s, title: e.target.value }))} required />
-                <input type="text" placeholder="Опис" value={createForm.description}
-                    onChange={(e) => setCreateForm((s) => ({ ...s, description: e.target.value }))} />
-                <input type="text" placeholder="Очікуваний результат" value={createForm.expected_result}
-                    onChange={(e) => setCreateForm((s) => ({ ...s, expected_result: e.target.value }))} />
-                <input type="date" value={createForm.deadline}
-                    onChange={(e) => setCreateForm((s) => ({ ...s, deadline: e.target.value }))} />
-                <select value={createForm.parent_id || ''}
-                    onChange={(e) => setCreateForm((s) => ({ ...s, parent_id: e.target.value ? Number(e.target.value) : null }))}>
-                    <option value="">Без батька</option>
-                    {list.map((r) => <option key={r.id} value={r.id}>{`#${r.id} ${r.title}`}</option>)}
-                </select>
-                <button type="submit" style={{ gridColumn: '1 / -1' }}>Додати</button>
-            </form>
+                <form className="results-create-form" onSubmit={onCreate}>
+                    <input
+                        type="text"
+                        placeholder="Назва *"
+                        value={createForm.title}
+                        onChange={(e) => setCreateForm((s) => ({ ...s, title: e.target.value }))}
+                        required
+                    />
+                    <input
+                        type="text"
+                        placeholder="Опис"
+                        value={createForm.description}
+                        onChange={(e) => setCreateForm((s) => ({ ...s, description: e.target.value }))}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Очікуваний результат"
+                        value={createForm.expected_result}
+                        onChange={(e) => setCreateForm((s) => ({ ...s, expected_result: e.target.value }))}
+                    />
+                    <input
+                        type="date"
+                        value={createForm.deadline}
+                        onChange={(e) => setCreateForm((s) => ({ ...s, deadline: e.target.value }))}
+                    />
+                    <select
+                        value={createForm.parent_id || ''}
+                        onChange={(e) => setCreateForm((s) => ({ ...s, parent_id: e.target.value ? Number(e.target.value) : null }))}
+                    >
+                        <option value="">Без батька</option>
+                        {list.map((r) => <option key={r.id} value={r.id}>{`#${r.id} ${r.title}`}</option>)}
+                    </select>
+                    <button type="submit" className="btn-primary">Додати</button>
+                </form>
 
-            {/* Таблиця */}
-            {loading ? <p>Завантаження...</p> : (
-                <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '100%' }}>
-                    <thead>
-                        <tr style={{ background: '#fafafa' }}>
-                            <th style={{ width: 60 }}>ID</th>
-                            <th>Назва</th>
-                            <th style={{ width: 120 }}>Дедлайн</th>
-                            <th style={{ width: 140 }}>Задачі (вик/всього)</th>
-                            <th style={{ width: 100 }}>Статус</th>
-                            <th style={{ width: 280 }}>Дії</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.map((r) => (
-                            <React.Fragment key={r.id}>
-                                <tr>
-                                    <td>#{r.id}</td>
-                                    <td>
-                                        <button onClick={() => toggleExpand(r.id)} style={{ marginRight: 8 }}>
-                                            {expanded[r.id] ? '▾' : '▸'}
-                                        </button>
-                                        {r.title}
-                                    </td>
-                                    <td>{r.deadline || '—'}</td>
-                                    <td>{`${r.tasks_done}/${r.tasks_total}`}</td>
-                                    <td>{r.is_completed ? '✅ Виконано' : '❌ Активний'}</td>
-                                    <td>
-                                        <button onClick={() => onToggle(r)}>{r.is_completed ? 'Зняти виконання' : 'Позначити виконаним'}</button>
-                                        <button onClick={() => openEdit(r)} style={{ marginLeft: 8 }}>Редагувати</button>
-                                        <button onClick={() => onDelete(r.id)} style={{ marginLeft: 8, color: 'crimson' }}>Видалити</button>
-                                    </td>
-                                </tr>
-
-                                {expanded[r.id] && (
+                {loading ? (
+                    <p className="results-loader">Завантаження...</p>
+                ) : (
+                    <table className="results-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: 60 }}>ID</th>
+                                <th>Назва</th>
+                                <th style={{ width: 120 }}>Дедлайн</th>
+                                <th style={{ width: 140 }}>Задачі (вик/всього)</th>
+                                <th style={{ width: 100 }}>Статус</th>
+                                <th style={{ width: 280 }}>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {list.map((r) => (
+                                <React.Fragment key={r.id}>
                                     <tr>
-                                        <td colSpan={6} style={{ background: '#fcfcff' }}>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                                <div>
-                                                    <h4 style={{ margin: '8px 0' }}>Деталі</h4>
-                                                    <div><b>Опис:</b> {r.description || '—'}</div>
-                                                    <div><b>Очікуваний результат:</b> {r.expected_result || '—'}</div>
-                                                    <div><b>Дедлайн:</b> {r.deadline || '—'}</div>
-                                                    <div><b>Підрезультатів:</b> {r.children_count}</div>
-                                                </div>
-                                                <div>
-                                                    <h4 style={{ margin: '8px 0' }}>Додати підрезультат</h4>
-                                                    <SubresultInlineForm parentId={r.id} onAdded={refreshCurrent} />
-                                                </div>
-                                            </div>
+                                        <td>#{r.id}</td>
+                                        <td>
+                                            <button className="expander" onClick={() => toggleExpand(r.id)}>
+                                                {expanded[r.id] ? '▾' : '▸'}
+                                            </button>
+                                            {r.title}
+                                        </td>
+                                        <td>{r.deadline || '—'}</td>
+                                        <td>{`${r.tasks_done}/${r.tasks_total}`}</td>
+                                        <td>{r.is_completed ? '✅ Виконано' : '❌ Активний'}</td>
+                                        <td className="actions">
+                                            <button className="btn-secondary" onClick={() => onToggle(r)}>
+                                                {r.is_completed ? 'Зняти виконання' : 'Позначити виконаним'}
+                                            </button>
+                                            <button className="btn-secondary" onClick={() => openEdit(r)}>Редагувати</button>
+                                            <button className="btn-danger" onClick={() => onDelete(r.id)}>Видалити</button>
                                         </td>
                                     </tr>
-                                )}
 
-                                {editingId === r.id && (
-                                    <tr>
-                                        <td colSpan={6} style={{ background: '#fff9f2' }}>
-                                            <h4 style={{ margin: '8px 0' }}>Редагувати результат</h4>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 140px 1fr', gap: 8 }}>
-                                                <input type="text" placeholder="Назва *" value={editForm.title}
-                                                    onChange={(e) => setEditForm((s) => ({ ...s, title: e.target.value }))} />
-                                                <input type="text" placeholder="Опис" value={editForm.description}
-                                                    onChange={(e) => setEditForm((s) => ({ ...s, description: e.target.value }))} />
-                                                <input type="text" placeholder="Очікуваний результат" value={editForm.expected_result}
-                                                    onChange={(e) => setEditForm((s) => ({ ...s, expected_result: e.target.value }))} />
-                                                <input type="date" value={editForm.deadline || ''}
-                                                    onChange={(e) => setEditForm((s) => ({ ...s, deadline: e.target.value }))} />
-                                                <select value={editForm.parent_id || ''}
-                                                    onChange={(e) => setEditForm((s) => ({ ...s, parent_id: e.target.value ? Number(e.target.value) : null }))}>
-                                                    <option value="">Без батька</option>
-                                                    {list.filter(x => x.id !== r.id).map((x) => (
-                                                        <option key={x.id} value={x.id}>{`#${x.id} ${x.title}`}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <div style={{ marginTop: 10 }}>
-                                                <button onClick={saveEdit}>Зберегти</button>
-                                                <button onClick={cancelEdit} style={{ marginLeft: 8 }}>Скасувати</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+                                    {expanded[r.id] && (
+                                        <tr className="row-expanded">
+                                            <td colSpan={6}>
+                                                <div className="expanded-grid">
+                                                    <div>
+                                                        <h4>Деталі</h4>
+                                                        <div><b>Опис:</b> {r.description || '—'}</div>
+                                                        <div><b>Очікуваний результат:</b> {r.expected_result || '—'}</div>
+                                                        <div><b>Дедлайн:</b> {r.deadline || '—'}</div>
+                                                        <div><b>Підрезультатів:</b> {r.children_count}</div>
+                                                    </div>
+                                                    <div>
+                                                        <h4>Додати підрезультат</h4>
+                                                        <SubresultInlineForm parentId={r.id} onAdded={refreshCurrent} />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
 
-            <Pagination page={pagination.page} pageCount={pagination.pageCount} onChange={(p) => fetchPage(p)} />
-        </div>
+                                    {editingId === r.id && (
+                                        <tr className="row-edit">
+                                            <td colSpan={6}>
+                                                <h4>Редагувати результат</h4>
+                                                <div className="edit-grid">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Назва *"
+                                                        value={editForm.title}
+                                                        onChange={(e) => setEditForm((s) => ({ ...s, title: e.target.value }))}
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Опис"
+                                                        value={editForm.description}
+                                                        onChange={(e) => setEditForm((s) => ({ ...s, description: e.target.value }))}
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Очікуваний результат"
+                                                        value={editForm.expected_result}
+                                                        onChange={(e) => setEditForm((s) => ({ ...s, expected_result: e.target.value }))}
+                                                    />
+                                                    <input
+                                                        type="date"
+                                                        value={editForm.deadline || ''}
+                                                        onChange={(e) => setEditForm((s) => ({ ...s, deadline: e.target.value }))}
+                                                    />
+                                                    <select
+                                                        value={editForm.parent_id || ''}
+                                                        onChange={(e) => setEditForm((s) => ({ ...s, parent_id: e.target.value ? Number(e.target.value) : null }))}
+                                                    >
+                                                        <option value="">Без батька</option>
+                                                        {list.filter(x => x.id !== r.id).map((x) => (
+                                                            <option key={x.id} value={x.id}>{`#${x.id} ${x.title}`}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="edit-actions">
+                                                    <button className="btn-primary" onClick={saveEdit}>Зберегти</button>
+                                                    <button className="btn-secondary" onClick={cancelEdit}>Скасувати</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+
+                <div className="results-page__pagination">
+                    <Pagination page={pagination.page} pageCount={pagination.pageCount} onChange={(p) => fetchPage(p)} />
+                </div>
+            </div>
+        </Layout>
     );
 }
 
@@ -217,12 +264,32 @@ function SubresultInlineForm({ parentId, onAdded }) {
         onAdded?.();
     };
     return (
-        <form onSubmit={createSub} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr 1fr auto', gap: 8 }}>
-            <input type="text" placeholder="Назва *" value={form.title} onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))} required />
-            <input type="text" placeholder="Опис" value={form.description} onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))} />
-            <input type="text" placeholder="Очікуваний результат" value={form.expected_result} onChange={(e) => setForm((s) => ({ ...s, expected_result: e.target.value }))} />
-            <input type="date" value={form.deadline} onChange={(e) => setForm((s) => ({ ...s, deadline: e.target.value }))} />
-            <button type="submit">Додати</button>
+        <form className="subresult-form" onSubmit={createSub}>
+            <input
+                type="text"
+                placeholder="Назва *"
+                value={form.title}
+                onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))}
+                required
+            />
+            <input
+                type="text"
+                placeholder="Опис"
+                value={form.description}
+                onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
+            />
+            <input
+                type="text"
+                placeholder="Очікуваний результат"
+                value={form.expected_result}
+                onChange={(e) => setForm((s) => ({ ...s, expected_result: e.target.value }))}
+            />
+            <input
+                type="date"
+                value={form.deadline}
+                onChange={(e) => setForm((s) => ({ ...s, deadline: e.target.value }))}
+            />
+            <button type="submit" className="btn-secondary">Додати</button>
         </form>
     );
 }
