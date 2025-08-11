@@ -1,19 +1,30 @@
 .sidebar {
-    background: var(--primary);
-    color: #fff;
-    height: 100%;
-    transition: width var(--transition);
-    overflow: hidden;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow);
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
+    transition: transform var(--transition);
+    z-index: 100;
 }
 
-.sidebar.collapsed {
-    width: var(--sidebar-collapsed);
+.sidebar.left {
+    left: 0;
+    transform: translateX(-100%);
+}
+
+.sidebar.right {
+    right: 0;
+    transform: translateX(100%);
 }
 
 .sidebar.expanded {
-    width: var(--sidebar-width);
+    transform: translateX(0);
 }
 
 /* Верхня панель */
@@ -28,7 +39,7 @@
 .sidebar-toggle {
     background: none;
     border: none;
-    color: #fff;
+    color: inherit;
     cursor: pointer;
 }
 
@@ -49,13 +60,13 @@
     align-items: center;
     padding: 10px 15px;
     text-decoration: none;
-    color: #fff;
+    color: inherit;
     font-size: 13px;
-    transition: background 0.2s;
+    transition: background var(--transition);
 }
 
 .sidebar nav ul li a:hover {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--bg);
 }
 
 .menu-icon {
@@ -68,3 +79,4 @@
 .menu-text {
     white-space: nowrap;
 }
+

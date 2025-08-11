@@ -1,19 +1,24 @@
 .layout {
-    display: grid;
-    grid-template-columns: var(--sidebar-width) 1fr;
-    height: 100vh;
+    position: relative;
+    min-height: 100vh;
     background: var(--bg);
-}
-
-.layout.collapsed-sidebar {
-    grid-template-columns: var(--sidebar-collapsed) 1fr;
 }
 
 .layout-column {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    margin-left: 0;
+    margin-right: 0;
+    transition: margin var(--transition);
+}
+
+.layout.left-open .layout-column {
+    margin-left: var(--sidebar-width);
+}
+
+.layout.right-open .layout-column {
+    margin-right: var(--sidebar-width);
 }
 
 .layout-content {
@@ -21,6 +26,54 @@
     min-height: 0;
     overflow-y: auto;
     padding: 20px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+/* sidebar handles */
+.sidebar-handle {
+    position: fixed;
+    top: 50%;
+    width: 16px;
+    height: 80px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 110;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition);
+}
+
+.sidebar-handle:hover {
     background: var(--bg);
+}
+
+.sidebar-handle::before {
+    content: "";
+    width: 4px;
+    height: 24px;
+    background: repeating-linear-gradient(
+        to right,
+        var(--border),
+        var(--border) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    border-radius: 2px;
+}
+
+.sidebar-handle-left {
+    left: 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.sidebar-handle-right {
+    right: 0;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
 
