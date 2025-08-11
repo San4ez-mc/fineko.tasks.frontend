@@ -5,7 +5,7 @@ import HomePage from "../pages/HomePage";
 import DailyTasksPage from "../modules/tasks/pages/DailyTasksPage";
 import ResultsPage from "../modules/results/pages/ResultsPage";
 import TemplatesPage from "../modules/templates/pages/TemplatesPage";
-import OrgStructurePage from "../modules/orgStructure/pages/OrgStructurePage";
+import OrgPage from "../modules/org/pages/OrgPage";
 import TelegramGroupPage from "../modules/telegram/pages/TelegramGroupPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
 import ForgotPasswordPage from "../modules/auth/pages/ForgotPasswordPage";
@@ -62,10 +62,10 @@ export default function AppRouter() {
                     }
                 />
                 <Route
-                    path="/org-structure"
+                    path="/org"
                     element={
                         <RequireAuth>
-                            <OrgStructurePage />
+                            <OrgPage />
                         </RequireAuth>
                     }
                 />
