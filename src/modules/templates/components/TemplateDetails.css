@@ -1,0 +1,32 @@
+@import "../../../styles/variables.css";
+
+.tpl-details{
+  display:grid; grid-template-columns: 1fr 1fr; gap:16px;
+  padding: 12px 12px 16px 40px; background:#fff; border-bottom:1px solid var(--border);
+}
+.td-col{ display:grid; gap:16px; }
+.td-block{ background:#fff; border:1px solid var(--border); border-radius: var(--radius); padding:12px; }
+.td-block h4{ margin:0 0 10px; color: var(--navy); }
+
+.td-line{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.td-line .k{ color: var(--text-muted); min-width:140px; }
+.td-row{ display:flex; align-items:center; gap:10px; }
+.link{ color: var(--blue); text-decoration:none; }
+
+.td-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+
+.td-actions{ margin-top:12px; display:flex; gap:8px; }
+
+.td-comments{ display:grid; gap:10px; }
+.td-comment .c-head{ font-size: var(--fz-sm); color: var(--text-muted); }
+.td-comment .c-text{ margin-top:4px; }
+
+.td-add-comment{ margin-top:8px; display:flex; gap:8px; }
+
+.td-usage{ display:grid; gap:8px; }
+.td-usage-item{
+  display:flex; align-items:center; gap:10px; padding:8px; border:1px solid var(--border);
+  border-radius: var(--radius-sm); text-decoration:none; color: var(--text);
+}
+.td-usage-item .t-title{ flex:1; }
+.td-usage-item .t-date{ font-size: var(--fz-sm); color: var(--text-muted); }

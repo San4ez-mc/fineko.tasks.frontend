@@ -1,0 +1,27 @@
+@import "../../../styles/variables.css";
+
+.tpl-row{
+  display:grid; grid-template-columns: 28px 1.2fr 1fr auto;
+  gap:12px; align-items:center; padding:12px;
+  border-bottom:1px solid var(--border); background:#fff;
+}
+.tpl-row:hover{ box-shadow: var(--shadow); }
+
+.tpl-row .caret{
+  border:1px solid var(--border); background:#fff; border-radius:8px;
+  width:28px; height:28px; cursor:pointer;
+}
+
+.tpl-row .title{
+  font-weight:600; color:var(--navy); text-decoration:none;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.tpl-row .meta{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  font-size: var(--fz-sm);
+}
+.tpl-row .link{ color: var(--blue); text-decoration:none; }
+.tpl-row .muted{ color: var(--text-muted); }
+
+.tpl-row .actions{ display:flex; gap:8px; flex-wrap:wrap; justify-self:end; }
