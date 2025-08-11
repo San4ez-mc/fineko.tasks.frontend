@@ -1,0 +1,47 @@
+@import "../../../styles/variables.css";
+
+.org-node{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding:10px;
+  min-width:220px;
+  max-width:360px;
+  margin:10px;
+}
+
+.org-node .head{
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+.org-node .caret{
+  width:28px; height:28px; border:1px solid var(--border);
+  background:#fff; border-radius:8px; cursor:pointer;
+}
+.org-node .title{
+  font-weight:600; color:var(--navy); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.org-node .badge{ margin-left:auto; }
+
+.unit-meta .line,
+.pos-meta .line{
+  display:flex; align-items:center; gap:8px; margin-top:6px;
+}
+.line .k{ color: var(--text-muted); min-width:80px; }
+
+.unit-actions, .pos-actions{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+
+.children{
+  display:flex; flex-wrap:wrap; align-items:flex-start; margin-top:6px; padding-left:18px;
+  border-left:2px dashed color-mix(in srgb, var(--navy) 20%, transparent);
+}
+
+/* типи вузлів */
+.is-division{ border-color: color-mix(in srgb, var(--blue) 30%, var(--border)); }
+.is-department{ border-color: color-mix(in srgb, var(--rush) 30%, var(--border)); }
+.is-position{ border-color: color-mix(in srgb, var(--navy) 25%, var(--border)); }
+
+/* підсвітка пошуку та DnD */
+.is-highlighted{ outline:2px solid var(--blue); box-shadow:0 0 0 4px color-mix(in srgb, var(--blue) 15%, transparent); }
+.droppable-ok{ outline:2px dashed #10B981; }
+.droppable-deny{ outline:2px dashed #EF4444; }
