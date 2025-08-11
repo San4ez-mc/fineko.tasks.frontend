@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import HomePage from "../pages/HomePage";
 import DailyTasksPage from "../modules/tasks/pages/DailyTasksPage";
 import ResultsPage from "../modules/results/pages/ResultsPage";
+import TemplatesPage from "../modules/templates/pages/TemplatesPage";
 import OrgStructurePage from "../modules/orgStructure/pages/OrgStructurePage";
 import TelegramGroupPage from "../modules/telegram/pages/TelegramGroupPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
@@ -41,6 +42,14 @@ export default function AppRouter() {
                     element={
                         <RequireAuth>
                             <ResultsPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/templates"
+                    element={
+                        <RequireAuth>
+                            <TemplatesPage />
                         </RequireAuth>
                     }
                 />

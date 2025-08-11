@@ -62,7 +62,7 @@ export default function Sidebar({
                                 {isOpen && (
                                     <>
                                         <span className="menu-text">Результати</span>
-                                        <span className="menu-badge">{resultsCount}</span>
+                                        <span className="badge menu-badge">{resultsCount}</span>
                                         <FiChevronDown
                                             className={`submenu-arrow ${
                                                 isResultsOpen ? "open" : ""
@@ -87,7 +87,7 @@ export default function Sidebar({
                                     </li>
                                     <li>
                                         <NavLink
-                                            to="/results/templates"
+                                            to="/templates"
                                             className={({ isActive }) =>
                                                 isActive ? "active" : ""
                                             }
@@ -158,7 +158,7 @@ export default function Sidebar({
                                         <span className="menu-text">
                                             Телеграм
                                         </span>
-                                        <span className="menu-badge">
+                                        <span className="badge menu-badge">
                                             {telegramCount}
                                         </span>
                                     </>
