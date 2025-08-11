@@ -8,16 +8,13 @@ export default function Layout({ children }) {
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
-        <div className="layout">
-            <Header onToggleMenu={() => setMenuOpen(!menuOpen)} />
-            <div
-                className={`layout-body ${menuOpen ? "with-sidebar" : "collapsed-sidebar"
-                    }`}
-            >
-                <Sidebar isOpen={menuOpen} onToggle={() => setMenuOpen(!menuOpen)} />
+        <div className={`layout ${menuOpen ? "" : "collapsed-sidebar"}`}>
+            <Sidebar isOpen={menuOpen} onToggle={() => setMenuOpen(!menuOpen)} />
+            <div className="layout-column">
+                <Header onToggleMenu={() => setMenuOpen(!menuOpen)} />
                 <main className="layout-content">{children}</main>
+                <Footer />
             </div>
-            <Footer />
         </div>
     );
 }
