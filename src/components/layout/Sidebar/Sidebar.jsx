@@ -87,7 +87,7 @@ export default function Sidebar({
                                     </li>
                                     <li>
                                         <NavLink
-                                            to="/results/templates"
+                                            to="/templates"
                                             className={({ isActive }) =>
                                                 isActive ? "active" : ""
                                             }
