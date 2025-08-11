@@ -1,32 +1,26 @@
 .layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    height: 100vh;
+    background: var(--bg);
+}
+
+.layout.collapsed-sidebar {
+    grid-template-columns: var(--sidebar-collapsed) 1fr;
+}
+
+.layout-column {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    overflow: hidden;
 }
 
-/* Область хедера + сайдбара + контенту */
-.layout-body {
-    display: flex;
-    flex: 1;
-    transition: all 0.3s ease;
-    padding-top: 0;
-}
-
-/* Контент */
 .layout-content {
     flex: 1;
+    min-height: 0;
+    overflow-y: auto;
     padding: 20px;
-    background: #fff;
-    transition: all 0.3s ease;
-    min-height: 100vh;
+    background: var(--bg);
 }
 
-/* Якщо меню закрите – відступ мінімальний (60px) */
-.layout-body.collapsed-sidebar .layout-content {
-    margin-left: 60px;
-}
-
-/* Якщо меню відкрите – контент звужується (220px) */
-.layout-body.with-sidebar .layout-content {
-    margin-left: 220px;
-}

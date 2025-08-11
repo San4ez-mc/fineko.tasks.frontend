@@ -32,4 +32,8 @@
     --fz-h: 25px;
     /* заголовки */
     --transition: 160ms ease;
+
+    --sidebar-width: 260px;
+    --sidebar-collapsed: 60px;
+    --header-height: 56px;
 }

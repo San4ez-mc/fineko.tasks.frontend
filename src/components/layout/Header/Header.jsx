@@ -12,14 +12,14 @@ export default function Header({ onToggleMenu }) {
             {/* Ліва частина: кнопка відкриття/закриття меню */}
             <div className="header-left">
                 <button className="menu-btn" onClick={onToggleMenu} title="Toggle menu">
-                    <FiMenu size={22} color="#fff" />
+                    <FiMenu size={22} />
                 </button>
                 {user && <span className="org-name">{user.organization?.name}</span>}
             </div>
 
             {/* Центр: пошук */}
             <div className="header-center">
-                <input type="text" className="search-input" placeholder="Знайти задачі..." />
+                <input type="text" className="search-input input" placeholder="Знайти задачі..." />
             </div>
 
             {/* Права частина: аватар */}
