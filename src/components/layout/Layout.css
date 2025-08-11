@@ -1,12 +1,12 @@
 .layout {
     display: grid;
-    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-columns: var(--sidebar-width) 1fr var(--right-sidebar-width);
     height: 100vh;
     background: var(--bg);
 }
 
 .layout.collapsed-sidebar {
-    grid-template-columns: var(--sidebar-collapsed) 1fr;
+    grid-template-columns: var(--sidebar-collapsed) 1fr var(--right-sidebar-width);
 }
 
 .layout-column {
