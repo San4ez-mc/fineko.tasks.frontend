@@ -12,46 +12,72 @@
     border-bottom: 1px solid var(--border);
 }
 
-/* Ліва частина: меню */
-.header-left .menu-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
+.header-left,
+.header-right {
     display: flex;
     align-items: center;
-    color: var(--navy);
+    gap: 12px;
 }
 
-.header-left .org-name {
-    margin-left: 10px;
-    font-weight: bold;
-}
-
-/* Центр: пошук */
 .header-center {
     flex: 1;
     display: flex;
     justify-content: center;
 }
 
-.search-input {
+.header-search {
+    position: relative;
     width: 100%;
     max-width: 400px;
 }
 
-/* Права частина: аватар */
-.header-right {
-    position: relative;
+.header-search .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    pointer-events: none;
+}
+
+.header-search .input {
+    width: 100%;
+    padding-left: 36px;
+}
+
+.icon-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: transform var(--transition), background var(--transition);
+}
+
+.icon-btn:hover {
+    transform: translateY(-1px);
+    background: var(--bg);
+}
+
+.icon-btn:active {
+    transform: translateY(1px);
+}
+
+.header-right {
+    position: relative;
 }
 
 .user-avatar {
     background: var(--primary);
     color: #000;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
+    border: 1px solid var(--border);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -60,7 +86,6 @@
     cursor: pointer;
 }
 
-/* Дропдаун-меню */
 .user-dropdown {
     position: absolute;
     top: calc(var(--header-height) + 4px);

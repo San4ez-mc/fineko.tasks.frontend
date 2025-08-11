@@ -11,7 +11,7 @@ export default function Layout({ children }) {
         <div className={`layout ${menuOpen ? "" : "collapsed-sidebar"}`}>
             <Sidebar isOpen={menuOpen} onToggle={() => setMenuOpen(!menuOpen)} />
             <div className="layout-column">
-                <Header onToggleMenu={() => setMenuOpen(!menuOpen)} />
+                <Header />
                 <main className="layout-content">{children}</main>
                 <Footer />
             </div>
