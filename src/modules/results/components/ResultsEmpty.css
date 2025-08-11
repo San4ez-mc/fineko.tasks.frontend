@@ -1,0 +1,10 @@
+@import "../../../styles/variables.css";
+
+.results-empty{
+  padding:16px;
+  text-align:center;
+}
+
+.results-empty p{
+  color: var(--text-muted);
+}

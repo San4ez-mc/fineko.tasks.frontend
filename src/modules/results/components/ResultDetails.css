@@ -1,0 +1,34 @@
+@import "../../../styles/variables.css";
+
+.result-details{
+  display:grid; grid-template-columns: 1fr 1fr; gap:16px;
+  padding: 12px 12px 16px 40px; background: #fff; border-bottom:1px solid var(--border);
+}
+.rd-col{ display:grid; gap:16px; }
+.rd-block{ background:#fff; border:1px solid var(--border); border-radius: var(--radius); padding:12px; }
+.rd-block h4{ margin:0 0 10px; color: var(--navy); }
+
+.rd-line{ display:flex; gap:8px; font-size: var(--fz-base); }
+.rd-line .k{ color: var(--text-muted); min-width:120px; }
+.rd-desc{ margin-top:8px; color: var(--text); }
+
+.rd-actions{ margin-top:12px; display:flex; gap:8px; }
+
+.rd-sublist{ display:grid; gap:8px; }
+.rd-subitem{ display:flex; align-items:center; gap:8px; }
+.rd-subitem .title{ color:var(--navy); text-decoration:none; }
+.rd-subitem .who{ font-size: var(--fz-sm); color: var(--text-muted); }
+
+.rd-tasks{ display:grid; gap:8px; }
+.rd-task{
+  display:flex; align-items:center; gap:10px; padding:8px; border:1px solid var(--border);
+  border-radius: var(--radius-sm); text-decoration:none; color: var(--text);
+}
+.rd-task .t-title{ flex:1; }
+.rd-task .t-date{ font-size: var(--fz-sm); color: var(--text-muted); }
+
+.rd-comments{ display:grid; gap:10px; }
+.rd-comment .c-head{ font-size: var(--fz-sm); color: var(--text-muted); }
+.rd-comment .c-text{ margin-top:4px; }
+
+.rd-add-comment{ margin-top:8px; display:flex; gap:8px; }
