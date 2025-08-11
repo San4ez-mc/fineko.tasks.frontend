@@ -48,7 +48,9 @@ export default function ResultRow({
         <button className="btn ghost" onClick={() => onViewTasks && onViewTasks(result.id)}>Задачі</button>
         <button className="btn ghost" onClick={() => onEdit && onEdit(result.id)}>Редагувати</button>
         <button className="btn ghost" onClick={() => onArchive && onArchive(result.id)}>Архівувати</button>
-        <button className="btn ghost" onClick={() => onDelete && onDelete(result.id)}>Видалити</button>
+        {onDelete && (
+          <button className="btn ghost" onClick={() => onDelete(result.id)}>Видалити</button>
+        )}
         <button className="btn primary" onClick={() => onMarkDone && onMarkDone(result.id)}>Позначити виконаним</button>
       </div>
     </div>
