@@ -1,0 +1,32 @@
+@import "../../../styles/variables.css";
+
+.result-row{
+  display:grid; grid-template-columns: 28px 1.4fr 1fr auto; gap:12px;
+  align-items:center; padding:12px; border-bottom:1px solid var(--border);
+  background:#fff;
+}
+.result-row:hover{ box-shadow: var(--shadow); }
+
+.result-row .caret{
+  border:1px solid var(--border); background:#fff; border-radius:8px; width:28px; height:28px; cursor:pointer;
+}
+.result-row .title{
+  font-weight:600; color:var(--navy); text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.result-row .meta{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size: var(--fz-sm); color: var(--text-muted);
+}
+.result-row .meta .k{ opacity:.7; }
+.result-row .meta .v{ color:var(--text); }
+
+.result-row .expected{
+  color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.result-row .actions{ display:flex; gap:8px; flex-wrap:wrap; justify-self:end; }
+
+/* статусні бейджі */
+.badge.status-new{ border-color: var(--text-muted); color: var(--text-muted); }
+.badge.status-progress{ border-color: var(--blue); color: var(--blue); }
+.badge.status-done{ border-color: #10B981; color:#065F46; }
+.badge.status-postponed{ border-color: var(--rush); color: var(--rush-dark); }

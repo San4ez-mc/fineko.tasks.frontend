@@ -1,0 +1,32 @@
+@import "../../../styles/variables.css";
+
+.results-filters{
+  padding: 12px;
+}
+
+.rf-row{
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+}
+
+.rf-search{
+  display:flex; align-items:center; gap:10px;
+  border:1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 6px 10px; background:#fff; min-width: 320px; flex:1;
+}
+.rf-search .ico{ width:18px; height:18px; color: var(--text-muted); }
+.rf-search input{
+  width:100%; border:none; outline:none; background:transparent;
+  font-size: var(--fz-base); color: var(--text);
+}
+
+.rf-group{ display:flex; gap:10px; flex-wrap:wrap; }
+.rf-field{
+  display:flex; flex-direction:column; gap:6px;
+  font-size: var(--fz-sm); color: var(--text-muted);
+}
+.rf-field select{
+  border:1px solid var(--border); border-radius: var(--radius-sm);
+  background:#fff; padding:8px 10px; min-width:160px;
+}
+
+.rf-actions{ margin-left:auto; display:flex; gap:8px; }
