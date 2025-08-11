@@ -1,185 +1,159 @@
-:root {
-    --color-primary: #ff8c42;
-    --color-primary-hover: #ff6a00;
-    --color-bg-sidebar: #2c2c2c;
-    --color-bg-content: #f5f5f5;
-    --color-text: #333;
-    --color-text-light: #e0e0e0;
-    --sidebar-width: 250px;
-    --sidebar-width-collapsed: 60px;
-    --transition-speed: 0.3s;
-}
+@import "./variables.css";
 
-body {
-    margin: 0;
-    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-    background: var(--color-bg-content);
-    color: var(--color-text);
-}
-
-button {
-    background: var(--color-primary);
-    color: #fff;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background var(--transition-speed);
-}
-
-button:hover {
-    background: var(--color-primary-hover);
-}
-
-.sidebar {
-    width: var(--sidebar-width);
-    background: var(--color-bg-sidebar);
-    color: #ff8c42;
-    height: 100vh;
-    transition: width var(--transition-speed);
-    overflow: hidden;
-    position: fixed;
-    left: 0;
-    top: 0;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-}
-
-.sidebar.collapsed {
-    width: var(--sidebar-width-collapsed);
-}
-
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid #444;
-}
-
-.sidebar-item {
-    padding: 12px 20px;
-    cursor: pointer;
-    transition: background var(--transition-speed);
-    display: flex;
-    align-items: center;
-}
-
-.sidebar-item:hover {
-    background: rgba(255, 140, 66, 0.2);
-}
-
-.sidebar-subitem {
-    padding: 8px 30px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background var(--transition-speed);
-}
-
-.sidebar-subitem:hover {
-    background: rgba(255, 140, 66, 0.15);
-}
-
-.main-content {
-    margin-left: var(--sidebar-width);
-    padding: 20px;
-    transition: margin-left var(--transition-speed);
-}
-
-.main-content.expanded {
-    margin-left: var(--sidebar-width-collapsed);
+html,
+body,
+#root {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, "Open Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size: var(--fz-base);
 }
 
 h1,
 h2,
 h3 {
-    color: var(--color-primary);
+    color: var(--navy);
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
-/* Хедер */
-.header {
-    background: #fff;
-    border-bottom: 1px solid #ddd;
-    padding: 12px 20px;
-    display: flex;
-    justify-content: space-between;
+h1 {
+    font-size: var(--fz-h);
+}
+
+a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.btn {
+    display: inline-flex;
     align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.header h2 {
-    margin: 0;
-    color: var(--color-primary);
-}
-
-/* Іконка користувача */
-.user-menu {
-    position: relative;
-}
-
-.user-icon {
+    gap: 8px;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
     cursor: pointer;
-    color: var(--color-primary);
-    transition: color var(--transition-speed);
+    transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
 }
 
-.user-icon:hover {
-    color: var(--color-primary-hover);
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
 }
 
-/* Випадаюче меню */
-.user-dropdown {
-    position: absolute;
-    right: 0;
-    top: 36px;
+.btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #111;
+}
+
+.btn.ghost {
+    background: transparent;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    font-size: var(--fz-sm);
     background: #fff;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.badge.critical {
+    border-color: var(--critical);
+    color: var(--critical);
+}
+
+.badge.important {
+    border-color: var(--important);
+    color: var(--important);
+}
+
+.badge.rush {
+    border-color: var(--rush);
+    color: var(--rush-dark);
+}
+
+.badge.neutral {
+    opacity: .7;
+}
+
+.row-hover:hover {
+    background: #fff;
+    box-shadow: var(--shadow);
+}
+
+.kbd {
+    font: 500 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #eef2ff;
+    padding: 2px 6px;
     border-radius: 6px;
-    overflow: hidden;
-    width: 150px;
-    animation: fadeIn 0.2s ease;
+    border: 1px solid #c7d2fe;
 }
 
-.user-dropdown-item {
+/* стрічка закреслення/готовності */
+.is-completed {
+    opacity: .6;
+    filter: saturate(.5);
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: rgba(0, 0, 0, .35);
+    transition: opacity var(--transition), filter var(--transition);
+}
+
+.input {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: var(--fz-base);
+    background: #fff;
+    color: var(--text);
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.input::placeholder {
+    color: #9CA3AF;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Таблиця */
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: var(--fz-base);
+}
+
+.table th {
+    text-align: left;
+    background: var(--bg);
     padding: 10px;
-    cursor: pointer;
-    transition: background var(--transition-speed);
+    border-bottom: 1px solid var(--border);
 }
 
-.user-dropdown-item:hover {
-    background: rgba(255, 140, 66, 0.1);
+.table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
 }
 
-.user-dropdown-item.logout {
-    color: #c0392b;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Використаємо простий системний або Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
-
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', Arial, sans-serif;
-    /* один стиль для всього додатку */
-    background: #f9f9f9;
-    color: #333;
-}
-
-* {
-    box-sizing: border-box;
+.table tr:hover {
+    background: #fff;
+    box-shadow: var(--shadow);
 }
