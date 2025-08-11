@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Layout from '../../../components/layout/Layout.jsx';
 import {
     getResults, getResult, createResult, updateResult, deleteResult, toggleResultComplete,
@@ -18,6 +18,7 @@ export default function ResultsPage() {
     const [editingId, setEditingId] = useState(null);
     const [editForm, setEditForm] = useState(initialForm);
     const [filters, setFilters] = useState({ q: '', status: '' });
+    const createFormRef = useRef(null);
 
     const fetchPage = async (page = 1) => {
         setLoading(true);
@@ -57,8 +58,16 @@ export default function ResultsPage() {
     };
 
     const onToggle = async (r) => {
+        if (!r.is_completed) {
+            const ok = window.confirm('Позначити результат виконаним? Це каскадно закриє усі підрезультати та задачі.');
+            if (!ok) return;
+        }
         await toggleResultComplete(r.id, !r.is_completed);
-        refreshCurrent();
+        if (!r.is_completed) {
+            setList((prev) => prev.map((x) => x.id === r.id ? { ...x, is_completed: true, tasks_done: x.tasks_total } : x));
+        } else {
+            refreshCurrent();
+        }
     };
 
     const openEdit = (r) => {
@@ -97,7 +106,7 @@ export default function ResultsPage() {
                     />
                 </div>
 
-                <form className="results-create-form" onSubmit={onCreate}>
+                <form ref={createFormRef} className="results-create-form" onSubmit={onCreate}>
                     <input
                         type="text"
                         placeholder="Назва *"
@@ -134,6 +143,16 @@ export default function ResultsPage() {
 
                 {loading ? (
                     <p className="results-loader">Завантаження...</p>
+                ) : list.length === 0 ? (
+                    <div className="results-empty">
+                        <p>Результатів не знайдено</p>
+                        <button
+                            className="btn-primary"
+                            onClick={() => createFormRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                        >
+                            Додати результат
+                        </button>
+                    </div>
                 ) : (
                     <table className="results-table">
                         <thead>

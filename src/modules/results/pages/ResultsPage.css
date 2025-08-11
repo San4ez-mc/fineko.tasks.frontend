@@ -122,6 +122,15 @@
     color: #666;
 }
 
+.results-empty {
+    text-align: center;
+    padding: 24px 0;
+}
+
+.results-empty .btn-primary {
+    margin-top: 8px;
+}
+
 /* ===== Адаптив ===== */
 @media (max-width: 1100px) {
     .results-page {
