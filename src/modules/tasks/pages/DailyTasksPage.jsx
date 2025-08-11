@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Layout from "../../../components/layout/Layout";
 import "./DailyTasksPage.css";
 import axios from "axios";
@@ -15,6 +15,8 @@ export default function DailyTasksPage() {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [openAddRow, setOpenAddRow] = useState(null);
+    const [filters, setFilters] = useState({});
+    const addRowRef = useRef(null);
 
     const formatDateForApi = (date) => date.toISOString().split("T")[0];
 
@@ -116,8 +118,26 @@ export default function DailyTasksPage() {
      */
     useEffect(() => {
         const dateStr = formatDateForApi(selectedDate);
-        loadTasksFromBackend(dateStr);
+        loadTasksFromBackend(dateStr, filters);
     }, [selectedDate]);
+
+    const handleTypeFilterChange = (type) => {
+        const newFilters = { ...filters, type };
+        setFilters(newFilters);
+        loadTasksFromBackend(formatDateForApi(selectedDate), newFilters);
+    };
+
+    const handleAssigneeFilterChange = (assignee) => {
+        const newFilters = { ...filters, assigned_to: assignee };
+        setFilters(newFilters);
+        loadTasksFromBackend(formatDateForApi(selectedDate), newFilters);
+    };
+
+    const handleSortChange = (sort) => {
+        const newFilters = { ...filters, sort };
+        setFilters(newFilters);
+        loadTasksFromBackend(formatDateForApi(selectedDate), newFilters);
+    };
 
     /**
      * ✅ Локальне оновлення поля без бекенду (використовуємо для попереднього перегляду)
@@ -175,14 +195,49 @@ export default function DailyTasksPage() {
         setTasks(updated);
     };
 
+    const formattedDate = selectedDate.toLocaleDateString("uk-UA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+
     return (
         <Layout>
+            <div className="page-header">
+                <div className="page-header-title">
+                    <h1>Мої задачі на {formattedDate}</h1>
+                    {filters.assigned_to && (
+                        <span className="page-header-assignee">
+                            Виконавець: {filters.assigned_to}
+                        </span>
+                    )}
+                </div>
+                <div className="page-header-actions">
+                    <button
+                        className="btn-add"
+                        onClick={() =>
+                            addRowRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                            })
+                        }
+                    >
+                        Додати задачу
+                    </button>
+                    <button className="btn-move">
+                        Перенести вибрані на іншу дату
+                    </button>
+                </div>
+            </div>
+
             {/* ✅ Фільтри задач */}
             <TaskFilters
                 selectedDate={selectedDate}
                 onDateChange={setSelectedDate}
                 onPrevDay={goPrevDay}
                 onNextDay={goNextDay}
+                onTypeFilterChange={handleTypeFilterChange}
+                onCreatorFilterChange={handleAssigneeFilterChange}
+                onSortChange={handleSortChange}
             />
 
             {loading && <p>Завантаження задач...</p>}
@@ -220,13 +275,15 @@ export default function DailyTasksPage() {
                 ))}
 
                 {/* ✅ Внизу після всіх задач завжди відкритий блок додавання */}
-                <AddTaskRow
-                    taskOptions={allAvailableTasks}
-                    collapsed={false}
-                    onAddTask={(newTask) =>
-                        handleAddTask(newTask, tasks.length)
-                    }
-                />
+                <div ref={addRowRef}>
+                    <AddTaskRow
+                        taskOptions={allAvailableTasks}
+                        collapsed={false}
+                        onAddTask={(newTask) =>
+                            handleAddTask(newTask, tasks.length)
+                        }
+                    />
+                </div>
             </div>
 
             {/* ✅ Сумарний час */}
