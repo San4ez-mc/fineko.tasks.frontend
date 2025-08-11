@@ -28,6 +28,7 @@ export default function ResultsFilters({ value, onChange, onReset }) {
           </svg>
           <input
             type="search"
+            className="input"
             placeholder="Пошук по всіх полях…"
             value={local.q}
             onChange={(e) => change({ q: e.target.value })}
@@ -38,6 +39,7 @@ export default function ResultsFilters({ value, onChange, onReset }) {
           <label className="rf-field">
             <span>Статус</span>
             <select
+              className="input"
               value={local.status}
               onChange={(e) => change({ status: e.target.value })}
             >
@@ -52,6 +54,7 @@ export default function ResultsFilters({ value, onChange, onReset }) {
           <label className="rf-field">
             <span>Шаблони</span>
             <select
+              className="input"
               value={local.hasTemplates}
               onChange={(e) => change({ hasTemplates: e.target.value })}
             >
@@ -64,6 +67,7 @@ export default function ResultsFilters({ value, onChange, onReset }) {
           <label className="rf-field">
             <span>Активні задачі</span>
             <select
+              className="input"
               value={local.hasActiveTasks}
               onChange={(e) => change({ hasActiveTasks: e.target.value })}
             >
@@ -76,6 +80,7 @@ export default function ResultsFilters({ value, onChange, onReset }) {
           <label className="rf-field">
             <span>Подання</span>
             <select
+              className="input"
               value={local.view}
               onChange={(e) => change({ view: e.target.value })}
             >

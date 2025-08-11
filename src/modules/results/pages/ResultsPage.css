@@ -1,172 +1,41 @@
-.results-page {
-    padding: 20px;
-    max-width: 1100px;
-    margin: 0 auto;
-    background: #fff;
+@import "../../../styles/variables.css";
+
+.results-page{
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
-.results-page__header {
-    margin-bottom: 12px;
+.results-page__header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
 
-.results-page__filters {
-    margin-bottom: 12px;
+.results-list{
+  display:grid;
+  gap:0;
 }
 
-/* ===== Create form ===== */
-.results-create-form {
-    display: grid;
-    grid-template-columns: 2fr 2fr 2fr 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 16px;
+.results-group + .results-group{
+  margin-top:16px;
 }
 
-.results-create-form .btn-primary {
-    grid-column: 1 / -1;
+.group-title{
+  margin:0;
+  padding:8px 12px;
+  font-weight:600;
 }
 
-/* ===== Table ===== */
-.results-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #eee;
-    font-size: 14px;
+.results-pagination{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  margin-top:16px;
 }
 
-.results-table thead tr {
-    background: #fafafa;
-}
-
-.results-table th,
-.results-table td {
-    padding: 8px 10px;
-    border: 1px solid #eee;
-    text-align: left;
-}
-
-.results-table .actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.expander {
-    margin-right: 8px;
-}
-
-/* Розгортка */
-.row-expanded td {
-    background: #fcfcff;
-}
-
-.expanded-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-/* Редагування */
-.row-edit td {
-    background: #fff9f2;
-}
-
-.edit-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 140px 1fr;
-    gap: 8px;
-}
-
-.edit-actions {
-    margin-top: 10px;
-    display: flex;
-    gap: 8px;
-}
-
-/* Підрезультат */
-.subresult-form {
-    display: grid;
-    grid-template-columns: 2fr 2fr 2fr 1fr auto;
-    gap: 8px;
-}
-
-/* Кнопки — базові стилі під помаранчево-сірий стиль */
-.btn-primary {
-    background: #ff6600;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.btn-secondary {
-    background: #f3f3f3;
-    color: #222;
-    border: 1px solid #ddd;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.btn-danger {
-    background: #ffe6e6;
-    color: #b00020;
-    border: 1px solid #ffcaca;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.results-loader {
-    padding: 12px 0;
-    color: #666;
-}
-
-.results-empty {
-    text-align: center;
-    padding: 24px 0;
-}
-
-.results-empty .btn-primary {
-    margin-top: 8px;
-}
-
-/* ===== Адаптив ===== */
-@media (max-width: 1100px) {
-    .results-page {
-        padding: 16px;
-    }
-}
-
-@media (max-width: 900px) {
-    .results-create-form {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .edit-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .expanded-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .subresult-form {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (max-width: 600px) {
-
-    .results-create-form,
-    .edit-grid,
-    .subresult-form {
-        grid-template-columns: 1fr;
-    }
-
-    .results-table th:nth-child(4),
-    .results-table td:nth-child(4) {
-        display: none;
-        /* сховаємо колонку "Задачі" на дуже вузьких екранах */
-    }
+.results-loader{
+  padding:12px 0;
 }
