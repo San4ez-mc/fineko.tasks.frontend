@@ -33,7 +33,7 @@
     /* заголовки */
     --transition: 160ms ease;
 
-    --sidebar-width: 260px;
+    --sidebar-width: 300px;
     --sidebar-collapsed: 60px;
     --header-height: 56px;
 }

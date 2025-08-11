@@ -3,9 +3,9 @@ import "./Sidebar.css";
 import { NavLink } from "react-router-dom";
 import { FiMenu, FiBarChart2, FiCheckSquare, FiGrid, FiSend } from "react-icons/fi";
 
-export default function Sidebar({ isOpen, onToggle }) {
+export default function Sidebar({ isOpen, onToggle, position = "left" }) {
     return (
-        <aside className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
+        <aside className={`sidebar ${position} ${isOpen ? "expanded" : ""}`}>
             <div className="sidebar-content">
 
                 {/* Верхня панель з кнопкою */}
