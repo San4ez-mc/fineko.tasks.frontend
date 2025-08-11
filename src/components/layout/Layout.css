@@ -51,6 +51,10 @@
     background: var(--bg);
 }
 
+.sidebar-handle:focus {
+    outline: 2px solid var(--blue);
+}
+
 .left-handle {
     left: 0;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
