@@ -1,0 +1,15 @@
+.filters-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.filters-bar input {
+    flex: 1 1 280px;
+    padding: 8px 10px;
+}
+
+.filters-bar select {
+    padding: 8px 10px;
+}
