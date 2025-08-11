@@ -2,18 +2,26 @@
     background: var(--primary);
     color: #fff;
     height: 100%;
-    transition: width var(--transition);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+    transition: transform var(--transition);
+    z-index: 100;
 }
 
-.sidebar.collapsed {
-    width: var(--sidebar-collapsed);
-}
-
+.sidebar.collapsed,
 .sidebar.expanded {
     width: var(--sidebar-width);
+}
+
+.layout.left-open .sidebar {
+    transform: translateX(0);
 }
 
 .sidebar-content {
@@ -130,6 +138,17 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    transform: translateX(100%);
+    transition: transform var(--transition);
+    z-index: 100;
+}
+
+.layout.right-open .right-sidebar {
+    transform: translateX(0);
 }
 
 .right-sidebar-content {

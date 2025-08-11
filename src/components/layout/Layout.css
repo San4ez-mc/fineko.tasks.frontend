@@ -1,19 +1,27 @@
 .layout {
-    display: grid;
-    grid-template-columns: var(--sidebar-width) 1fr var(--right-sidebar-width);
-    height: 100vh;
+    --left-open: 0;
+    --right-open: 0;
     background: var(--bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
 }
 
-.layout.collapsed-sidebar {
-    grid-template-columns: var(--sidebar-collapsed) 1fr var(--right-sidebar-width);
+.layout.left-open {
+    --left-open: 1;
+}
+
+.layout.right-open {
+    --right-open: 1;
 }
 
 .layout-column {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    margin-left: calc(var(--left-open) * var(--sidebar-width));
+    margin-right: calc(var(--right-open) * var(--right-sidebar-width));
+    transition: margin var(--transition);
 }
 
 .layout-content {
@@ -21,6 +29,34 @@
     min-height: 0;
     overflow-y: auto;
     padding: 20px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.sidebar-handle {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 80px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    border: none;
+    cursor: pointer;
+    z-index: 110;
+    transition: background var(--transition);
+}
+
+.sidebar-handle:hover {
     background: var(--bg);
 }
 
+.left-handle {
+    left: 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.right-handle {
+    right: 0;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
