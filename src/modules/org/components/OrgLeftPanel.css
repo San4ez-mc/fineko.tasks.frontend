@@ -1,0 +1,22 @@
+@import "../../../styles/variables.css";
+
+.org-left-panel{ display:grid; gap:12px; }
+
+.olp-filters{ display:grid; gap:10px; }
+
+.rf-search{
+  display:flex; align-items:center; gap:10px;
+  border:1px solid var(--border); border-radius: var(--radius-sm);
+  padding:6px 10px; background:#fff;
+}
+.rf-search .ico{ width:18px; height:18px; color: var(--text-muted); }
+.rf-field{ display:flex; flex-direction:column; gap:6px; font-size: var(--fz-sm); color: var(--text-muted); }
+.olp-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; }
+
+.olp-table{ display:grid; gap:0; border:1px solid var(--border); border-radius: var(--radius); overflow:hidden; background:#fff; }
+.olp-th, .olp-tr{ display:grid; grid-template-columns: 1.3fr 1fr 1fr auto; gap:12px; align-items:center; padding:10px 12px; }
+.olp-th{ background: var(--surface-muted); font-weight:600; color: var(--navy); }
+.olp-tr{ border-top:1px solid var(--border); }
+.olp-tr .title{ font-weight:600; color: var(--text); }
+.olp-tr .muted{ color: var(--text-muted); font-size: var(--fz-sm); }
+.olp-tr .actions{ display:flex; gap:6px; justify-content:flex-end; }
