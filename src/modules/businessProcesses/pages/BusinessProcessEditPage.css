@@ -1,0 +1,192 @@
+.bp-edit-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+
+.bp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bp-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.bp-name-input {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 6px 10px;
+  min-width: 280px;
+}
+
+.bp-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-indicator.saved { color: #18a058; }
+.save-indicator.dirty { color: #d97706; }
+
+.bp-error {
+  color: #b10000;
+  background: #ffecec;
+  border: 1px solid #ffbcbc;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.bp-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.add-lane-top {
+  align-self: flex-start;
+}
+
+.bp-lane {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.bp-lane + .bp-lane { margin-top: 8px; }
+
+.bp-lane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.bp-lane-title {
+  font-weight: 600;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 6px 10px;
+  min-width: 220px;
+}
+
+.bp-lane-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 54px;
+}
+
+.bp-node-wrap { display: flex; }
+
+.bp-node {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+}
+
+.bp-node.if { border-style: dashed; }
+
+.bp-node-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bp-node-title {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.bp-node-flags {
+  display: flex; gap: 6px;
+}
+
+.icon { width: 22px; height: 22px; border-radius: 6px; border: 1px solid #ddd; }
+.icon.new { background: #f0fff4; }
+.icon.outdated { background: #f6f0ff; }
+.icon.problem { background: #fff5f5; }
+.icon.on { outline: 2px solid #00000022; }
+
+.bp-node-bottom {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.bp-node-assignee {
+  min-width: 220px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.bp-node-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.bp-add-blocks { display: flex; gap: 8px; }
+
+.btn { border: none; background: #ff7a00; color: #fff; border-radius: 10px; padding: 8px 12px; cursor: pointer; }
+.btn.ghost { background: #f3f4f6; color: #111827; }
+.btn.small { padding: 6px 10px; border-radius: 8px; }
+.btn.tiny { padding: 4px 8px; border-radius: 8px; font-size: 12px; }
+
+.edges-panel {
+  margin-top: 8px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edges-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.edges-row select, .edges-row input {
+  border: 1px solid #ddd; border-radius: 10px; padding: 6px 10px;
+}
+
+.edges-list { display: flex; flex-direction: column; gap: 6px; }
+.edge-item { display: flex; align-items: center; gap: 8px; }
+.edge-item.new { color: #16a34a; }
+.edge-item.outdated { color: #7c3aed; }
+.edge-item.problem { color: #dc2626; }
+
+.comments-popover {
+  position: absolute;
+  z-index: 10;
+  width: 380px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 12px 18px rgba(0,0,0,0.12);
+  padding: 8px;
+  margin-top: 6px;
+}
+
+.cp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.cp-body { max-height: 260px; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+.cp-empty { color: #6b7280; font-size: 14px; }
+.cp-item { border-bottom: 1px dashed #eee; padding-bottom: 6px; }
+.cp-meta { font-size: 12px; color: #6b7280; }
+.cp-text { font-size: 14px; }
+
+.cp-footer { display: flex; gap: 6px; margin-top: 6px; }
+.cp-footer input { flex: 1; border: 1px solid #ddd; border-radius: 10px; padding: 6px 10px; }

@@ -5,7 +5,8 @@ import HomePage from "../pages/HomePage";
 import DailyTasksPage from "../modules/tasks/pages/DailyTasksPage";
 import ResultsPage from "../modules/results/pages/ResultsPage";
 import TemplatesPage from "../modules/templates/pages/TemplatesPage";
-import BusinessProcessesPage from "../modules/processes/pages/BusinessProcessesPage";
+import BusinessProcessesPage from "../modules/businessProcesses/pages/BusinessProcessesPage";
+import BusinessProcessEditPage from "../modules/businessProcesses/pages/BusinessProcessEditPage";
 import BpListPage from "../modules/bp/pages/BpListPage";
 import BpEditorPage from "../modules/bp/pages/BpEditorPage";
 import OrgPage from "../modules/org/pages/OrgPage";
@@ -70,6 +71,22 @@ export default function AppRouter() {
                     element={
                         <RequireAuth>
                             <BusinessProcessesPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/business-processes/new"
+                    element={
+                        <RequireAuth>
+                            <BusinessProcessEditPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/business-processes/:id/edit"
+                    element={
+                        <RequireAuth>
+                            <BusinessProcessEditPage />
                         </RequireAuth>
                     }
                 />
