@@ -78,3 +78,8 @@
 .results-create .input.error{
   border-color:var(--critical);
 }
+
+.results-create textarea{
+  min-height:200px;
+  resize:vertical;
+}

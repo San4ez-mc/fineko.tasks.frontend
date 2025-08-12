@@ -8,7 +8,7 @@ import {
   createResult,
   createSubresult,
 } from '../api/results';
-import { useAuth } from '../../../context/AuthContext';
+import { getUsers } from '../../../services/api/users';
 import ResultsFilters from '../components/ResultsFilters.jsx';
 import ResultRow from '../components/ResultRow.jsx';
 import ResultDetails from '../components/ResultDetails.jsx';
@@ -24,7 +24,6 @@ const defaultFilters = {
 };
 
 export default function ResultsPage() {
-  const { user } = useAuth();
   const [list, setList] = useState([]);
   const [filters, setFilters] = useState(defaultFilters);
   const [page, setPage] = useState(1);
@@ -33,22 +32,43 @@ export default function ResultsPage() {
   const [expanded, setExpanded] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [parentId, setParentId] = useState(null);
-  const [form, setForm] = useState({ title: '', deadline: '', expected: '', urgent: false, assigneeId: '' });
+  const [users, setUsers] = useState([]);
+  const [form, setForm] = useState({ title: '', finalResult: '', urgent: false, description: '', responsibleId: '' });
   const [errors, setErrors] = useState({});
 
   const mapItem = (r) => ({
     ...r,
-    expected: r.expected_result || r.expected,
+    expected: r.final_result || r.expected_result || r.expected,
     dailyTasksCount: r.daily_tasks_count ?? r.tasks_total ?? 0,
-    urgent: r.is_urgent || r.urgent,
+    urgent: r.urgent || r.is_urgent,
     ownerName: r.owner_name || r.ownerName,
-    assigneeName: r.assignee_name || r.assigneeName,
+    assigneeName: r.assignee_name || r.assigneeName || r.responsible_name,
   });
+
+  const userLabel = (u) => {
+    const first = u.first_name || u.firstName || u.name || '';
+    const last = u.last_name || u.lastName || '';
+    const full = `${first} ${last}`.trim();
+    return full || u.username || `ID ${u.id}`;
+  };
 
   useEffect(() => {
     fetchList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, page]);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const data = await getUsers();
+        const items = Array.isArray(data) ? data : data.items || [];
+        setUsers(items);
+      } catch (_) {
+        /* ignore */
+      }
+    };
+    loadUsers();
+  }, []);
 
   const fetchList = async () => {
     setLoading(true);
@@ -79,7 +99,7 @@ export default function ResultsPage() {
 
   const openForm = (pid = null) => {
     setParentId(pid);
-    setForm({ title: '', deadline: '', expected: '', urgent: false, assigneeId: '' });
+    setForm({ title: '', finalResult: '', urgent: false, description: '', responsibleId: '' });
     setErrors({});
     setShowForm(true);
   };
@@ -88,18 +108,19 @@ export default function ResultsPage() {
     e.preventDefault();
     const errs = {};
     if (!form.title) errs.title = 'Обов\'язково';
-    if (!form.deadline) errs.deadline = 'Обов\'язково';
+    if (!form.finalResult) errs.finalResult = 'Обов\'язково';
+    if (!form.responsibleId) errs.responsibleId = 'Обов\'язково';
     if (Object.keys(errs).length) {
       setErrors(errs);
       return;
     }
     const payload = {
       title: form.title,
-      deadline: form.deadline,
-      expected_result: form.expected || undefined,
-      is_urgent: form.urgent,
+      final_result: form.finalResult,
+      urgent: form.urgent,
+      description: form.description,
+      responsible_id: Number(form.responsibleId),
     };
-    if (form.assigneeId) payload.assignee_id = form.assigneeId;
     try {
       const data = parentId
         ? await createSubresult(parentId, payload)
@@ -122,6 +143,8 @@ export default function ResultsPage() {
     } catch (e) {
       const apiErrors = e.response?.data?.errors || {};
       setErrors(apiErrors);
+      const msg = e.response?.data?.message || 'Сталася помилка при збереженні результату';
+      alert(msg);
     }
   };
 
@@ -219,12 +242,11 @@ export default function ResultsPage() {
       <div className="results-page">
         <div className="results-page__header">
           <h1>Результати</h1>
-          <button
-            className="btn primary"
-            onClick={() => (showForm ? (setShowForm(false), setParentId(null)) : openForm(null))}
-          >
-            {showForm ? 'Скасувати' : 'Додати результат'}
-          </button>
+          {!showForm && (
+            <button className="btn primary" onClick={() => openForm(null)}>
+              Додати результат
+            </button>
+          )}
         </div>
 
         <ResultsFilters value={filters} onChange={onFiltersChange} onReset={onFiltersReset} />
@@ -232,58 +254,59 @@ export default function ResultsPage() {
         {showForm && (
           <div className="results-create card">
             <form onSubmit={handleSubmit}>
+              <label className="rc-field">
+                <span>Назва*</span>
+                <input
+                  type="text"
+                  className={`input ${errors.title ? 'error' : ''}`}
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                />
+                {errors.title && <div className="field-error">{errors.title}</div>}
+              </label>
               <div className="rc-row">
                 <label className="rc-field">
-                  <span>Назва*</span>
+                  <span>Кінцевий результат*</span>
                   <input
                     type="text"
-                    className={`input ${errors.title ? 'error' : ''}`}
-                    value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    className={`input ${errors.finalResult ? 'error' : ''}`}
+                    value={form.finalResult}
+                    onChange={(e) => setForm({ ...form, finalResult: e.target.value })}
                   />
-                  {errors.title && <div className="field-error">{errors.title}</div>}
+                  {errors.finalResult && <div className="field-error">{errors.finalResult}</div>}
                 </label>
-                <label className="rc-field">
-                  <span>Дедлайн*</span>
+                <label className="rc-check">
                   <input
-                    type="date"
-                    className={`input ${errors.deadline ? 'error' : ''}`}
-                    value={form.deadline}
-                    onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+                    type="checkbox"
+                    checked={form.urgent}
+                    onChange={(e) => setForm({ ...form, urgent: e.target.checked })}
                   />
-                  {errors.deadline && <div className="field-error">{errors.deadline}</div>}
+                  <span>Терміново</span>
                 </label>
               </div>
               <label className="rc-field">
-                <span>Очікуваний результат</span>
-                <input
-                  type="text"
+                <span>Опис</span>
+                <textarea
                   className="input"
-                  value={form.expected}
-                  onChange={(e) => setForm({ ...form, expected: e.target.value })}
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
                 />
-              </label>
-              <label className="rc-check">
-                <input
-                  type="checkbox"
-                  checked={form.urgent}
-                  onChange={(e) => setForm({ ...form, urgent: e.target.checked })}
-                />
-                <span>Терміновість</span>
               </label>
               <label className="rc-field">
-                <span>Постановник</span>
-                <input type="text" className="input" value={user?.name || user?.username || ''} readOnly />
-              </label>
-              <label className="rc-field">
-                <span>Відповідальний</span>
-                <input
-                  type="text"
-                  className="input"
-                  value={form.assigneeId}
-                  onChange={(e) => setForm({ ...form, assigneeId: e.target.value })}
-                  placeholder="ID користувача"
-                />
+                <span>Відповідальний*</span>
+                <select
+                  className={`input ${errors.responsibleId ? 'error' : ''}`}
+                  value={form.responsibleId}
+                  onChange={(e) => setForm({ ...form, responsibleId: e.target.value })}
+                >
+                  <option value="">Оберіть користувача</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {userLabel(u)}
+                    </option>
+                  ))}
+                </select>
+                {errors.responsibleId && <div className="field-error">{errors.responsibleId}</div>}
               </label>
               <div className="rc-actions">
                 <button type="submit" className="btn primary">Зберегти</button>
