@@ -29,6 +29,7 @@
 .sidebar-content {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 /* Верхня панель */
@@ -112,17 +113,29 @@
     font-size: var(--fz-sm);
     background: var(--bg);
     color: var(--text);
+    white-space: nowrap;
 }
 
 .submenu {
     list-style: none;
     margin: 0;
-    padding: 0 0 0 25px;
+    padding: 0;
 }
 
 .submenu li a {
     padding: 8px 15px;
     font-size: 12px;
+}
+
+.nav-subitem {
+    display: flex;
+    align-items: center;
+    padding-left: var(--space-3);
+}
+
+.sidebar-divider {
+    border-top: 1px solid var(--border);
+    margin: var(--space-2) 0;
 }
 
 .submenu-arrow {

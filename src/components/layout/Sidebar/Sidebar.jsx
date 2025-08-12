@@ -78,7 +78,7 @@ export default function Sidebar({
                                         <NavLink
                                             to="/results"
                                             className={({ isActive }) =>
-                                                isActive ? "active" : ""
+                                                `${isActive ? "active" : ""} nav-subitem`
                                             }
                                         >
                                             <span className="menu-text">
@@ -90,7 +90,7 @@ export default function Sidebar({
                                         <NavLink
                                             to="/templates"
                                             className={({ isActive }) =>
-                                                isActive ? "active" : ""
+                                                `${isActive ? "active" : ""} nav-subitem`
                                             }
                                         >
                                             <span className="menu-text">
@@ -116,6 +116,7 @@ export default function Sidebar({
                                 )}
                             </NavLink>
                         </li>
+                        <li className="sidebar-divider" aria-hidden="true"></li>
                         <li>
                             <NavLink
                                 to="/business-processes"

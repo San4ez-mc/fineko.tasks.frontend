@@ -33,7 +33,12 @@
     /* заголовки */
     --transition: 160ms ease;
 
-    --sidebar-width: 300px;
+    /* spacing */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+
+    --sidebar-width: 200px;
     --sidebar-collapsed: 60px;
     --right-sidebar-width: 300px;
     --header-height: 56px;

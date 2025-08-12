@@ -35,60 +35,58 @@ export default function ResultsFilters({ value, onChange, onReset }) {
           />
         </label>
 
-        <div className="rf-group">
-          <label className="rf-field">
-            <span>Статус</span>
-            <select
-              className="input"
-              value={local.status}
-              onChange={(e) => change({ status: e.target.value })}
-            >
-              <option value="all">Усі</option>
-              <option value="new">Новий</option>
-              <option value="in_progress">В процесі</option>
-              <option value="done">Виконано</option>
-              <option value="postponed">Відкладено</option>
-            </select>
-          </label>
+        <label className="rf-field">
+          <span>Статус</span>
+          <select
+            className="input"
+            value={local.status}
+            onChange={(e) => change({ status: e.target.value })}
+          >
+            <option value="all">Усі</option>
+            <option value="new">Новий</option>
+            <option value="in_progress">В процесі</option>
+            <option value="done">Виконано</option>
+            <option value="postponed">Відкладено</option>
+          </select>
+        </label>
 
-          <label className="rf-field">
-            <span>Шаблони</span>
-            <select
-              className="input"
-              value={local.hasTemplates}
-              onChange={(e) => change({ hasTemplates: e.target.value })}
-            >
-              <option value="any">Неважливо</option>
-              <option value="yes">Є</option>
-              <option value="no">Немає</option>
-            </select>
-          </label>
+        <label className="rf-field">
+          <span>Шаблони</span>
+          <select
+            className="input"
+            value={local.hasTemplates}
+            onChange={(e) => change({ hasTemplates: e.target.value })}
+          >
+            <option value="any">Неважливо</option>
+            <option value="yes">Є</option>
+            <option value="no">Немає</option>
+          </select>
+        </label>
 
-          <label className="rf-field">
-            <span>Активні задачі</span>
-            <select
-              className="input"
-              value={local.hasActiveTasks}
-              onChange={(e) => change({ hasActiveTasks: e.target.value })}
-            >
-              <option value="any">Неважливо</option>
-              <option value="yes">Є активність</option>
-              <option value="no">Нема активності</option>
-            </select>
-          </label>
+        <label className="rf-field">
+          <span>Активні задачі</span>
+          <select
+            className="input"
+            value={local.hasActiveTasks}
+            onChange={(e) => change({ hasActiveTasks: e.target.value })}
+          >
+            <option value="any">Неважливо</option>
+            <option value="yes">Є активність</option>
+            <option value="no">Нема активності</option>
+          </select>
+        </label>
 
-          <label className="rf-field">
-            <span>Подання</span>
-            <select
-              className="input"
-              value={local.view}
-              onChange={(e) => change({ view: e.target.value })}
-            >
-              <option value="list">Список</option>
-              <option value="owner">Групувати за постановником</option>
-            </select>
-          </label>
-        </div>
+        <label className="rf-field">
+          <span>Подання</span>
+          <select
+            className="input"
+            value={local.view}
+            onChange={(e) => change({ view: e.target.value })}
+          >
+            <option value="list">Список</option>
+            <option value="owner">Групувати за постановником</option>
+          </select>
+        </label>
 
         <div className="rf-actions">
           <button className="btn ghost" onClick={() => onReset && onReset()}>Скинути фільтри</button>
