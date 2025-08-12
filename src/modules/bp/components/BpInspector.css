@@ -1,0 +1,6 @@
+.bp-inspector {
+    width: var(--right-sidebar-width);
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    padding: var(--space-2);
+}

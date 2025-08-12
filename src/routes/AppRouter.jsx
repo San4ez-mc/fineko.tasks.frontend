@@ -6,6 +6,8 @@ import DailyTasksPage from "../modules/tasks/pages/DailyTasksPage";
 import ResultsPage from "../modules/results/pages/ResultsPage";
 import TemplatesPage from "../modules/templates/pages/TemplatesPage";
 import BusinessProcessesPage from "../modules/processes/pages/BusinessProcessesPage";
+import BpListPage from "../modules/bp/pages/BpListPage";
+import BpEditorPage from "../modules/bp/pages/BpEditorPage";
 import OrgPage from "../modules/org/pages/OrgPage";
 import TelegramGroupPage from "../modules/telegram/pages/TelegramGroupPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
@@ -67,6 +69,30 @@ export default function AppRouter() {
                     element={
                         <RequireAuth>
                             <BusinessProcessesPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/bp"
+                    element={
+                        <RequireAuth>
+                            <BpListPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/bp/new"
+                    element={
+                        <RequireAuth>
+                            <BpEditorPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/bp/:id"
+                    element={
+                        <RequireAuth>
+                            <BpEditorPage />
                         </RequireAuth>
                     }
                 />

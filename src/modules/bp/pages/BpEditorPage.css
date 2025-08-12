@@ -1,0 +1,15 @@
+.bp-editor-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--header-height));
+}
+
+.bp-editor-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.bp-editor-main .bp-canvas {
+    flex: 1;
+}
