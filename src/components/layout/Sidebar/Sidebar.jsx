@@ -27,9 +27,12 @@ export default function Sidebar({
     resultsCount = 0,
     telegramCount = 0,
 }) {
-    const [isResultsOpen, setIsResultsOpen] = useState(true);
+    const [isTasksOpen, setIsTasksOpen] = useState(true);
     const location = useLocation();
-    const resultsActive = location.pathname.startsWith("/results");
+    const tasksActive =
+        location.pathname.startsWith("/results") ||
+        location.pathname.startsWith("/templates") ||
+        location.pathname.startsWith("/tasks");
     const { activeCompany } = useCompany();
 
     const handleNavClick = () => {
@@ -61,26 +64,25 @@ export default function Sidebar({
                 {/* Пункти меню */}
                 <nav>
                     <ul>
-                        <li className={resultsActive ? "active" : ""}>
+                        <li className={tasksActive ? "active" : ""}>
                             <button
                                 className="menu-link"
-                                onClick={() => setIsResultsOpen(!isResultsOpen)}
-                                aria-expanded={isResultsOpen}
+                                onClick={() => setIsTasksOpen(!isTasksOpen)}
+                                aria-expanded={isTasksOpen}
                             >
-                                <FiBarChart2 className="menu-icon" />
+                                <FiCheckSquare className="menu-icon" />
                                 {isOpen && (
                                     <>
-                                        <span className="menu-text">Результати</span>
-                                        <span className="badge menu-badge">{resultsCount}</span>
+                                        <span className="menu-text">Задачі</span>
                                         <FiChevronDown
                                             className={`submenu-arrow ${
-                                                isResultsOpen ? "open" : ""
+                                                isTasksOpen ? "open" : ""
                                             }`}
                                         />
                                     </>
                                 )}
                             </button>
-                            {isOpen && isResultsOpen && (
+                            {isOpen && isTasksOpen && (
                                 <ul className="submenu">
                                     <li>
                                         <NavLink
@@ -90,9 +92,11 @@ export default function Sidebar({
                                             }
                                             onClick={handleNavClick}
                                         >
+                                            <FiBarChart2 className="submenu-icon" />
                                             <span className="menu-text">
                                                 Результати
                                             </span>
+                                            <span className="badge menu-badge">{resultsCount}</span>
                                         </NavLink>
                                     </li>
                                     <li>
@@ -103,29 +107,28 @@ export default function Sidebar({
                                             }
                                             onClick={handleNavClick}
                                         >
+                                            <FiGrid className="submenu-icon" />
                                             <span className="menu-text">
                                                 Шаблони
                                             </span>
                                         </NavLink>
                                     </li>
+                                    <li>
+                                        <NavLink
+                                            to="/tasks"
+                                            className={({ isActive }) =>
+                                                `${isActive ? "active" : ""} nav-subitem`
+                                            }
+                                            onClick={handleNavClick}
+                                        >
+                                            <FiCheckSquare className="submenu-icon" />
+                                            <span className="menu-text">
+                                                Щоденні задачі
+                                            </span>
+                                        </NavLink>
+                                    </li>
                                 </ul>
                             )}
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/tasks"
-                                className={({ isActive }) =>
-                                    isActive ? "active" : ""
-                                }
-                                onClick={handleNavClick}
-                            >
-                                <FiCheckSquare className="menu-icon" />
-                                {isOpen && (
-                                    <span className="menu-text">
-                                        Щоденні задачі
-                                    </span>
-                                )}
-                            </NavLink>
                         </li>
                         <li className="sidebar-divider" aria-hidden="true"></li>
                         <li>
