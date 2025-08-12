@@ -30,6 +30,12 @@ export default function Sidebar({
     const location = useLocation();
     const resultsActive = location.pathname.startsWith("/results");
 
+    const handleNavClick = () => {
+        if (isOpen) {
+            onToggle();
+        }
+    };
+
     return (
         <aside className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
             <div className="sidebar-content">
@@ -80,6 +86,7 @@ export default function Sidebar({
                                             className={({ isActive }) =>
                                                 `${isActive ? "active" : ""} nav-subitem`
                                             }
+                                            onClick={handleNavClick}
                                         >
                                             <span className="menu-text">
                                                 Результати
@@ -92,6 +99,7 @@ export default function Sidebar({
                                             className={({ isActive }) =>
                                                 `${isActive ? "active" : ""} nav-subitem`
                                             }
+                                            onClick={handleNavClick}
                                         >
                                             <span className="menu-text">
                                                 Шаблони
@@ -107,6 +115,7 @@ export default function Sidebar({
                                 className={({ isActive }) =>
                                     isActive ? "active" : ""
                                 }
+                                onClick={handleNavClick}
                             >
                                 <FiCheckSquare className="menu-icon" />
                                 {isOpen && (
@@ -123,6 +132,7 @@ export default function Sidebar({
                                 className={({ isActive }) =>
                                     isActive ? "active" : ""
                                 }
+                                onClick={handleNavClick}
                             >
                                 <FiGitBranch className="menu-icon" />
                                 {isOpen && (
@@ -138,6 +148,7 @@ export default function Sidebar({
                                 className={({ isActive }) =>
                                     isActive ? "active" : ""
                                 }
+                                onClick={handleNavClick}
                             >
                                 <FiGrid className="menu-icon" />
                                 {isOpen && (
@@ -153,6 +164,7 @@ export default function Sidebar({
                                 className={({ isActive }) =>
                                     isActive ? "active" : ""
                                 }
+                                onClick={handleNavClick}
                             >
                                 <FiBook className="menu-icon" />
                                 {isOpen && (
@@ -168,6 +180,7 @@ export default function Sidebar({
                                 className={({ isActive }) =>
                                     isActive ? "active" : ""
                                 }
+                                onClick={handleNavClick}
                             >
                                 <FiSend className="menu-icon" />
                                 {isOpen && (
