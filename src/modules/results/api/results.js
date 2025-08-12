@@ -9,6 +9,9 @@ export const getResult = async (id) =>
 export const createResult = async (data) =>
     (await api.post("/results", data)).data;
 
+export const createSubresult = async (parentId, data) =>
+    (await api.post(`/results/${parentId}/children`, data)).data;
+
 export const updateResult = async (id, data) =>
     (await api.patch(`/results/${id}`, data)).data;
 
