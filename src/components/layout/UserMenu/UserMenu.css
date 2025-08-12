@@ -1,0 +1,10 @@
+.company-select-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.company-select {
+    width: 100%;
+    padding: 4px;
+}

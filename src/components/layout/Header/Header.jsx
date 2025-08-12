@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import "./Header.css";
 import { FiMenu, FiSearch, FiCheckSquare } from "react-icons/fi";
 import { useAuth } from "../../../context/AuthContext";
+import UserMenu from "../UserMenu/UserMenu";
 
 export default function Header() {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
 
     const handleLeftToggle = () => {
         window.dispatchEvent(new CustomEvent("ui:toggleLeftSidebar"));
@@ -63,17 +64,7 @@ export default function Header() {
                 >
                     {initials}
                 </div>
-                {userMenuOpen && (
-                    <div className="user-dropdown">
-                        <ul>
-                            <li>Профіль</li>
-                            <li>Налаштування</li>
-                            <li className="logout" onClick={logout}>
-                                Вихід
-                            </li>
-                        </ul>
-                    </div>
-                )}
+                {userMenuOpen && <UserMenu />}
             </div>
         </header>
     );

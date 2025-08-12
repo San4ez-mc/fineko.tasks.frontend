@@ -19,6 +19,7 @@ import {
 import CheckToggle from "../../ui/CheckToggle";
 import axios from "axios";
 import { API_BASE_URL } from "../../../config";
+import { useCompany } from "../../../context/CompanyContext";
 
 export default function Sidebar({
     isOpen,
@@ -29,6 +30,7 @@ export default function Sidebar({
     const [isResultsOpen, setIsResultsOpen] = useState(true);
     const location = useLocation();
     const resultsActive = location.pathname.startsWith("/results");
+    const { activeCompany } = useCompany();
 
     return (
         <aside className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
@@ -184,6 +186,9 @@ export default function Sidebar({
                         </li>
                     </ul>
                 </nav>
+            </div>
+            <div className="active-company">
+                {activeCompany?.name || "Компанія не вибрана"}
             </div>
         </aside>
     );
