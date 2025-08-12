@@ -18,10 +18,10 @@ export default function Header() {
 
     const initials = user?.name
         ? user.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .toUpperCase()
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
         : "";
 
     return (
@@ -49,6 +49,7 @@ export default function Header() {
             </div>
 
             <div className="header-right">
+                <button className="btn ghost" type="button">Open Telegram</button>
                 <button
                     className="icon-btn"
                     aria-label="Задачі на сьогодні"
@@ -57,7 +58,6 @@ export default function Header() {
                 >
                     <FiCheckSquare size={20} />
                 </button>
-                <button className="btn ghost" type="button">Open Telegram</button>
                 <div
                     className="user-avatar"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
