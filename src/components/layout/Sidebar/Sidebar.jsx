@@ -14,6 +14,7 @@ import {
     FiChevronDown,
     FiBook,
     FiExternalLink,
+    FiGitBranch,
 } from "react-icons/fi";
 import CheckToggle from "../../ui/CheckToggle";
 import axios from "axios";
@@ -77,7 +78,7 @@ export default function Sidebar({
                                         <NavLink
                                             to="/results"
                                             className={({ isActive }) =>
-                                                isActive ? "active" : ""
+                                                `${isActive ? "active" : ""} nav-subitem`
                                             }
                                         >
                                             <span className="menu-text">
@@ -89,7 +90,7 @@ export default function Sidebar({
                                         <NavLink
                                             to="/templates"
                                             className={({ isActive }) =>
-                                                isActive ? "active" : ""
+                                                `${isActive ? "active" : ""} nav-subitem`
                                             }
                                         >
                                             <span className="menu-text">
@@ -111,6 +112,22 @@ export default function Sidebar({
                                 {isOpen && (
                                     <span className="menu-text">
                                         Щоденні задачі
+                                    </span>
+                                )}
+                            </NavLink>
+                        </li>
+                        <li className="sidebar-divider" aria-hidden="true"></li>
+                        <li>
+                            <NavLink
+                                to="/business-processes"
+                                className={({ isActive }) =>
+                                    isActive ? "active" : ""
+                                }
+                            >
+                                <FiGitBranch className="menu-icon" />
+                                {isOpen && (
+                                    <span className="menu-text">
+                                        Бізнес-процеси
                                     </span>
                                 )}
                             </NavLink>

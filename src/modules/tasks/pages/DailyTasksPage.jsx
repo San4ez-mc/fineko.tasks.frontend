@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Layout from "../../../components/layout/Layout";
 import "./DailyTasksPage.css";
 import "../../templates/components/TemplatesFilters.css";
 import axios from "axios";
 import { API_BASE_URL } from "../../../config";
 import { formatMinutesToHours } from "../../../utils/timeFormatter";
+import { FiCalendar } from "react-icons/fi";
 
 export default function DailyTasksPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -15,12 +16,12 @@ export default function DailyTasksPage() {
     status: "any",
     priority: "any",
     timer: "any",
-    date: "",
     result: "any",
     assignee: "any",
   });
   const [timers, setTimers] = useState({});
   const [activeTimerId, setActiveTimerId] = useState(null);
+  const dateInputRef = useRef(null);
 
   const formatDateForApi = (date) => date.toISOString().split("T")[0];
 
@@ -68,7 +69,6 @@ export default function DailyTasksPage() {
       status: "any",
       priority: "any",
       timer: "any",
-      date: "",
       result: "any",
       assignee: "any",
     };
@@ -140,11 +140,40 @@ export default function DailyTasksPage() {
     day: "numeric",
   });
 
+  const goPrevDay = () =>
+    setSelectedDate((d) => new Date(d.getTime() - 86400000));
+  const goNextDay = () =>
+    setSelectedDate((d) => new Date(d.getTime() + 86400000));
+  const openDatePicker = () => dateInputRef.current?.showPicker();
+
   return (
     <Layout>
       <div className="page-header">
         <div className="page-header-left">
-          <h1>Мої задачі на {formattedDate}</h1>
+          <h1 className="tasks-title">
+            <button className="btn ghost icon" onClick={goPrevDay}>
+              ←
+            </button>
+            Мої задачі на
+            <button
+              className="date-trigger"
+              onClick={openDatePicker}
+              title="Обрати дату"
+            >
+              {formattedDate}
+              <FiCalendar className="ico-calendar" aria-hidden />
+            </button>
+            <button className="btn ghost icon" onClick={goNextDay}>
+              →
+            </button>
+            <input
+              type="date"
+              ref={dateInputRef}
+              className="date-input"
+              value={formatDateForApi(selectedDate)}
+              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+            />
+          </h1>
           {filters.assignee !== "any" && filters.assignee !== "" && (
             <span className="muted">Виконавець: {filters.assignee}</span>
           )}
@@ -227,15 +256,6 @@ export default function DailyTasksPage() {
                 <option value="yes">є</option>
                 <option value="no">нема</option>
               </select>
-            </label>
-
-            <label className="tf-field">
-              <span>Дата</span>
-              <input
-                type="date"
-                value={filters.date}
-                onChange={(e) => handleFilterChange({ date: e.target.value })}
-              />
             </label>
 
             <label className="tf-field">

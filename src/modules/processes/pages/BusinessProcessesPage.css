@@ -1,0 +1,35 @@
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.page-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.processes-table .actions {
+    display: flex;
+    gap: 6px;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--blue);
+    cursor: pointer;
+    font: inherit;
+}
+
+.link-btn:hover {
+    text-decoration: underline;
+}

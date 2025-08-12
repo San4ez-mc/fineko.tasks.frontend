@@ -1,0 +1,5 @@
+.bp-canvas {
+    position: relative;
+    overflow: auto;
+    background: var(--bg);
+}

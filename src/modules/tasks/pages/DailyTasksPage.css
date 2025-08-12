@@ -20,6 +20,39 @@
   color: var(--text-muted);
 }
 
+.tasks-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-trigger {
+  background: transparent;
+  border: 1px dashed var(--blue);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.date-trigger:hover {
+  background: color-mix(in srgb, var(--blue) 6%, transparent);
+}
+
+.ico-calendar {
+  pointer-events: none;
+}
+
+.date-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
 .tasks-list {
   display: grid;
 }

@@ -19,9 +19,8 @@
   font-size: var(--fz-base); color: var(--text);
 }
 
-.rf-group{ display:flex; gap:10px; flex-wrap:wrap; }
 .rf-field{
-  display:flex; flex-direction:column; gap:6px;
+  display:flex; align-items:center; gap:6px;
   font-size: var(--fz-sm); color: var(--text-muted);
 }
 .rf-field select{
