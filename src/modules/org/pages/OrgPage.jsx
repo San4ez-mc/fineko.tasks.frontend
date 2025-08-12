@@ -117,20 +117,17 @@ export default function OrgPage() {
           onFocusPosition={handleFocusPosition}
         />
       </aside>
-
-
-        <main className="org-canvas">
-          <OrgCanvas
-            tree={tree}
-            expanded={expanded}
-            onToggleExpand={toggleExpand}
-            highlightIds={highlightIds}
-            onUpdateUnit={handleUpdateUnit}
-            onMove={handleMove}
-            onReplaceUser={handleReplaceUser}
-          />
-        </main>
-      </div>
+      <main className="org-canvas">
+        <OrgCanvas
+          tree={tree}
+          expanded={expanded}
+          onToggleExpand={toggleExpand}
+          highlightIds={highlightIds}
+          onUpdateUnit={handleUpdateUnit}
+          onMove={handleMove}
+          onReplaceUser={handleReplaceUser}
+        />
+      </main>
     </div>
   );
 }
