@@ -6,6 +6,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../../config";
 import { formatMinutesToHours } from "../../../utils/timeFormatter";
 import { FiCalendar } from "react-icons/fi";
+import { getResults } from "../../results/api/results";
 
 export default function DailyTasksPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -22,6 +23,23 @@ export default function DailyTasksPage() {
   const [timers, setTimers] = useState({});
   const [activeTimerId, setActiveTimerId] = useState(null);
   const dateInputRef = useRef(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskType, setNewTaskType] = useState("neutral");
+  const [plannedTime, setPlannedTime] = useState("00:00");
+  const [newTaskResult, setNewTaskResult] = useState("");
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [results, setResults] = useState([]);
+  const [titleError, setTitleError] = useState(false);
+
+  const priorityMap = { critical: 1, important: 2, rush: 3, neutral: 4 };
+  const sortTasks = (arr) =>
+    [...arr].sort((a, b) => {
+      if (a.status === "done" && b.status !== "done") return 1;
+      if (b.status === "done" && a.status !== "done") return -1;
+      return (priorityMap[a.type] || 0) - (priorityMap[b.type] || 0);
+    });
 
   const formatDateForApi = (date) => date.toISOString().split("T")[0];
 
@@ -47,7 +65,7 @@ export default function DailyTasksPage() {
           expected_result: t.expected_result || "",
           actual_result: t.result || "",
         }));
-        setTasks(mapped);
+        setTasks(sortTasks(mapped));
       })
       .catch((err) => console.error("Помилка завантаження задач:", err));
   };
@@ -123,7 +141,9 @@ export default function DailyTasksPage() {
       .patch(`${API_BASE_URL}/task/update-field?id=${id}`, { field, value })
       .then(() => {
         setTasks((prev) =>
-          prev.map((t) => (t.id === id ? { ...t, [field]: value } : t))
+          sortTasks(
+            prev.map((t) => (t.id === id ? { ...t, [field]: value } : t))
+          )
         );
       })
       .catch(() => {});
@@ -145,6 +165,76 @@ export default function DailyTasksPage() {
   const goNextDay = () =>
     setSelectedDate((d) => new Date(d.getTime() + 86400000));
   const openDatePicker = () => dateInputRef.current?.showPicker();
+
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/tasks/templates`)
+      .then((r) => setTemplates(r.data?.templates || []))
+      .catch(() => {});
+    getResults({ status: "active" })
+      .then((data) => setResults(data.results || []))
+      .catch(() => {});
+  }, []);
+
+  const handleTemplateSelect = (id) => {
+    setSelectedTemplate(id);
+    const t = templates.find((tmp) => String(tmp.id) === String(id));
+    if (t) {
+      setNewTaskTitle(t.title || "");
+      setNewTaskType(t.priority || t.type || "neutral");
+      if (t.plannedTime) setPlannedTime(t.plannedTime);
+      else if (t.plannedMinutes !== undefined) {
+        const h = String(Math.floor(t.plannedMinutes / 60)).padStart(2, "0");
+        const m = String(t.plannedMinutes % 60).padStart(2, "0");
+        setPlannedTime(`${h}:${m}`);
+      }
+      setNewTaskResult(t.resultId || "");
+    }
+  };
+
+  const handleCreateTask = () => {
+    if (!newTaskTitle.trim()) {
+      setTitleError(true);
+      return;
+    }
+    setTitleError(false);
+    const [h, m] = plannedTime.split(":").map((n) => parseInt(n, 10) || 0);
+    const payload = {
+      date: formatDateForApi(selectedDate),
+      title: newTaskTitle.trim(),
+      type: newTaskType,
+      plannedMinutes: h * 60 + m,
+    };
+    if (newTaskResult) payload.resultId = newTaskResult;
+    axios
+      .post(`${API_BASE_URL}/tasks/daily`, payload)
+      .then((res) => {
+        const newTask = {
+          id: res.data?.id || Date.now(),
+          title: payload.title,
+          status: "new",
+          dueDate: formatDateForApi(selectedDate),
+          type: payload.type,
+          expected_time: payload.plannedMinutes,
+        };
+        setTasks((prev) => sortTasks([...prev, newTask]));
+        window.dispatchEvent(
+          new CustomEvent("today-task-added", { detail: newTask })
+        );
+        window.dispatchEvent(
+          new CustomEvent("toast", {
+            detail: { type: "success", message: "Додано" },
+          })
+        );
+        setIsFormOpen(false);
+        setNewTaskTitle("");
+        setNewTaskType("neutral");
+        setPlannedTime("00:00");
+        setNewTaskResult("");
+        setSelectedTemplate("");
+      })
+      .catch((err) => console.error("Помилка створення задачі", err));
+  };
 
   return (
     <Layout>
@@ -179,12 +269,68 @@ export default function DailyTasksPage() {
           )}
         </div>
         <div className="page-header-actions">
-          <button className="btn primary">Додати задачу</button>
+          <button
+            className="btn primary"
+            onClick={() => setIsFormOpen((o) => !o)}
+          >
+            {isFormOpen ? "Скасувати" : "Додати задачу"}
+          </button>
           <button className="btn ghost">
             Перенести вибрані на іншу дату
           </button>
         </div>
       </div>
+
+      {isFormOpen && (
+        <div className="add-task-form card">
+          <input
+            type="text"
+            className={`title-input ${titleError ? "error" : ""}`}
+            placeholder="Назва задачі*"
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+          />
+          <select
+            value={newTaskType}
+            onChange={(e) => setNewTaskType(e.target.value)}
+          >
+            <option value="critical">critical</option>
+            <option value="important">important</option>
+            <option value="rush">rush</option>
+            <option value="neutral">neutral</option>
+          </select>
+          <input
+            type="time"
+            value={plannedTime}
+            onChange={(e) => setPlannedTime(e.target.value)}
+          />
+          <select
+            value={newTaskResult}
+            onChange={(e) => setNewTaskResult(e.target.value)}
+          >
+            <option value="">Без результату</option>
+            {results.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.title}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedTemplate}
+            onChange={(e) => handleTemplateSelect(e.target.value)}
+          >
+            <option value="">З шаблону…</option>
+            {templates.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.title}
+              </option>
+            ))}
+          </select>
+          <button className="btn" onClick={handleCreateTask}>
+            Створити
+          </button>
+        </div>
+      )}
 
       <div className="tpl-filters card">
         <div className="tf-row">

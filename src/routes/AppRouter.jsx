@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 import HomePage from "../pages/HomePage";
 import DailyTasksPage from "../modules/tasks/pages/DailyTasksPage";
@@ -9,6 +9,7 @@ import BusinessProcessesPage from "../modules/processes/pages/BusinessProcessesP
 import BpListPage from "../modules/bp/pages/BpListPage";
 import BpEditorPage from "../modules/bp/pages/BpEditorPage";
 import OrgPage from "../modules/org/pages/OrgPage";
+import Layout from "../components/layout/Layout";
 import TelegramGroupPage from "../modules/telegram/pages/TelegramGroupPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
 import ForgotPasswordPage from "../modules/auth/pages/ForgotPasswordPage";
@@ -96,14 +97,9 @@ export default function AppRouter() {
                         </RequireAuth>
                     }
                 />
-                <Route
-                    path="/org"
-                    element={
-                        <RequireAuth>
-                            <OrgPage />
-                        </RequireAuth>
-                    }
-                />
+                <Route element={<RequireAuth><Layout><Outlet /></Layout></RequireAuth>}>
+                    <Route path="/org" element={<OrgPage />} />
+                </Route>
                 <Route
                     path="/telegram-group"
                     element={

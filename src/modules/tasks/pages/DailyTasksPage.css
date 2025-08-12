@@ -128,3 +128,26 @@
   margin-top: 20px;
 }
 
+.add-task-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.add-task-form input,
+.add-task-form select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.add-task-form .title-input {
+  flex: 1;
+}
+
+.add-task-form input.error {
+  border-color: var(--red, #e00);
+}
+

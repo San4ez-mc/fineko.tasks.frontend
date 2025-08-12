@@ -3,8 +3,7 @@
 .org-layout{
   display:grid;
   grid-template-columns: 360px 1fr;
-  gap:0;
-  height:100%;
+  min-height: calc(100dvh - var(--header-h) - var(--footer-h));
 }
 
 .org-left{
@@ -15,7 +14,6 @@
 }
 
 .org-canvas{
-  position:relative;
   overflow:auto;
   background: var(--bg);
 }

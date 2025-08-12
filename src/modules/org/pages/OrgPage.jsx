@@ -101,6 +101,7 @@ export default function OrgPage() {
     }, [tree]);
 
   return (
+
     <div className="org-layout">
       <aside className="org-left card">
         <OrgLeftPanel
@@ -117,17 +118,19 @@ export default function OrgPage() {
         />
       </aside>
 
-      <main className="org-canvas">
-        <OrgCanvas
-          tree={tree}
-          expanded={expanded}
-          onToggleExpand={toggleExpand}
-          highlightIds={highlightIds}
-          onUpdateUnit={handleUpdateUnit}
-          onMove={handleMove}
-          onReplaceUser={handleReplaceUser}
-        />
-      </main>
+
+        <main className="org-canvas">
+          <OrgCanvas
+            tree={tree}
+            expanded={expanded}
+            onToggleExpand={toggleExpand}
+            highlightIds={highlightIds}
+            onUpdateUnit={handleUpdateUnit}
+            onMove={handleMove}
+            onReplaceUser={handleReplaceUser}
+          />
+        </main>
+      </div>
     </div>
   );
 }

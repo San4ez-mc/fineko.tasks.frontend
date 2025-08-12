@@ -230,6 +230,24 @@ export function RightSidebar() {
         return () => clearInterval(interval);
     }, []);
 
+    useEffect(() => {
+        const handler = (e) => {
+            const t = e.detail;
+            setTasks((prev) => [
+                ...prev,
+                {
+                    id: t.id,
+                    title: t.title,
+                    type: t.type,
+                    planned: t.expected_time,
+                    status: t.status,
+                },
+            ]);
+        };
+        window.addEventListener("today-task-added", handler);
+        return () => window.removeEventListener("today-task-added", handler);
+    }, []);
+
     const toggleComplete = async (id) => {
         const current = tasks.find((t) => t.id === id);
         const newStatus = current.status === "done" ? "new" : "done";
