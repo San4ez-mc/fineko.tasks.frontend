@@ -18,7 +18,9 @@
 .layout-column {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
+    box-sizing: border-box;
+    padding-top: var(--header-height);
     margin-left: calc(var(--left-open) * var(--sidebar-width));
     margin-right: calc(var(--right-open) * var(--right-sidebar-width));
     transition: margin var(--transition);

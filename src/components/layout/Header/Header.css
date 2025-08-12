@@ -6,9 +6,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 10;
+    left: calc(var(--left-open) * var(--sidebar-width));
+    right: calc(var(--right-open) * var(--right-sidebar-width));
+    z-index: 120;
     border-bottom: 1px solid var(--border);
 }
 
