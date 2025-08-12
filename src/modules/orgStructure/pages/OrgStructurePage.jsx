@@ -1,8 +1,7 @@
 // frontend/src/modules/org/pages/OrgStructurePage.jsx
 import React, { useEffect, useState } from "react";
 import Layout from "../../../components/layout/Layout";
-import axios from "axios";
-import { API_BASE_URL } from "../../../config";
+import api from "../../../services/api";
 
 export default function OrgStructurePage() {
     const [tree, setTree] = useState([]);
@@ -11,8 +10,8 @@ export default function OrgStructurePage() {
         async function load() {
             try {
                 const [posRes, userRes] = await Promise.all([
-                    axios.get(`${API_BASE_URL}/position`),
-                    axios.get(`${API_BASE_URL}/user`),
+                    api.get("/position"),
+                    api.get("/user"),
                 ]);
                 const positions = posRes.data;
                 const users = userRes.data;

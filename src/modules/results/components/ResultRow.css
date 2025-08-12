@@ -35,6 +35,20 @@
   white-space:nowrap;
 }
 
+.result-row.is-done{
+  color: var(--text-muted);
+}
+.result-row.is-done .title{
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.result-row .actions .done-label{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
 .result-row .actions .btn{
   width:auto;
   white-space:nowrap;

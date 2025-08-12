@@ -1,8 +1,7 @@
 // frontend/src/modules/auth/pages/ForgotPasswordPage.jsx
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { API_BASE_URL } from "../../../config";
+import api from "../../../services/api";
 import AuthLayout from "../../../components/layout/AuthLayout/AuthLayout";
 import "./LoginPage.css";
 
@@ -16,8 +15,8 @@ export default function ForgotPasswordPage() {
         setError("");
         setMessage("");
         try {
-            const res = await axios.post(
-                `${API_BASE_URL}/auth/request-password-reset`,
+            const res = await api.post(
+                "/auth/request-password-reset",
                 { email }
             );
             if (res.data && res.data.success) {
