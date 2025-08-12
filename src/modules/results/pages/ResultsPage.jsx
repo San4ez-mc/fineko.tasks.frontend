@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../../components/layout/Layout.jsx';
-import { getResults } from '../api/results';
+import { getResults, toggleResultComplete } from '../api/results';
 import ResultRow from '../components/ResultRow.jsx';
 import ResultDetails from '../components/ResultDetails.jsx';
 import ResultsEmpty from '../components/ResultsEmpty.jsx';
@@ -37,6 +37,22 @@ export default function ResultsPage() {
     setExpanded((prev) => (prev === id ? null : id));
   };
 
+  const handleToggleDone = async (id, done) => {
+    const prevDone = results.find((r) => r.id === id)?.done;
+    setResults((prev) => prev.map((r) => (r.id === id ? { ...r, done } : r)));
+    try {
+      await toggleResultComplete(id, done);
+    } catch (e) {
+      setResults((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, done: prevDone } : r))
+      );
+      const msg = e.response?.data?.message || 'Не вдалося зберегти';
+      window.dispatchEvent(
+        new CustomEvent('toast', { detail: { type: 'error', message: msg } })
+      );
+    }
+  };
+
   return (
     <Layout>
       <div className="results-page">
@@ -68,6 +84,7 @@ export default function ResultsPage() {
                   result={r}
                   expanded={expanded === r.id}
                   onToggleExpand={toggleExpand}
+                  onToggleDone={handleToggleDone}
                 />
                 {expanded === r.id && <ResultDetails result={r} />}
               </React.Fragment>

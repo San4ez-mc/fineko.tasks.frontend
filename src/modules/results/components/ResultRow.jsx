@@ -1,5 +1,6 @@
 import React from "react";
 import "./ResultRow.css";
+import CheckToggle from "../../../components/ui/CheckToggle";
 
 /**
  * result: {
@@ -15,15 +16,17 @@ import "./ResultRow.css";
  * onEdit(id)
  * onArchive(id)
  * onDelete(id)  // має перевіряти права вище
- * onMarkDone(id) // підтвердження робити вище
- */
+ * onToggleDone(id, done)
+*/
 export default function ResultRow({
   result, expanded,
-  onToggleExpand, onCreateTemplate, onCreateTask, onViewTasks, onEdit, onArchive, onDelete, onMarkDone
+  onToggleExpand, onCreateTemplate, onCreateTask, onViewTasks, onEdit, onArchive, onDelete, onToggleDone
 }) {
   const statusClass = mapStatus(result.status);
+  const isDone = Boolean(result.done || result.completed_at);
+  const rowClass = `result-row ${expanded ? "expanded" : ""} ${isDone ? "is-done" : ""}`;
   return (
-    <div className={`result-row ${expanded ? "expanded" : ""}`}>
+    <div className={rowClass}>
       <button className="caret" aria-label="Розгорнути" onClick={() => onToggleExpand && onToggleExpand(result.id)}>
         {expanded ? "▾" : "▸"}
       </button>
@@ -51,7 +54,14 @@ export default function ResultRow({
         {onDelete && (
           <button className="btn ghost" onClick={() => onDelete(result.id)}>Видалити</button>
         )}
-        <button className="btn primary" onClick={() => onMarkDone && onMarkDone(result.id)}>Позначити виконаним</button>
+        <label className="done-label">
+          <CheckToggle
+            checked={isDone}
+            onChange={() => onToggleDone && onToggleDone(result.id, !isDone)}
+            ariaLabel="Готово"
+          />
+          <span className="done-text">Готово</span>
+        </label>
       </div>
     </div>
   );
