@@ -147,6 +147,13 @@
     transform: rotate(180deg);
 }
 
+/* Активна компанія внизу сайдбару */
+.active-company {
+    padding: 10px 15px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+}
+
 /* Right sidebar */
 .right-sidebar {
     width: var(--right-sidebar-width);
