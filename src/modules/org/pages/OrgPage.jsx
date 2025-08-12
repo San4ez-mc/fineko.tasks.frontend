@@ -67,29 +67,32 @@ export default function OrgPage() {
   );
 
   return (
-    <div className="org-layout">
-      <aside className="org-left card">
-        <OrgLeftPanel
-          positions={filteredPositions}
-          allPositions={positions}
-          filters={filters}
-          onFiltersChange={setFilters}
-          onSearch={handleSearch}
-          onUpdatePosition={handleUpdatePosition}
-        />
-      </aside>
+    <div className="page">
+      <h1 className="page-title">Орг. структура</h1>
+      <div className="org-layout">
+        <aside className="org-left card">
+          <OrgLeftPanel
+            positions={filteredPositions}
+            allPositions={positions}
+            filters={filters}
+            onFiltersChange={setFilters}
+            onSearch={handleSearch}
+            onUpdatePosition={handleUpdatePosition}
+          />
+        </aside>
 
-      <main className="org-canvas">
-        <OrgCanvas
-          tree={tree}
-          expanded={expanded}
-          onToggleExpand={toggleExpand}
-          highlightIds={highlightIds}
-          onUpdateUnit={handleUpdateUnit}
-          onMove={handleMove}
-          onReplaceUser={handleReplaceUser}
-        />
-      </main>
+        <main className="org-canvas">
+          <OrgCanvas
+            tree={tree}
+            expanded={expanded}
+            onToggleExpand={toggleExpand}
+            highlightIds={highlightIds}
+            onUpdateUnit={handleUpdateUnit}
+            onMove={handleMove}
+            onReplaceUser={handleReplaceUser}
+          />
+        </main>
+      </div>
     </div>
   );
 }
