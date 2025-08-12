@@ -1,0 +1,41 @@
+@import "../../../styles/variables.css";
+
+.add-result-form {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.add-result-form .arf-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.add-result-form .arf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.add-result-form .arf-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-result-form textarea {
+  min-height: 200px;
+  resize: vertical;
+}
+
+.add-result-form .arf-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.add-result-form .arf-error {
+  color: var(--critical);
+  font-size: var(--fz-sm);
+}
