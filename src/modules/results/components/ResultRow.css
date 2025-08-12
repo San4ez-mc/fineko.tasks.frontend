@@ -1,8 +1,12 @@
 @import "../../../styles/variables.css";
 
 .result-row{
-  display:grid; grid-template-columns: 28px 1.4fr 1fr auto; gap:12px;
-  align-items:center; padding:12px; border-bottom:1px solid var(--border);
+  display:grid;
+  grid-template-columns: 28px minmax(0,1.4fr) minmax(0,1fr) max-content;
+  gap:12px;
+  align-items:center;
+  padding:12px;
+  border-bottom:1px solid var(--border);
   background:#fff;
 }
 .result-row:hover{ box-shadow: var(--shadow); }
@@ -23,7 +27,33 @@
   color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 
-.result-row .actions{ display:flex; gap:8px; flex-wrap:wrap; justify-self:end; }
+.result-row .actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:nowrap;
+  justify-self:end;
+  white-space:nowrap;
+}
+
+.result-row .actions .btn{
+  width:auto;
+  white-space:nowrap;
+}
+
+@media (max-width: 1100px){
+  .result-row{
+    grid-template-columns: 28px 1fr auto;
+    grid-auto-rows: auto;
+  }
+  .result-row .expected{
+    grid-column: 2 / -1;
+  }
+  .result-row .actions{
+    grid-column: 2 / -1;
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+}
 
 /* статусні бейджі */
 .badge.status-new{ border-color: var(--text-muted); color: var(--text-muted); }
