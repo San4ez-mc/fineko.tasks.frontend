@@ -133,6 +133,12 @@
     padding-left: var(--space-3);
 }
 
+.submenu-icon {
+    font-size: 16px;
+    margin-right: 8px;
+    min-width: 18px;
+}
+
 .sidebar-divider {
     border-top: 1px solid var(--border);
     margin: var(--space-2) 0;
