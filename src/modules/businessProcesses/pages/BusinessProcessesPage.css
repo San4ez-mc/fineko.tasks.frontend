@@ -1,0 +1,34 @@
+.bp-list-page {
+  padding: 12px;
+}
+
+.bp-list-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.bp-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bp-list-item {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bp-list-item-name {
+  font-weight: 600;
+}
+
+.bp-list-item-actions {
+  display: flex;
+  gap: 8px;
+}
