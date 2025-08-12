@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import "../components/OrgLeftPanel.css";
 import "../components/OrgCanvas.css";
 import "./OrgPage.css";
 
 import OrgLeftPanel from "../components/OrgLeftPanel";
 import OrgCanvas from "../components/OrgCanvas";
+import { createPosition, createDepartment, updatePosition as apiUpdatePosition } from "../../../services/api/org";
 
 /**
  * OrgPage – контейнер сторінки оргструктури.
@@ -35,7 +36,34 @@ export default function OrgPage() {
   };
   const handleUpdatePosition = (id, patch) => {
     setPositions((prev) => prev.map(p => p.id === id ? { ...p, ...patch } : p));
-    // TODO: PATCH /org/position/{id}
+    apiUpdatePosition(id, patch).catch(()=>{});
+  };
+
+  const handleCreatePosition = async (data) => {
+    try {
+      const newP = await createPosition(data);
+      setPositions(prev => [...prev, newP]);
+      setTree(prev => addPosition(prev, newP));
+    } catch {
+      alert("Помилка створення посади");
+    }
+  };
+
+  const handleCreateDepartment = async (data) => {
+    try {
+      const newDep = await createDepartment(data);
+      setTree(prev => addDepartment(prev, newDep));
+    } catch {
+      alert("Помилка створення відділу");
+    }
+  };
+
+  const handleFocusPosition = (id) => {
+    setHighlightIds(new Set([id]));
+    setTimeout(() => {
+      const el = document.querySelector('.org-canvas .org-node.is-highlighted');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
   };
 
   // DnD переміщення
@@ -65,21 +93,31 @@ export default function OrgPage() {
     () => filterPositions(positions, filters),
     [positions, filters]
   );
+  const divisions = useMemo(() => tree.map(div => ({ id: div.id, name: div.name })), [tree]);
+  const departments = useMemo(() => {
+    const arr = [];
+    tree.forEach(div => div.departments.forEach(dep => arr.push({ id: dep.id, name: dep.name, divisionId: div.id })));
+    return arr;
+    }, [tree]);
 
   return (
-    <div className="page">
-      <h1 className="page-title">Орг. структура</h1>
-      <div className="org-layout">
-        <aside className="org-left card">
-          <OrgLeftPanel
-            positions={filteredPositions}
-            allPositions={positions}
-            filters={filters}
-            onFiltersChange={setFilters}
-            onSearch={handleSearch}
-            onUpdatePosition={handleUpdatePosition}
-          />
-        </aside>
+
+    <div className="org-layout">
+      <aside className="org-left card">
+        <OrgLeftPanel
+          positions={filteredPositions}
+          divisions={divisions}
+          departments={departments}
+          filters={filters}
+          onFiltersChange={setFilters}
+          onSearch={handleSearch}
+          onUpdatePosition={handleUpdatePosition}
+          onCreatePosition={handleCreatePosition}
+          onCreateDepartment={handleCreateDepartment}
+          onFocusPosition={handleFocusPosition}
+        />
+      </aside>
+
 
         <main className="org-canvas">
           <OrgCanvas
@@ -211,4 +249,32 @@ function moveEntity(tree, entity, id, targetId) {
 }
 function loadExpanded() {
   try { return new Set(JSON.parse(localStorage.getItem("org.expanded") || "[]")); } catch { return new Set(); }
+}
+
+function addPosition(tree, p) {
+  const next = JSON.parse(JSON.stringify(tree));
+  next.forEach(div => div.departments.forEach(dep => {
+    if (dep.id === p.departmentId) {
+      dep.employees.push({ id: p.id, type: "position", title: p.title, user: p.user, isManager: p.isManager });
+    }
+  }));
+  return next;
+}
+
+function addDepartment(tree, dep) {
+  const next = JSON.parse(JSON.stringify(tree));
+  next.forEach(div => {
+    if (div.id === dep.divisionId) {
+      div.departments.push({
+        id: dep.id,
+        type: "department",
+        name: dep.name,
+        head: dep.head || null,
+        productValue: dep.productValue || "",
+        order: 0,
+        employees: []
+      });
+    }
+  });
+  return next;
 }

@@ -1,19 +1,65 @@
-import React from "react";
+import React, { useState } from "react";
 
 /**
  * props:
  * - positions: [{id,title,user,managers[],departmentId,divisionId,departmentName,divisionName}]
- * - allPositions: [] (для селектів)
+ * - divisions: []
+ * - departments: []
  * - filters: { q, divisionId, departmentId, role }
  * - onFiltersChange(next)
  * - onSearch(q)
  * - onUpdatePosition(id, patch) // { managers:[], departmentId }
+ * - onCreatePosition(data)
+ * - onCreateDepartment(data)
+ * - onFocusPosition(id)
  */
 export default function OrgLeftPanel({
-  positions, allPositions, filters, onFiltersChange, onSearch, onUpdatePosition
+  positions, divisions, departments, filters,
+  onFiltersChange, onSearch, onUpdatePosition,
+  onCreatePosition, onCreateDepartment, onFocusPosition
 }) {
-  const divisions = uniquePairs(allPositions.map(p => ({ id: p.divisionId, name: p.divisionName })));
-  const departments = uniquePairs(allPositions.map(p => ({ id: p.departmentId, name: p.departmentName })));
+  const [showPosForm, setShowPosForm] = useState(false);
+  const [showDepForm, setShowDepForm] = useState(false);
+  const [posForm, setPosForm] = useState({ title: "", departmentId: departments[0]?.id || "", managers: "" });
+  const [depForm, setDepForm] = useState({ name: "", divisionId: divisions[0]?.id || "", head: "" });
+  const [savingPos, setSavingPos] = useState(false);
+  const [savingDep, setSavingDep] = useState(false);
+
+  const submitPos = async (e) => {
+    e.preventDefault();
+    if (!onCreatePosition) return;
+    setSavingPos(true);
+    try {
+      const managers = posForm.managers
+        .split(",")
+        .map((s, i) => s.trim())
+        .filter(Boolean)
+        .map((name, i) => ({ id: `tmp-${i}`, name }));
+      await onCreatePosition({ title: posForm.title, departmentId: posForm.departmentId, managers });
+      setPosForm({ title: "", departmentId: departments[0]?.id || "", managers: "" });
+      setShowPosForm(false);
+    } catch {
+      alert("Помилка створення посади");
+    } finally {
+      setSavingPos(false);
+    }
+  };
+
+  const submitDep = async (e) => {
+    e.preventDefault();
+    if (!onCreateDepartment) return;
+    setSavingDep(true);
+    try {
+      const head = depForm.head ? { name: depForm.head } : null;
+      await onCreateDepartment({ name: depForm.name, divisionId: depForm.divisionId, head });
+      setDepForm({ name: "", divisionId: divisions[0]?.id || "", head: "" });
+      setShowDepForm(false);
+    } catch {
+      alert("Помилка створення відділу");
+    } finally {
+      setSavingDep(false);
+    }
+  };
 
   return (
     <div className="org-left-panel">
@@ -45,7 +91,8 @@ export default function OrgLeftPanel({
             <span>Відділ</span>
             <select className="input" value={filters.departmentId} onChange={(e)=>onFiltersChange({...filters, departmentId: e.target.value})}>
               <option value="any">Усі</option>
-              {departments.map(d=> <option key={d.id} value={d.id}>{d.name}</option>)}
+              {departments.filter(d=> filters.divisionId === "any" || d.divisionId === filters.divisionId)
+                .map(d=> <option key={d.id} value={d.id}>{d.name}</option>)}
             </select>
           </label>
 
@@ -62,6 +109,11 @@ export default function OrgLeftPanel({
         </div>
       </div>
 
+      <div className="olp-actions">
+        <button className="btn ghost" onClick={()=>{ setShowPosForm(p=>!p); setShowDepForm(false); }}>Додати посаду</button>
+        <button className="btn ghost" onClick={()=>{ setShowDepForm(p=>!p); setShowPosForm(false); }}>Додати відділ</button>
+      </div>
+
       <div className="olp-table">
         <div className="olp-th">
           <div>Посада</div>
@@ -70,10 +122,48 @@ export default function OrgLeftPanel({
           <div>Дії</div>
         </div>
 
+        {showPosForm && (
+          <form className="olp-tr" onSubmit={submitPos}>
+            <div className="name">
+              <input className="input" required value={posForm.title} onChange={(e)=>setPosForm({...posForm,title:e.target.value})} />
+            </div>
+            <div className="managers">
+              <input className="input" placeholder="ПІБ керівників" value={posForm.managers} onChange={(e)=>setPosForm({...posForm,managers:e.target.value})} />
+            </div>
+            <div className="dept">
+              <select className="input" required value={posForm.departmentId} onChange={(e)=>setPosForm({...posForm,departmentId:e.target.value})}>
+                {departments.map(d=> <option key={d.id} value={d.id}>{d.name}</option>)}
+              </select>
+            </div>
+            <div className="actions">
+              <button className="btn" type="submit" disabled={savingPos}>{savingPos?"…":"Зберегти"}</button>
+            </div>
+          </form>
+        )}
+
+        {showDepForm && (
+          <form className="olp-tr" onSubmit={submitDep}>
+            <div className="name">
+              <input className="input" required value={depForm.name} onChange={(e)=>setDepForm({...depForm,name:e.target.value})} />
+            </div>
+            <div className="managers">
+              <input className="input" placeholder="Керівник" value={depForm.head} onChange={(e)=>setDepForm({...depForm,head:e.target.value})} />
+            </div>
+            <div className="dept">
+              <select className="input" required value={depForm.divisionId} onChange={(e)=>setDepForm({...depForm,divisionId:e.target.value})}>
+                {divisions.map(d=> <option key={d.id} value={d.id}>{d.name}</option>)}
+              </select>
+            </div>
+            <div className="actions">
+              <button className="btn" type="submit" disabled={savingDep}>{savingDep?"…":"Зберегти"}</button>
+            </div>
+          </form>
+        )}
+
         {positions.map(p => (
           <div className="olp-tr" key={p.id}>
             <div className="name">
-              <div className="title">{p.title}</div>
+              <div className="title" onClick={()=>onFocusPosition && onFocusPosition(p.id)} style={{cursor:"pointer"}}>{p.title}</div>
               <div className="muted">{p.user?.name || "—"}</div>
             </div>
 
@@ -99,8 +189,3 @@ export default function OrgLeftPanel({
   );
 }
 
-function uniquePairs(arr){
-  const map = new Map();
-  arr.forEach(({id,name}) => { if(id && !map.has(id)) map.set(id, name); });
-  return [...map.entries()].map(([id,name]) => ({id,name}));
-}
