@@ -19,7 +19,7 @@ export default function LoginPage() {
             const user = await login({ username, password }); // ✅ передаємо як об’єкт
             if (user) {
                 const redirect = searchParams.get("redirect");
-                navigate(redirect || "/tasks/daily");
+                navigate(redirect || "/tasks");
             } else {
                 setError("Невірний логін або пароль");
             }
