@@ -13,10 +13,18 @@
 .rf-field{ display:flex; flex-direction:column; gap:6px; font-size: var(--fz-sm); color: var(--text-muted); }
 .olp-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; }
 
+.olp-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
 .olp-table{ display:grid; gap:0; border:1px solid var(--border); border-radius: var(--radius); overflow:hidden; background:#fff; }
 .olp-th, .olp-tr{ display:grid; grid-template-columns: 1.3fr 1fr 1fr auto; gap:12px; align-items:center; padding:10px 12px; }
 .olp-th{ background: var(--surface-muted); font-weight:600; color: var(--navy); }
 .olp-tr{ border-top:1px solid var(--border); }
-.olp-tr .title{ font-weight:600; color: var(--text); }
+.olp-tr .name, .olp-tr .managers, .olp-tr .dept{ min-width:0; }
+.olp-tr .title{ font-weight:600; color: var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .olp-tr .muted{ color: var(--text-muted); font-size: var(--fz-sm); }
 .olp-tr .actions{ display:flex; gap:6px; justify-content:flex-end; }
+
+@media (max-width: 1200px){
+  .olp-th, .olp-tr{ grid-template-columns: 1.2fr 1fr auto; }
+  .olp-tr .dept{ display:none; }
+}

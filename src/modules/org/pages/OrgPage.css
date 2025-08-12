@@ -11,6 +11,7 @@
   padding:12px;
   border-right:1px solid var(--border);
   background:#fff;
+  overflow:auto;
 }
 
 .org-canvas{
