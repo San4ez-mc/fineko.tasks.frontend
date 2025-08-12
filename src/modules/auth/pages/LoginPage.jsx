@@ -1,6 +1,6 @@
 // frontend/src/modules/auth/pages/LoginPage.jsx
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import AuthLayout from "../../../components/layout/AuthLayout/AuthLayout";
 import "./LoginPage.css";
 import { useAuth } from "../../../context/AuthContext";
@@ -8,6 +8,7 @@ import { useAuth } from "../../../context/AuthContext";
 export default function LoginPage() {
     const { login } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -17,7 +18,8 @@ export default function LoginPage() {
         try {
             const user = await login({ username, password }); // ✅ передаємо як об’єкт
             if (user) {
-                navigate("/home"); // або на потрібну стартову сторінку
+                const redirect = searchParams.get("redirect");
+                navigate(redirect || "/tasks/daily");
             } else {
                 setError("Невірний логін або пароль");
             }
