@@ -38,6 +38,12 @@ export default function Sidebar({
         }
     };
 
+    const handleNavClick = () => {
+        if (isOpen) {
+            onToggle();
+        }
+    };
+
     return (
         <aside className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
             <div className="sidebar-content">
