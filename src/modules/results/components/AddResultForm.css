@@ -53,9 +53,25 @@
 .add-result-form .arf-actions {
   display: flex;
   gap: 12px;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid transparent;
+}
+
+@media (max-width: 576px) {
+  .add-result-form .arf-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-result-form .arf-actions .btn {
+    width: 100%;
+  }
 }
 
 .add-result-form .arf-error {
   color: var(--critical);
   font-size: var(--fz-sm);
+  min-height: var(--space-3);
 }
