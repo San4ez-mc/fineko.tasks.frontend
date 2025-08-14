@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../../components/layout/Layout.jsx';
 import { getResults } from '../api/results';
-import ResultRow from '../components/ResultRow.jsx';
+import ResultItem from '../components/ResultItem.jsx';
 import ResultDetails from '../components/ResultDetails.jsx';
 import ResultsEmpty from '../components/ResultsEmpty.jsx';
 import ResultForm from '../components/ResultForm.jsx';
@@ -64,7 +64,7 @@ export default function ResultsPage() {
           <div className="results-list">
             {results.map((r) => (
               <React.Fragment key={r.id}>
-                <ResultRow
+                <ResultItem
                   result={r}
                   expanded={expanded === r.id}
                   onToggleExpand={toggleExpand}
