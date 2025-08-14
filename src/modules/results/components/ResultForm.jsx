@@ -6,6 +6,7 @@ export default function ResultForm({ onSaved, onCancel }) {
   const [form, setForm] = useState({
     title: '',
     final_result: '',
+    date: '',
     due_date: '',
     urgent: false,
     description: '',
@@ -14,6 +15,7 @@ export default function ResultForm({ onSaved, onCancel }) {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
   const [dueDateValid, setDueDateValid] = useState(true);
+  const [dateValid, setDateValid] = useState(true);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -31,30 +33,71 @@ export default function ResultForm({ onSaved, onCancel }) {
     const { name, value, type, checked } = e.target;
     const val = type === 'checkbox' ? checked : value;
     setForm((prev) => ({ ...prev, [name]: val }));
+
     if (name === 'due_date') {
-      const re = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/;
+      // очікуємо формат гг:хх (24h), напр. 09:30
+      const re = /^\d{2}:\d{2}$/;
       setDueDateValid(re.test(val) || val === '');
     }
+
+    if (name === 'date') {
+      // дата не може бути в минулому
+      const selected = new Date(val);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      setDateValid(selected >= today || val === '');
+    }
   };
+
+  const todayStr = new Date().toISOString().split('T')[0];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     try {
+      if (form.date) {
+        const selected = new Date(form.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selected < today) {
+          setDateValid(false);
+          return;
+        }
+      }
+
+      if (form.due_date && !/^\d{2}:\d{2}$/.test(form.due_date)) {
+        setDueDateValid(false);
+        return;
+      }
+
       const payload = {
         title: form.title,
         final_result: form.final_result,
-        due_date: form.due_date,
-        urgent: form.urgent,
+        date: form.date || null,
+        due_date: form.due_date || null,
+        urgent: !!form.urgent,
         description: form.description,
-        responsible_id: Number(form.responsible_id)
+        responsible_id: form.responsible_id ? Number(form.responsible_id) : null
       };
+
       await api.post('/results', payload);
+
       onSaved && onSaved();
-      setForm({ title: '', final_result: '', due_date: '', urgent: false, description: '', responsible_id: '' });
+
+      setForm({
+        title: '',
+        final_result: '',
+        date: '',
+        due_date: '',
+        urgent: false,
+        description: '',
+        responsible_id: ''
+      });
       setDueDateValid(true);
+      setDateValid(true);
     } catch (e) {
-      const msg = e.response?.data?.message || 'Не вдалося створити результат';
+      const msg = e?.response?.data?.message || 'Не вдалося створити результат';
       setError(msg);
     }
   };
@@ -95,20 +138,37 @@ export default function ResultForm({ onSaved, onCancel }) {
               required
             />
           </label>
+
           <label className="rf-field">
+            <span>Дата</span>
+            <input
+              type="date"
+              name="date"
+              className={`input${!dateValid && form.date ? ' invalid' : ''}`}
+              value={form.date}
+              min={todayStr}
+              onChange={handleChange}
+            />
+            {!dateValid && form.date && (
+              <span className="rf-hint">Дата не може бути в минулому</span>
+            )}
+          </label>
+
+          <label className="rf-field rf-due">
             <span>Кінцевий термін</span>
             <input
               type="text"
               name="due_date"
               className={`input${!dueDateValid && form.due_date ? ' invalid' : ''}`}
-              placeholder="ДД.ММ.РРРР гг:хх"
+              placeholder="гг:хх"
               value={form.due_date}
               onChange={handleChange}
             />
             {!dueDateValid && form.due_date && (
-              <span className="rf-hint">Формат: ДД.ММ.РРРР гг:хх</span>
+              <span className="rf-hint">Формат: гг:хх</span>
             )}
           </label>
+
           <label className="rf-check">
             <input
               type="checkbox"
@@ -142,12 +202,14 @@ export default function ResultForm({ onSaved, onCancel }) {
           >
             <option value="">Оберіть відповідального</option>
             {users.map((u) => (
-              <option key={u.id} value={u.id}>{labelForUser(u)}</option>
+              <option key={u.id} value={u.id}>
+                {labelForUser(u)}
+              </option>
             ))}
           </select>
         </label>
 
-        {error && <div className="rf-error">{error}</div>}
+        <div className="rf-error" aria-live="polite">{error}</div>
 
         <div className="rf-actions">
           <button type="submit" className="btn primary">Зберегти</button>

@@ -1,0 +1,81 @@
+@import "../../../styles/variables.css";
+
+.add-result-form {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.add-result-form .arf-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+@media (max-width: 640px) {
+  .add-result-form .arf-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .add-result-form .arf-check {
+    grid-column: 1 / -1;
+  }
+
+  .add-result-form .arf-due {
+    grid-column: 1 / -1;
+  }
+}
+
+.add-result-form .arf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.add-result-form .arf-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-result-form .arf-hint {
+  font-size: var(--fz-sm);
+  color: var(--text-muted);
+}
+
+.add-result-form .input.invalid {
+  border-color: var(--critical);
+}
+
+.add-result-form textarea {
+  min-height: 200px;
+  resize: vertical;
+}
+
+.add-result-form .arf-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid transparent;
+}
+
+@media (max-width: 576px) {
+  .add-result-form .arf-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-result-form .arf-actions .btn {
+    width: 100%;
+  }
+}
+
+.add-result-form .arf-error {
+  color: var(--critical);
+  font-size: var(--fz-sm);
+  min-height: var(--space-3);
+}
