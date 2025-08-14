@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../../../components/layout/Layout";
+import Breadcrumbs from "../../../components/ui/Breadcrumbs";
 import api from "../../../services/api";
 import "./BusinessProcessEditPage.css";
 
@@ -374,6 +375,12 @@ export default function BusinessProcessEditPage() {
     return (
       <Layout>
         <div className="bp-edit-page">
+          <Breadcrumbs
+            items={[
+              { label: "Бізнес процеси", to: "/business-processes" },
+              { label: isNew ? "Новий бізнес‑процес" : name },
+            ]}
+          />
           <div className="loader">Завантаження…</div>
         </div>
       </Layout>
@@ -382,6 +389,12 @@ export default function BusinessProcessEditPage() {
   return (
     <Layout>
       <div className="bp-edit-page">
+        <Breadcrumbs
+          items={[
+            { label: "Бізнес процеси", to: "/business-processes" },
+            { label: isNew ? "Новий бізнес‑процес" : name },
+          ]}
+        />
         <div className="bp-header">
           <div className="bp-title">
             <span>Бізнес процес — </span>
