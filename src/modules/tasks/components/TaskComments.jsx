@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./TaskComments.css";
 
 export default function TaskComments({ comments = [], onAddComment }) {
     const [newComment, setNewComment] = useState("");
