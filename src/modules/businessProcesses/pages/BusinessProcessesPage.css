@@ -1,34 +1,107 @@
-.bp-list-page {
-  padding: 12px;
+@import "../../../styles/variables.css";
+
+.bp {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
 }
 
-.bp-list-header {
+/* Заголовок + дії */
+.bp-head {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.bp-list-items {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.bp-list-item {
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
+  gap: 12px;
   align-items: center;
 }
 
-.bp-list-item-name {
-  font-weight: 600;
-}
-
-.bp-list-item-actions {
+.bp-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
+
+.bp-error {
+  color: var(--critical);
+  font-size: var(--fz-sm);
+}
+
+/* Порожній стан */
+.bp-empty {
+  text-align: center;
+  padding: 32px 16px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.bp-empty__icon {
+  font-size: 42px;
+}
+
+.bp-empty__title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.bp-empty__text {
+  color: var(--text-muted);
+  max-width: 560px;
+}
+
+.bp-empty__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Список */
+.bp-list {
+  display: grid;
+  gap: 10px;
+}
+
+.bp-item {
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.bp-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bp-item__title {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.bp-item__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.bp-item__meta {
+  color: var(--text-muted);
+  font-size: var(--fz-sm);
+}
+
+/* Завантаження */
+.bp-loading {
+  padding: 12px;
+  color: var(--text-muted);
+}
+
+/* Адаптив */
+@media (max-width: 640px) {
+  .bp-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .bp-actions {
+    justify-content: space-between;
+  }
+}
+
