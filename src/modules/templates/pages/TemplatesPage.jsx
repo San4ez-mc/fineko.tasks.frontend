@@ -198,9 +198,6 @@ export default function TemplatesPage() {
     }
   };
 
-  const setFlag = (key, val) =>
-    setForm((s) => ({ ...s, flags: { ...s.flags, [key]: val } }));
-
   const setPayload = (key, val) =>
     setForm((s) => ({ ...s, payload: { ...s.payload, [key]: val } }));
 
@@ -277,26 +274,8 @@ export default function TemplatesPage() {
                 />
               </label>
 
-              <div className="grid">
-                <div className="col">
-                  <div className="group">
-                    <div className="group-title">Поля для збереження</div>
-                    {Object.entries(FIELD_LABELS).map(([k, label]) => (
-                      <label key={k} className="chk">
-                        <input
-                          type="checkbox"
-                          checked={!!form.flags[k]}
-                          onChange={(e) => setFlag(k, e.target.checked)}
-                        />
-                        <span>{label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="col">
-                  <div className="group">
-                    <div className="group-title">Значення полів</div>
+              <div className="group">
+                <div className="group-title">Значення полів</div>
 
                     <label className="field">
                       <span>Назва задачі</span>
@@ -339,7 +318,7 @@ export default function TemplatesPage() {
                       </select>
                     </label>
 
-                    <div className="row2">
+                <div className="row2">
                       <label className="field">
                         <span>Запланований час</span>
                         <input
@@ -429,8 +408,6 @@ export default function TemplatesPage() {
                       )}
                     </div>
                   </div>
-                </div>
-              </div>
 
               {error && <div className="tp-error">{error}</div>}
 

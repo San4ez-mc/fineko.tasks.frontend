@@ -66,3 +66,20 @@
     right: 0;
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
+
+@media (max-width: 768px) {
+    .layout-column {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .layout.left-open .layout-column,
+    .layout.right-open .layout-column {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .sidebar-handle {
+        display: none;
+    }
+}
