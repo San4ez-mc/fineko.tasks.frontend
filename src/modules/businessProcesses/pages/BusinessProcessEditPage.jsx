@@ -23,7 +23,8 @@ export default function BusinessProcessEditPage() {
 
   const [users, setUsers] = useState([]);
   const [positions, setPositions] = useState([]);
-  const [activePopoverNode, setActivePopoverNode] = useState(null);
+  const [activeNoteNode, setActiveNoteNode] = useState(null);
+  const [noteText, setNoteText] = useState("");
 
   const autosaveTimer = useRef(null);
 
@@ -187,6 +188,7 @@ export default function BusinessProcessEditPage() {
       title: type === "if" ? "IF" : "Нова дія",
       assignee_user_id: undefined, // задається окремо
       flags: {},
+      comment: "",
     };
     setSchemaSafe((prev) => {
       const nodes = prev.nodes.slice();
@@ -283,35 +285,21 @@ export default function BusinessProcessEditPage() {
     }));
   };
 
-  // ------------------- Comments & Tasks -------------------
-  const openComments = (nodeId) => setActivePopoverNode(nodeId);
-  const closeComments = () => setActivePopoverNode(null);
-
-  const [comments, setComments] = useState({}); // nodeId -> array
-  const loadComments = async (nodeId) => {
-    try {
-      const { data } = await api.get(
-        `/business-processes/${isNew ? "tmp" : id}/nodes/${nodeId}/comments`
-      );
-      setComments((prev) => ({ ...prev, [nodeId]: Array.isArray(data) ? data : [] }));
-    } catch (e) {
-      // тихо
-    }
+  // ------------------- Notes & Tasks -------------------
+  const openNote = (node) => {
+    setActiveNoteNode(node.id);
+    setNoteText(node.comment || "");
   };
 
-  const addComment = async (nodeId, text, parent_id = null) => {
-    try {
-      const { data } = await api.post(
-        `/business-processes/${isNew ? "tmp" : id}/nodes/${nodeId}/comments`,
-        { text, parent_id }
-      );
-      setComments((prev) => ({
-        ...prev,
-        [nodeId]: [...(prev[nodeId] || []), data],
-      }));
-    } catch (e) {
-      // показати тост бажано
-    }
+  const closeNote = () => {
+    setActiveNoteNode(null);
+    setNoteText("");
+  };
+
+  const saveNote = () => {
+    if (!activeNoteNode) return;
+    updateNode(activeNoteNode, { comment: noteText });
+    closeNote();
   };
 
   const createTaskFromNode = async (node) => {
@@ -481,11 +469,8 @@ export default function BusinessProcessEditPage() {
                             </button>
                             <button
                               className="btn tiny"
-                              onClick={() => {
-                                openComments(node.id);
-                                void loadComments(node.id);
-                              }}
-                              title="Коментарі / задача"
+                              onClick={() => openNote(node)}
+                              title="Нотатка"
                             >
                               Коментувати
                             </button>
@@ -499,13 +484,13 @@ export default function BusinessProcessEditPage() {
                           </div>
                         </div>
 
-                        {/* Поповер з коментарями */}
-                        {activePopoverNode === node.id && (
-                          <CommentsPopover
-                            nodeId={node.id}
-                            onClose={closeComments}
-                            comments={comments[node.id] || []}
-                            onAdd={(text, parent) => addComment(node.id, text, parent)}
+                        {/* Поповер з нотаткою */}
+                        {activeNoteNode === node.id && (
+                          <NotePopover
+                            value={noteText}
+                            onChange={setNoteText}
+                            onSave={saveNote}
+                            onClose={closeNote}
                           />
                         )}
                       </div>
@@ -600,51 +585,22 @@ function EdgesPanel({ schema, onAdd, onRemove }) {
   );
 }
 
-function CommentsPopover({ nodeId, comments, onAdd, onClose }) {
-  const [text, setText] = useState("");
+function NotePopover({ value, onChange, onSave, onClose }) {
   return (
     <div className="comments-popover" role="dialog">
       <div className="cp-header">
-        <div>Коментарі до блоку</div>
+        <div>Нотатка</div>
         <button className="btn tiny ghost" onClick={onClose}>×</button>
       </div>
       <div className="cp-body">
-        {comments.length === 0 ? (
-          <div className="cp-empty">Ще немає коментарів</div>
-        ) : (
-          comments.map((c) => (
-            <div className="cp-item" key={c.id}>
-              <div className="cp-meta">
-                <b>{c.author_name || `User #${c.user_id}`}</b> ·{" "}
-                <span>{new Date(c.created_at).toLocaleString()}</span>
-              </div>
-              <div className="cp-text">{c.text}</div>
-            </div>
-          ))
-        )}
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
       </div>
       <div className="cp-footer">
-        <input
-          type="text"
-          placeholder="Додати коментар…"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && text.trim()) {
-              onAdd(text.trim(), null);
-              setText("");
-            }
-          }}
-        />
-        <button
-          className="btn small"
-          onClick={() => {
-            if (!text.trim()) return;
-            onAdd(text.trim(), null);
-            setText("");
-          }}
-        >
-          Надіслати
+        <button className="btn small" onClick={onSave}>
+          Зберегти
         </button>
       </div>
     </div>
