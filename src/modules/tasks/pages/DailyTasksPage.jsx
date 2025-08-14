@@ -491,8 +491,11 @@ export default function DailyTasksPage() {
                 </div>
             )}
 
-            <div className="tasks-list">
-                {tasks.map((task) => (
+            {tasks.length === 0 ? (
+                <div className="tasks-empty">Задач на сьогодні не додано</div>
+            ) : (
+                <div className="tasks-list">
+                    {tasks.map((task) => (
                     <React.Fragment key={task.id}>
                         <div
                             className={`task-row ${task.status === "done" ? "is-completed" : ""
@@ -668,8 +671,9 @@ export default function DailyTasksPage() {
                             </div>
                         )}
                     </React.Fragment>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
 
             <div className="card tasks-summary">
                 Сумарний очікуваний час: {formatMinutesToHours(totalExpected)}
