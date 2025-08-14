@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiCheckCircle, FiPlayCircle, FiPauseCircle } from "react-icons/fi";
 import TaskComments from "./TaskComments";
+import "./TaskItem.css";
 
 export default function TaskItem({
     task,
@@ -150,15 +151,34 @@ export default function TaskItem({
             {/* Розгорнута частина */}
             {expandedTask === task.id && (
                 <div className="task-details">
-                    {/* Опис */}
-                    <textarea
-                        className="task-description"
-                        style={{ minHeight: "8em" }}
-                        value={task.description}
-                        onChange={(e) =>
-                            onUpdateField(task.id, "description", e.target.value)
-                        }
-                    />
+                    <div className="task-results-row">
+                        <label>
+                            Очікуваний результат
+                            <textarea
+                                value={task.expected_result}
+                                onChange={(e) =>
+                                    onUpdateField(
+                                        task.id,
+                                        "expected_result",
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </label>
+                        <label>
+                            Результат
+                            <textarea
+                                value={task.actual_result}
+                                onChange={(e) =>
+                                    onUpdateField(
+                                        task.id,
+                                        "actual_result",
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </label>
+                    </div>
 
                     {/* Поля в один рядок */}
                     <div

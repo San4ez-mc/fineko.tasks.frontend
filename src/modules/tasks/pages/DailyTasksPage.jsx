@@ -25,15 +25,25 @@ export default function DailyTasksPage() {
     const dateInputRef = useRef(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [newTaskTitle, setNewTaskTitle] = useState("");
-    const [newTaskType, setNewTaskType] = useState("neutral");
+    const [newTaskType, setNewTaskType] = useState("важлива термінова");
     const [plannedTime, setPlannedTime] = useState("00:00");
-    const [newTaskResult, setNewTaskResult] = useState("");
+    const [actualTime, setActualTime] = useState("00:00");
+    const [newTaskExpectedResult, setNewTaskExpectedResult] = useState("");
+    const [newTaskActualResult, setNewTaskActualResult] = useState("");
+    const [taskManager, setTaskManager] = useState("");
+    const [newTaskComments, setNewTaskComments] = useState("");
+    const [newTaskResultId, setNewTaskResultId] = useState("");
     const [templates, setTemplates] = useState([]);
     const [selectedTemplate, setSelectedTemplate] = useState("");
     const [results, setResults] = useState([]);
     const [titleError, setTitleError] = useState(false);
 
-    const priorityMap = { critical: 1, important: 2, rush: 3, neutral: 4 };
+    const priorityMap = {
+        "важлива термінова": 1,
+        "важлива нетермінова": 2,
+        "неважлива термінова": 3,
+        "неважлива нетермінова": 4,
+    };
     const sortTasks = (arr) =>
         [...arr].sort((a, b) => {
             if (a.status === "done" && b.status !== "done") return 1;
@@ -59,11 +69,13 @@ export default function DailyTasksPage() {
                     title: t.title,
                     status: t.status,
                     dueDate: t.planned_date,
-                    type: t.type || "neutral",
+                    type: t.type || "неважлива нетермінова",
                     expected_time: Number(t.expected_time || 0),
-                    description: t.expected_result || "",
+                    actual_time: Number(t.actual_time || 0),
                     expected_result: t.expected_result || "",
                     actual_result: t.result || "",
+                    manager: t.manager || "",
+                    comments: t.comments || "",
                 }));
                 setTasks(sortTasks(mapped));
             })
@@ -181,14 +193,14 @@ export default function DailyTasksPage() {
         const t = templates.find((tmp) => String(tmp.id) === String(id));
         if (t) {
             setNewTaskTitle(t.title || "");
-            setNewTaskType(t.priority || t.type || "neutral");
+            setNewTaskType(t.priority || t.type || "важлива термінова");
             if (t.plannedTime) setPlannedTime(t.plannedTime);
             else if (t.plannedMinutes !== undefined) {
                 const h = String(Math.floor(t.plannedMinutes / 60)).padStart(2, "0");
                 const m = String(t.plannedMinutes % 60).padStart(2, "0");
                 setPlannedTime(`${h}:${m}`);
             }
-            setNewTaskResult(t.resultId || "");
+            setNewTaskResultId(t.resultId || "");
         }
     };
 
@@ -199,13 +211,19 @@ export default function DailyTasksPage() {
         }
         setTitleError(false);
         const [h, m] = plannedTime.split(":").map((n) => parseInt(n, 10) || 0);
+        const [ah, am] = actualTime.split(":").map((n) => parseInt(n, 10) || 0);
         const payload = {
             date: formatDateForApi(selectedDate),
             title: newTaskTitle.trim(),
             type: newTaskType,
             plannedMinutes: h * 60 + m,
+            actualMinutes: ah * 60 + am,
+            expected_result: newTaskExpectedResult.trim(),
+            result: newTaskActualResult.trim(),
+            manager: taskManager.trim(),
+            comments: newTaskComments.trim(),
         };
-        if (newTaskResult) payload.resultId = newTaskResult;
+        if (newTaskResultId) payload.resultId = newTaskResultId;
         axios
             .post(`${API_BASE_URL}/tasks/daily`, payload)
             .then((res) => {
@@ -216,6 +234,11 @@ export default function DailyTasksPage() {
                     dueDate: formatDateForApi(selectedDate),
                     type: payload.type,
                     expected_time: payload.plannedMinutes,
+                    actual_time: payload.actualMinutes,
+                    expected_result: payload.expected_result,
+                    actual_result: payload.result,
+                    manager: payload.manager,
+                    comments: payload.comments,
                 };
                 setTasks((prev) => sortTasks([...prev, newTask]));
                 window.dispatchEvent(
@@ -228,9 +251,14 @@ export default function DailyTasksPage() {
                 );
                 setIsFormOpen(false);
                 setNewTaskTitle("");
-                setNewTaskType("neutral");
+                setNewTaskType("важлива термінова");
                 setPlannedTime("00:00");
-                setNewTaskResult("");
+                setActualTime("00:00");
+                setNewTaskExpectedResult("");
+                setNewTaskActualResult("");
+                setTaskManager("");
+                setNewTaskComments("");
+                setNewTaskResultId("");
                 setSelectedTemplate("");
             })
             .catch((err) => console.error("Помилка створення задачі", err));
@@ -290,23 +318,52 @@ export default function DailyTasksPage() {
                         value={newTaskTitle}
                         onChange={(e) => setNewTaskTitle(e.target.value)}
                     />
+                    <textarea
+                        className="full-width"
+                        placeholder="Очікуваний результат"
+                        value={newTaskExpectedResult}
+                        onChange={(e) => setNewTaskExpectedResult(e.target.value)}
+                    />
+                    <textarea
+                        className="full-width"
+                        placeholder="Результат"
+                        value={newTaskActualResult}
+                        onChange={(e) => setNewTaskActualResult(e.target.value)}
+                    />
                     <select
                         value={newTaskType}
                         onChange={(e) => setNewTaskType(e.target.value)}
                     >
-                        <option value="critical">critical</option>
-                        <option value="important">important</option>
-                        <option value="rush">rush</option>
-                        <option value="neutral">neutral</option>
+                        <option value="важлива термінова">Важлива - термінова</option>
+                        <option value="важлива нетермінова">Важлива - не термінова</option>
+                        <option value="неважлива термінова">Неважлива - термінова</option>
+                        <option value="неважлива нетермінова">Неважлива - нетермінова</option>
                     </select>
                     <input
                         type="time"
                         value={plannedTime}
                         onChange={(e) => setPlannedTime(e.target.value)}
                     />
+                    <input
+                        type="time"
+                        value={actualTime}
+                        onChange={(e) => setActualTime(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Хто назначив задачу"
+                        value={taskManager}
+                        onChange={(e) => setTaskManager(e.target.value)}
+                    />
+                    <textarea
+                        className="full-width"
+                        placeholder="Коментарі"
+                        value={newTaskComments}
+                        onChange={(e) => setNewTaskComments(e.target.value)}
+                    />
                     <select
-                        value={newTaskResult}
-                        onChange={(e) => setNewTaskResult(e.target.value)}
+                        value={newTaskResultId}
+                        onChange={(e) => setNewTaskResultId(e.target.value)}
                     >
                         <option value="">Без результату</option>
                         {results.map((r) => (
@@ -453,7 +510,7 @@ export default function DailyTasksPage() {
                                 <a className="title" href={`/tasks/${task.id}`}>
                                     {task.title}
                                 </a>
-                                {task.type && <span className={`badge ${task.type}`}></span>}
+                                {task.type && <span className="badge">{task.type}</span>}
                                 {task.result_id && (
                                     <a className="link" href={`/results/${task.result_id}`}>
                                         Результат: {task.result_title || task.result_id}
@@ -510,17 +567,6 @@ export default function DailyTasksPage() {
                         {expandedTask === task.id && (
                             <div className="task-details">
                                 <label className="td-line">
-                                    <span className="k">Опис</span>
-                                    <textarea
-                                        className="input"
-                                        defaultValue={task.description}
-                                        onBlur={(e) =>
-                                            updateTaskField(task.id, "description", e.target.value)
-                                        }
-                                    />
-                                </label>
-
-                                <label className="td-line">
                                     <span className="k">Очікуваний результат</span>
                                     <textarea
                                         className="input"
@@ -536,7 +582,7 @@ export default function DailyTasksPage() {
                                 </label>
 
                                 <label className="td-line">
-                                    <span className="k">Фактичний результат</span>
+                                    <span className="k">Результат</span>
                                     <textarea
                                         className="input"
                                         defaultValue={task.actual_result}
@@ -546,6 +592,77 @@ export default function DailyTasksPage() {
                                                 "actual_result",
                                                 e.target.value
                                             )
+                                        }
+                                    />
+                                </label>
+
+                                <label className="td-line">
+                                    <span className="k">Тип</span>
+                                    <select
+                                        className="input"
+                                        defaultValue={task.type}
+                                        onChange={(e) =>
+                                            updateTaskField(task.id, "type", e.target.value)
+                                        }
+                                    >
+                                        <option value="важлива термінова">Важлива - термінова</option>
+                                        <option value="важлива нетермінова">Важлива - не термінова</option>
+                                        <option value="неважлива термінова">Неважлива - термінова</option>
+                                        <option value="неважлива нетермінова">Неважлива - нетермінова</option>
+                                    </select>
+                                </label>
+
+                                <label className="td-line">
+                                    <span className="k">Очікуваний час (хв)</span>
+                                    <input
+                                        type="number"
+                                        className="input"
+                                        defaultValue={task.expected_time}
+                                        onBlur={(e) =>
+                                            updateTaskField(
+                                                task.id,
+                                                "expected_time",
+                                                parseInt(e.target.value, 10) || 0
+                                            )
+                                        }
+                                    />
+                                </label>
+
+                                <label className="td-line">
+                                    <span className="k">Фактичний час (хв)</span>
+                                    <input
+                                        type="number"
+                                        className="input"
+                                        defaultValue={task.actual_time}
+                                        onBlur={(e) =>
+                                            updateTaskField(
+                                                task.id,
+                                                "actual_time",
+                                                parseInt(e.target.value, 10) || 0
+                                            )
+                                        }
+                                    />
+                                </label>
+
+                                <label className="td-line">
+                                    <span className="k">Хто призначив</span>
+                                    <input
+                                        type="text"
+                                        className="input"
+                                        defaultValue={task.manager}
+                                        onBlur={(e) =>
+                                            updateTaskField(task.id, "manager", e.target.value)
+                                        }
+                                    />
+                                </label>
+
+                                <label className="td-line">
+                                    <span className="k">Коментарі</span>
+                                    <textarea
+                                        className="input"
+                                        defaultValue={task.comments}
+                                        onBlur={(e) =>
+                                            updateTaskField(task.id, "comments", e.target.value)
                                         }
                                     />
                                 </label>
