@@ -8,6 +8,7 @@ import { FiCalendar } from "react-icons/fi";
 import { getResults } from "../../results/api/results";
 import { useAuth } from "../../../context/AuthContext";
 import TaskComments from "../components/TaskComments";
+import VoiceInput from "../../../shared/components/VoiceInput";
 
 export default function DailyTasksPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -239,6 +240,17 @@ export default function DailyTasksPage() {
         }
     };
 
+    const handleVoiceTask = (data) => {
+        if (data.title) setNewTaskTitle(data.title);
+        if (data.description) setNewTaskDescription(data.description);
+        if (data.expected_result) setNewTaskExpectedResult(data.expected_result);
+        if (data.type) setNewTaskType(data.type);
+        if (data.planned_time) setPlannedTime(data.planned_time);
+        if (data.manager) setTaskManager(data.manager);
+        if (data.comments) setNewTaskComments(data.comments);
+        if (data.resultId) setNewTaskResultId(String(data.resultId));
+    };
+
     const handleCreateTask = () => {
         if (!newTaskTitle.trim()) {
             setTitleError(true);
@@ -460,6 +472,7 @@ export default function DailyTasksPage() {
 
             {isFormOpen && (
                 <div className="add-task-form card">
+                    <VoiceInput endpoint="/tasks/voice" onResult={handleVoiceTask} />
                     <input
                         type="text"
                         className={`title-input ${titleError ? "error" : ""}`}

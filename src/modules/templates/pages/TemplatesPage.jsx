@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Layout from "../../../components/layout/Layout";
 import "./TemplatesPage.css";
+import VoiceInput from "../../../shared/components/VoiceInput";
 import {
   listTemplates,
   createTemplate,
@@ -165,6 +166,26 @@ export default function TemplatesPage() {
               : { type: form.payload.repeat?.type || "none", interval: 1 },
         },
       };
+
+  const handleVoiceTemplate = (data) => {
+    setForm((s) => ({
+      ...s,
+      name: data.name || s.name,
+      flags: { ...s.flags, ...(data.flags || {}) },
+      payload: { ...s.payload, ...(data.payload || {
+        title: data.title,
+        expected_result: data.expected_result,
+        result: data.result,
+        type: data.type,
+        planned_time: data.planned_time,
+        actual_time: data.actual_time,
+        manager: data.manager,
+        comments: data.comments,
+        resultId: data.resultId,
+        repeat: data.repeat
+      })}
+    }));
+  };
       if (!payload.name) {
         setError("Назва шаблону обов’язкова");
         return;
@@ -263,6 +284,7 @@ export default function TemplatesPage() {
             </div>
 
             <form onSubmit={onSubmit} className="tp-modal__body">
+              <VoiceInput endpoint="/templates/voice" onResult={handleVoiceTemplate} />
               <label className="field">
                 <span>Назва шаблону*</span>
                 <input
