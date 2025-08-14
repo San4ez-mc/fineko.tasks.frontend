@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function TaskComments({ comments, onAddComment }) {
+export default function TaskComments({ comments = [], onAddComment }) {
     const [newComment, setNewComment] = useState("");
     const [replyTo, setReplyTo] = useState(null); // ID або індекс коментаря, на який відповідаємо
     const [replyText, setReplyText] = useState("");
@@ -28,14 +28,16 @@ export default function TaskComments({ comments, onAddComment }) {
             {comments.length === 0 && <p>Поки немає коментарів</p>}
             {comments.map((c, idx) => (
                 <div key={idx} className="comment-item">
-                    <b>{c.author}:</b> {c.text}
+                    <div className="comment-author">{c.author}</div>
+                    <div className="comment-text">{c.text}</div>
 
                     {/* Якщо є підкоментарі */}
                     {c.replies && c.replies.length > 0 && (
                         <div className="comment-replies">
                             {c.replies.map((r, ridx) => (
                                 <div key={ridx} className="comment-reply">
-                                    <b>{r.author}:</b> {r.text}
+                                    <div className="comment-author">{r.author}</div>
+                                    <div className="comment-text">{r.text}</div>
                                 </div>
                             ))}
                         </div>
@@ -58,7 +60,9 @@ export default function TaskComments({ comments, onAddComment }) {
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
                             />
-                            <button onClick={() => handleAddReply(idx)}>Додати відповідь</button>
+                            <button onClick={() => handleAddReply(idx)}>
+                                Додати відповідь
+                            </button>
                         </div>
                     )}
                 </div>
