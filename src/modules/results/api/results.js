@@ -20,3 +20,6 @@ export const deleteResult = async (id) =>
 
 export const toggleResultComplete = async (id, isCompleted) =>
     (await api.patch(`/results/${id}`, { is_completed: isCompleted })).data;
+
+export const getResultTasks = async (id) =>
+    (await api.get(`/results/${id}/tasks`)).data;

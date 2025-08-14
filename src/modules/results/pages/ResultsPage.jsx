@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../../components/layout/Layout.jsx';
-import { getResults } from '../api/results';
+import { getResults, getResultTasks } from '../api/results';
 import ResultItem from '../components/ResultItem.jsx';
 import ResultDetails from '../components/ResultDetails.jsx';
 import ResultsEmpty from '../components/ResultsEmpty.jsx';
@@ -13,6 +13,7 @@ export default function ResultsPage() {
   const [expanded, setExpanded] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [parentId, setParentId] = useState(null);
+  const [tasksLoading, setTasksLoading] = useState({});
 
   const fetchResults = async () => {
     setLoading(true);
@@ -35,8 +36,30 @@ export default function ResultsPage() {
     fetchResults();
   };
 
+  const fetchTasks = async (id) => {
+    setTasksLoading((prev) => ({ ...prev, [id]: true }));
+    try {
+      const tasks = await getResultTasks(id);
+      setResults((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, tasks } : r))
+      );
+    } catch (e) {
+      setResults((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, tasks: [] } : r))
+      );
+    } finally {
+      setTasksLoading((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
   const toggleExpand = (id) => {
-    setExpanded((prev) => (prev === id ? null : id));
+    setExpanded((prev) => {
+      const next = prev === id ? null : id;
+      if (next && !(results.find((r) => r.id === id) || {}).tasks) {
+        fetchTasks(id);
+      }
+      return next;
+    });
   };
 
   const handleAddSubresult = (id) => {

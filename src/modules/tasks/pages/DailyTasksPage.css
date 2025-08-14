@@ -2,7 +2,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  padding: 8px 0;
+  margin-bottom: 8px;
 }
 
 .page-header-left {
@@ -103,6 +104,14 @@
   gap: 10px;
 }
 
+.task-details textarea {
+  min-height: 40px;
+}
+
+.task-details .description-input {
+  min-height: 100px;
+}
+
 .td-line {
   display: flex;
   flex-direction: column;
@@ -130,6 +139,7 @@
 
 .tasks-empty {
   margin-top: 20px;
+  text-align: center;
 }
 
 .add-task-form {
@@ -159,6 +169,22 @@
 
 .add-task-form input.error {
   border-color: var(--red, #e00);
+}
+
+/* Кольорові типи задач */
+.badge.type-important-urgent {
+  background: red;
+  color: #fff;
+}
+
+.badge.type-important-not-urgent {
+  background: blue;
+  color: #fff;
+}
+
+.badge.type-not-important-urgent {
+  background: purple;
+  color: #fff;
 }
 
 
@@ -198,90 +224,5 @@
 
   .task-details {
     margin-left: 0;
-  }
-
-  /* Коментарі */
-  .task-comments {
-    margin-top: 8px;
-  }
-
-  .comment-item {
-    margin-bottom: 8px;
-  }
-
-  .comment-author {
-    font-weight: 600;
-    margin-bottom: 2px;
-  }
-
-  .comment-text {
-    margin-bottom: 4px;
-  }
-
-  .comment-replies {
-    margin-left: 12px;
-    padding-left: 6px;
-    border-left: 2px dashed #ddd;
-  }
-
-  .comment-reply {
-    margin-bottom: 6px;
-  }
-
-  .reply-btn {
-    background: none;
-    border: none;
-    color: var(--blue);
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .reply-form {
-    margin-top: 4px;
-    display: flex;
-    gap: 4px;
-  }
-
-  .add-comment {
-    margin-top: 8px;
-    display: flex;
-    gap: 6px;
-  }
-
-  .add-comment input {
-    flex: 1;
-    padding: 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  .add-comment button {
-    padding: 6px 10px;
-    border: none;
-    background: var(--blue);
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .add-comment button:hover {
-    background: #0056b3;
-  }
-
-  /* Кольорові типи задач */
-  .badge.type-important-urgent {
-    background: red;
-    color: #fff;
-  }
-
-  .badge.type-important-not-urgent {
-    background: blue;
-    color: #fff;
-  }
-
-  .badge.type-not-important-urgent {
-    background: purple;
-    color: #fff;
-
   }
 }
