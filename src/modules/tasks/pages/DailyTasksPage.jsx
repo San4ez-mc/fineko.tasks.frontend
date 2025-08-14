@@ -37,6 +37,9 @@ export default function DailyTasksPage() {
     const [results, setResults] = useState([]);
     const [titleError, setTitleError] = useState(false);
     const { user } = useAuth();
+    const [isFiltersOpen, setIsFiltersOpen] = useState(() =>
+        typeof window !== "undefined" ? window.innerWidth > 600 : true
+    );
 
     useEffect(() => {
         if (user?.name) {
@@ -349,113 +352,132 @@ export default function DailyTasksPage() {
             </div>
 
             <div className="tpl-filters card">
-                <div className="tf-row">
-                    <label className="tf-search" aria-label="Пошук по всіх полях">
-                        <svg viewBox="0 0 24 24" className="ico" aria-hidden="true">
-                            <circle
-                                cx="11"
-                                cy="11"
-                                r="7"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                fill="none"
-                            />
-                            <line
-                                x1="21"
-                                y1="21"
-                                x2="16.5"
-                                y2="16.5"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                            />
-                        </svg>
-                        <input
-                            type="search"
-                            placeholder="Пошук по всіх полях…"
-                            value={filters.q}
-                            onChange={(e) => handleFilterChange({ q: e.target.value })}
-                        />
-                    </label>
-
-                    <div className="tf-group">
-                        <label className="tf-field">
-                            <span>Статус</span>
-                            <select
-                                value={filters.status}
-                                onChange={(e) => handleFilterChange({ status: e.target.value })}
-                            >
-                                <option value="any">Будь‑який</option>
-                                <option value="new">нове</option>
-                                <option value="in_progress">в роботі</option>
-                                <option value="done">виконано</option>
-                                <option value="postponed">відкладено</option>
-                            </select>
-                        </label>
-
-                        <label className="tf-field">
-                            <span>Тип</span>
-                            <select
-                                value={filters.priority}
+                <button
+                    className="btn ghost tf-toggle"
+                    onClick={() => setIsFiltersOpen((o) => !o)}
+                >
+                    Фільтри {isFiltersOpen ? "▲" : "▼"}
+                </button>
+                {isFiltersOpen && (
+                    <div className="tf-row">
+                        <label className="tf-search" aria-label="Пошук по всіх полях">
+                            <svg viewBox="0 0 24 24" className="ico" aria-hidden="true">
+                                <circle
+                                    cx="11"
+                                    cy="11"
+                                    r="7"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    fill="none"
+                                />
+                                <line
+                                    x1="21"
+                                    y1="21"
+                                    x2="16.5"
+                                    y2="16.5"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                />
+                            </svg>
+                            <input
+                                type="search"
+                                placeholder="Пошук по всіх полях…"
+                                value={filters.q}
                                 onChange={(e) =>
-                                    handleFilterChange({ priority: e.target.value })
+                                    handleFilterChange({ q: e.target.value })
                                 }
-                                style={priorityStyles[filters.priority] || {}}
-                            >
-                                <option value="any">Будь‑який</option>
-                                <option
-                                    value="critical"
-                                    style={priorityStyles.critical}
-                                >
-                                    Важлива термінова
-                                </option>
-                                <option
-                                    value="important"
-                                    style={priorityStyles.important}
-                                >
-                                    Важлива нетермінова
-                                </option>
-                                <option value="rush" style={priorityStyles.rush}>
-                                    Неважлива термінова
-                                </option>
-                                <option
-                                    value="neutral"
-                                    style={priorityStyles.neutral}
-                                >
-                                    Неважлива нетермінова
-                                </option>
-                            </select>
+                            />
                         </label>
 
-                        <label className="tf-field">
-                            <span>Активний таймер</span>
-                            <select
-                                value={filters.timer}
-                                onChange={(e) => handleFilterChange({ timer: e.target.value })}
-                            >
-                                <option value="any">будь‑який</option>
-                                <option value="yes">є</option>
-                                <option value="no">нема</option>
-                            </select>
-                        </label>
+                        <div className="tf-group">
+                            <label className="tf-field">
+                                <span>Статус</span>
+                                <select
+                                    value={filters.status}
+                                    onChange={(e) =>
+                                        handleFilterChange({ status: e.target.value })
+                                    }
+                                >
+                                    <option value="any">Будь‑який</option>
+                                    <option value="new">нове</option>
+                                    <option value="in_progress">в роботі</option>
+                                    <option value="done">виконано</option>
+                                    <option value="postponed">відкладено</option>
+                                </select>
+                            </label>
 
-                        <label className="tf-field">
-                            <span>Прив’язаний результат</span>
-                            <select
-                                value={filters.result}
-                                onChange={(e) => handleFilterChange({ result: e.target.value })}
-                            >
-                                <option value="any">Будь‑який</option>
-                            </select>
-                        </label>
+                            <label className="tf-field">
+                                <span>Тип</span>
+                                <select
+                                    value={filters.priority}
+                                    onChange={(e) =>
+                                        handleFilterChange({ priority: e.target.value })
+                                    }
+                                    style={priorityStyles[filters.priority] || {}}
+                                >
+                                    <option value="any">Будь‑який</option>
+                                    <option
+                                        value="critical"
+                                        style={priorityStyles.critical}
+                                    >
+                                        Важлива термінова
+                                    </option>
+                                    <option
+                                        value="important"
+                                        style={priorityStyles.important}
+                                    >
+                                        Важлива нетермінова
+                                    </option>
+                                    <option
+                                        value="rush"
+                                        style={priorityStyles.rush}
+                                    >
+                                        Неважлива термінова
+                                    </option>
+                                    <option
+                                        value="neutral"
+                                        style={priorityStyles.neutral}
+                                    >
+                                        Неважлива нетермінова
+                                    </option>
+                                </select>
+                            </label>
 
+                            <label className="tf-field">
+                                <span>Активний таймер</span>
+                                <select
+                                    value={filters.timer}
+                                    onChange={(e) =>
+                                        handleFilterChange({ timer: e.target.value })
+                                    }
+                                >
+                                    <option value="any">будь‑який</option>
+                                    <option value="yes">є</option>
+                                    <option value="no">нема</option>
+                                </select>
+                            </label>
+
+                            <label className="tf-field">
+                                <span>Прив’язаний результат</span>
+                                <select
+                                    value={filters.result}
+                                    onChange={(e) =>
+                                        handleFilterChange({ result: e.target.value })
+                                    }
+                                >
+                                    <option value="any">Будь‑який</option>
+                                </select>
+                            </label>
+
+                        </div>
+
+                        <div className="tf-actions">
+                            <button className="btn ghost" onClick={resetFilters}>
+                                Скинути фільтри
+                            </button>
+                        </div>
                     </div>
-
-                    <div className="tf-actions">
-                        <button className="btn ghost" onClick={resetFilters}>
-                            Скинути фільтри
-                        </button>
-                    </div>
-                </div>
+                )}
             </div>
 
             {isFormOpen && (
