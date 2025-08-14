@@ -19,7 +19,6 @@ export default function DailyTasksPage() {
         priority: "any",
         timer: "any",
         result: "any",
-        assignee: "any",
     });
     const [timers, setTimers] = useState({});
     const [activeTimerId, setActiveTimerId] = useState(null);
@@ -116,7 +115,6 @@ export default function DailyTasksPage() {
             priority: "any",
             timer: "any",
             result: "any",
-            assignee: "any",
         };
         setFilters(base);
         loadTasks(formatDateForApi(selectedDate), base);
@@ -325,9 +323,6 @@ export default function DailyTasksPage() {
                             onChange={(e) => setSelectedDate(new Date(e.target.value))}
                         />
                     </h1>
-                    {filters.assignee !== "any" && filters.assignee !== "" && (
-                        <span className="muted">Виконавець: {filters.assignee}</span>
-                    )}
                 </div>
                 <div className="page-header-actions">
                     <button
@@ -424,17 +419,6 @@ export default function DailyTasksPage() {
                             </select>
                         </label>
 
-                        <label className="tf-field">
-                            <span>Виконавець</span>
-                            <select
-                                value={filters.assignee}
-                                onChange={(e) =>
-                                    handleFilterChange({ assignee: e.target.value })
-                                }
-                            >
-                                <option value="any">Будь‑хто</option>
-                            </select>
-                        </label>
                     </div>
 
                     <div className="tf-actions">
