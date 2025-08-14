@@ -138,7 +138,11 @@ export default function DailyTasksPage() {
             })
             .catch(() => { });
         setTasks((prev) =>
-            prev.map((t) => (t.id === id ? { ...t, status: newStatus } : t))
+            sortTasks(
+                prev.map((t) =>
+                    t.id === id ? { ...t, status: newStatus } : t
+                )
+            )
         );
     };
 
