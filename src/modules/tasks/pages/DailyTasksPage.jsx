@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Layout from "../../../components/layout/Layout";
 import "./DailyTasksPage.css";
 import "../../templates/components/TemplatesFilters.css";
-import axios from "axios";
-import { API_BASE_URL } from "../../../config";
+import api from "../../../services/api";
 import { formatMinutesToHours } from "../../../utils/timeFormatter";
 import { FiCalendar } from "react-icons/fi";
 import { getResults } from "../../results/api/results";
@@ -60,8 +59,8 @@ export default function DailyTasksPage() {
             if (value && value !== "any") params.append(key, value);
         });
 
-        axios
-            .get(`${API_BASE_URL}/task/filter?${params.toString()}`)
+        api
+            .get(`/task/filter?${params.toString()}`)
             .then((res) => {
                 const backendTasks = res.data?.tasks || [];
                 const mapped = backendTasks.map((t) => ({
@@ -110,8 +109,8 @@ export default function DailyTasksPage() {
         const task = tasks.find((t) => t.id === id);
         if (!task) return;
         const newStatus = task.status === "done" ? "new" : "done";
-        axios
-            .patch(`${API_BASE_URL}/task/update-field?id=${id}`, {
+        api
+            .patch(`/task/update-field?id=${id}`, {
                 field: "status",
                 value: newStatus,
             })
@@ -149,8 +148,8 @@ export default function DailyTasksPage() {
     };
 
     const updateTaskField = (id, field, value) => {
-        axios
-            .patch(`${API_BASE_URL}/task/update-field?id=${id}`, { field, value })
+        api
+            .patch(`/task/update-field?id=${id}`, { field, value })
             .then(() => {
                 setTasks((prev) =>
                     sortTasks(
@@ -179,8 +178,8 @@ export default function DailyTasksPage() {
     const openDatePicker = () => dateInputRef.current?.showPicker();
 
     useEffect(() => {
-        axios
-            .get(`${API_BASE_URL}/tasks/templates`)
+        api
+            .get(`/tasks/templates`)
             .then((r) => setTemplates(r.data?.templates || []))
             .catch(() => { });
         getResults({ status: "active" })
@@ -224,8 +223,8 @@ export default function DailyTasksPage() {
             comments: newTaskComments.trim(),
         };
         if (newTaskResultId) payload.resultId = newTaskResultId;
-        axios
-            .post(`${API_BASE_URL}/tasks/daily`, payload)
+        api
+            .post(`/tasks/daily`, payload)
             .then((res) => {
                 const newTask = {
                     id: res.data?.id || Date.now(),

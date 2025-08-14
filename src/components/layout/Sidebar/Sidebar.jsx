@@ -17,8 +17,7 @@ import {
     FiGitBranch,
 } from "react-icons/fi";
 import CheckToggle from "../../ui/CheckToggle";
-import axios from "axios";
-import { API_BASE_URL } from "../../../config";
+import api from "../../../services/api";
 import { useCompany } from "../../../context/CompanyContext";
 
 export default function Sidebar({
@@ -279,8 +278,8 @@ export function RightSidebar() {
             )
         );
         try {
-            await axios.patch(
-                `${API_BASE_URL}/task/update-field?id=${id}`,
+            await api.patch(
+                `/task/update-field?id=${id}`,
                 { field: "status", value: newStatus }
             );
         } catch (e) {
