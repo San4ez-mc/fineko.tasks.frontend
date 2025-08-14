@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { toggleResultComplete } from "../api/results";
 import "./ResultRow.css";
 
 /**
@@ -15,25 +16,43 @@ import "./ResultRow.css";
  * onEdit(id)
  * onArchive(id)
  * onDelete(id)  // має перевіряти права вище
- * onMarkDone(id) // підтвердження робити вище
  */
 export default function ResultRow({
   result, expanded,
-  onToggleExpand, onCreateTemplate, onCreateTask, onViewTasks, onEdit, onArchive, onDelete, onMarkDone
+  onToggleExpand, onCreateTemplate, onCreateTask, onViewTasks, onEdit, onArchive, onDelete
 }) {
-  const statusClass = mapStatus(result.status);
+  const [status, setStatus] = useState(result.status);
+
+  useEffect(() => {
+    setStatus(result.status);
+  }, [result.status]);
+
+  const statusClass = mapStatus(status);
+
+  const handleToggleDone = async () => {
+    const prev = status;
+    const next = status === "done" ? "new" : "done";
+    setStatus(next);
+    try {
+      await toggleResultComplete(result.id, next === "done");
+    } catch (e) {
+      setStatus(prev);
+      alert("Не вдалося оновити статус");
+    }
+  };
   return (
     <div className={`result-row ${expanded ? "expanded" : ""} ${result.status === "done" ? "done" : ""}`}>
       <button className="caret" aria-label="Розгорнути" onClick={() => onToggleExpand && onToggleExpand(result.id)}>
         {expanded ? "▾" : "▸"}
       </button>
+      <input type="checkbox" checked={status === "done"} onChange={handleToggleDone} />
 
       <a className="title" href={`/results/${result.id}`} title={result.title}>{result.title}</a>
 
       <div className="meta">
         {result.deadline && <span className="k">До</span>}
         {result.deadline && <span className="v">{result.deadline}</span>}
-        <span className={`badge ${statusClass}`}>{humanStatus(result.status)}</span>
+        <span className={`badge ${statusClass}`}>{humanStatus(status)}</span>
         {result.urgent && <span className="badge critical">Терміново</span>}
         <span className="badge neutral">Щоденних: {result.dailyTasksCount ?? 0}</span>
       </div>
@@ -51,7 +70,6 @@ export default function ResultRow({
         {onDelete && (
           <button className="btn ghost" onClick={() => onDelete(result.id)}>Видалити</button>
         )}
-        <button className="btn primary" onClick={() => onMarkDone && onMarkDone(result.id)}>Позначити виконаним</button>
       </div>
     </div>
   );

@@ -19,4 +19,4 @@ export const deleteResult = async (id) =>
     (await api.delete(`/results/${id}`)).data;
 
 export const toggleResultComplete = async (id, isCompleted) =>
-    (await api.post(`/results/${id}/complete`, { is_completed: isCompleted })).data;
+    (await api.patch(`/results/${id}`, { is_completed: isCompleted })).data;
