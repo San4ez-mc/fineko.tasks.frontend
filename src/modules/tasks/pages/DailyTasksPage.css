@@ -157,3 +157,42 @@
   border-color: var(--red, #e00);
 }
 
+@media (max-width: 600px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .page-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .task-row {
+    grid-template-columns: 24px 1fr;
+    grid-template-rows: repeat(4, auto);
+    gap: 8px;
+  }
+
+  .task-row .title {
+    white-space: normal;
+  }
+
+  .task-row .badge.neutral,
+  .task-row .task-date,
+  .task-row .timer-cell,
+  .task-row .actions {
+    grid-column: 2;
+  }
+
+  .task-row .actions {
+    justify-content: flex-start;
+  }
+
+  .task-details {
+    margin-left: 0;
+  }
+}
+
