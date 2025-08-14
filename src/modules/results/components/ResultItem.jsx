@@ -46,14 +46,9 @@ export default function ResultItem({
       onClick={handleCardClick}
     >
       <div className="ri-top">
-        <a
-          className="ri-title"
-          href={`/results/${result.id}`}
-          title={result.title}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <span className="ri-title" title={result.title}>
           {result.title}
-        </a>
+        </span>
         <div className="ri-actions">
           <div className={`ri-done-wrapper ${loading ? "loading" : ""}`}>
             <CheckToggle
