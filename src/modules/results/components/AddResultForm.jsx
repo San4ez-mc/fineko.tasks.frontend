@@ -144,7 +144,7 @@ export default function AddResultForm({ onSaved, onCancel }) {
           </select>
         </label>
 
-        {error && <div className="arf-error">{error}</div>}
+        <div className="arf-error" aria-live="polite">{error}</div>
 
         <div className="arf-actions">
           <button type="submit" className="btn primary">Зберегти</button>
