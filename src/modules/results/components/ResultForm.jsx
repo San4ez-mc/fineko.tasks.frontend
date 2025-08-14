@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import './ResultForm.css';
+import VoiceInput from '../../../shared/components/VoiceInput';
 
 export default function ResultForm({ onSaved, onCancel }) {
   const [form, setForm] = useState({
@@ -48,6 +49,19 @@ export default function ResultForm({ onSaved, onCancel }) {
       setDateValid(selected >= today || val === '');
     }
   };
+  const handleVoice = (data) => {
+    setForm((prev) => ({
+      ...prev,
+      title: data.title || prev.title,
+      final_result: data.final_result || prev.final_result,
+      date: data.date || prev.date,
+      due_date: data.due_date || prev.due_date,
+      urgent: data.urgent !== undefined ? data.urgent : prev.urgent,
+      description: data.description || prev.description,
+      responsible_id: data.responsible_id ? String(data.responsible_id) : prev.responsible_id,
+    }));
+  };
+
 
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -112,6 +126,7 @@ export default function ResultForm({ onSaved, onCancel }) {
   return (
     <div className="result-form card">
       <form onSubmit={handleSubmit}>
+        <VoiceInput endpoint="/results/voice" onResult={handleVoice} />
         <label className="rf-field">
           <span>Назва*</span>
           <input

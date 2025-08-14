@@ -8,13 +8,13 @@ import { FiCalendar } from "react-icons/fi";
 import { getResults } from "../../results/api/results";
 import { useAuth } from "../../../context/AuthContext";
 import TaskComments from "../components/TaskComments";
+import VoiceInput from "../../../shared/components/VoiceInput";
 
 export default function DailyTasksPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tasks, setTasks] = useState([]);
     const [expandedTask, setExpandedTask] = useState(null);
     const [filters, setFilters] = useState({
-        q: "",
         status: "any",
         priority: "any",
         timer: "any",
@@ -120,7 +120,6 @@ export default function DailyTasksPage() {
 
     const resetFilters = () => {
         const base = {
-            q: "",
             status: "any",
             priority: "any",
             timer: "any",
@@ -242,6 +241,17 @@ export default function DailyTasksPage() {
         }
     };
 
+    const handleVoiceTask = (data) => {
+        if (data.title) setNewTaskTitle(data.title);
+        if (data.description) setNewTaskDescription(data.description);
+        if (data.expected_result) setNewTaskExpectedResult(data.expected_result);
+        if (data.type) setNewTaskType(data.type);
+        if (data.planned_time) setPlannedTime(data.planned_time);
+        if (data.manager) setTaskManager(data.manager);
+        if (data.comments) setNewTaskComments(data.comments);
+        if (data.resultId) setNewTaskResultId(String(data.resultId));
+    };
+
     const handleCreateTask = () => {
         if (!newTaskTitle.trim()) {
             setTitleError(true);
@@ -305,6 +315,7 @@ export default function DailyTasksPage() {
                 setNewTaskComments("");
                 setNewTaskResultId("");
                 setSelectedTemplate("");
+                loadTasks(formatDateForApi(selectedDate), filters);
             })
             .catch((err) => console.error("Помилка створення задачі", err));
     };
@@ -352,41 +363,22 @@ export default function DailyTasksPage() {
             </div>
 
             <div className="tpl-filters card">
-                <button
-                    className="btn ghost tf-toggle"
-                    onClick={() => setIsFiltersOpen((o) => !o)}
-                >
-                    Фільтри {isFiltersOpen ? "▲" : "▼"}
-                </button>
-                {isFiltersOpen && (
-                    <div className="tf-row">
-                        <label className="tf-search" aria-label="Пошук по всіх полях">
-                            <svg viewBox="0 0 24 24" className="ico" aria-hidden="true">
-                                <circle
-                                    cx="11"
-                                    cy="11"
-                                    r="7"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    fill="none"
-                                />
-                                <line
-                                    x1="21"
-                                    y1="21"
-                                    x2="16.5"
-                                    y2="16.5"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                />
-                            </svg>
-                            <input
-                                type="search"
-                                placeholder="Пошук по всіх полях…"
-                                value={filters.q}
-                                onChange={(e) =>
-                                    handleFilterChange({ q: e.target.value })
-                                }
-                            />
+
+                <div className="tf-row">
+                    <div className="tf-group">
+                        <label className="tf-field">
+                            <span>Статус</span>
+                            <select
+                                value={filters.status}
+                                onChange={(e) => handleFilterChange({ status: e.target.value })}
+                            >
+                                <option value="any">Будь‑який</option>
+                                <option value="new">нове</option>
+                                <option value="in_progress">в роботі</option>
+                                <option value="done">виконано</option>
+                                <option value="postponed">відкладено</option>
+                            </select>
+
                         </label>
 
                         <div className="tf-group">
@@ -482,6 +474,7 @@ export default function DailyTasksPage() {
 
             {isFormOpen && (
                 <div className="add-task-form card">
+                    <VoiceInput endpoint="/tasks/voice" onResult={handleVoiceTask} />
                     <input
                         type="text"
                         className={`title-input ${titleError ? "error" : ""}`}
@@ -562,27 +555,36 @@ export default function DailyTasksPage() {
                     {tasks.map((task) => (
                         <React.Fragment key={task.id}>
                             <div
-                                className={`task-row ${task.status === "done" ? "is-completed" : ""
-                                    }`}
+                                className={`task-row ${task.status === "done" ? "is-completed" : ""}`}
+                                onClick={() =>
+                                    setExpandedTask(
+                                        expandedTask === task.id ? null : task.id
+                                    )
+                                }
                             >
                                 <input
                                     type="checkbox"
                                     className="chk"
                                     checked={task.status === "done"}
-                                    onChange={() => toggleTaskCompletion(task.id)}
+                                    onChange={(e) => {
+                                        e.stopPropagation();
+                                        toggleTaskCompletion(task.id);
+                                    }}
                                 />
 
                                 <div className="title-cell">
-                                    <a className="title" href={`/tasks/${task.id}`}>
-                                        {task.title}
-                                    </a>
+                                    <span className="title">{task.title}</span>
                                     {task.type && (
                                         <span className={`badge ${getTypeClass(task.type)}`}>
                                             {task.type}
                                         </span>
                                     )}
                                     {task.result_id && (
-                                        <a className="link" href={`/results/${task.result_id}`}>
+                                        <a
+                                            className="link"
+                                            href={`/results/${task.result_id}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
                                             Результат: {task.result_title || task.result_id}
                                         </a>
                                     )}
@@ -598,21 +600,30 @@ export default function DailyTasksPage() {
                                     {activeTimerId === task.id ? (
                                         <button
                                             className="btn ghost"
-                                            onClick={() => pauseTimer(task.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                pauseTimer(task.id);
+                                            }}
                                         >
                                             ⏸
                                         </button>
                                     ) : (
                                         <button
                                             className="btn ghost"
-                                            onClick={() => startTimer(task.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                startTimer(task.id);
+                                            }}
                                         >
                                             ▶
                                         </button>
                                     )}
                                     <button
                                         className="btn ghost"
-                                        onClick={() => stopTimer(task.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            stopTimer(task.id);
+                                        }}
                                     >
                                         ⏹
                                     </button>
@@ -622,14 +633,11 @@ export default function DailyTasksPage() {
                                 </div>
 
                                 <div className="actions">
-                                    <button className="btn ghost">Перенести</button>
                                     <button
-                                        className="caret"
-                                        onClick={() =>
-                                            setExpandedTask(expandedTask === task.id ? null : task.id)
-                                        }
+                                        className="btn ghost"
+                                        onClick={(e) => e.stopPropagation()}
                                     >
-                                        {expandedTask === task.id ? "▾" : "▸"}
+                                        Перенести
                                     </button>
                                 </div>
                             </div>
@@ -639,8 +647,9 @@ export default function DailyTasksPage() {
                                     <label className="td-line">
                                         <span className="k">Опис</span>
                                         <textarea
-                                            className="input"
+                                            className="input description-input"
                                             defaultValue={task.description}
+                                            rows={4}
                                             onBlur={(e) =>
                                                 updateTaskField(
                                                     task.id,
@@ -656,6 +665,7 @@ export default function DailyTasksPage() {
                                         <textarea
                                             className="input"
                                             defaultValue={task.expected_result}
+                                            rows={2}
                                             onBlur={(e) =>
                                                 updateTaskField(
                                                     task.id,
@@ -671,6 +681,7 @@ export default function DailyTasksPage() {
                                         <textarea
                                             className="input"
                                             defaultValue={task.actual_result}
+                                            rows={2}
                                             onBlur={(e) =>
                                                 updateTaskField(
                                                     task.id,
@@ -680,7 +691,7 @@ export default function DailyTasksPage() {
                                             }
                                         />
                                     </label>
-
+                                    
                                     <label className="td-line">
                                         <span className="k">Тип</span>
                                         <select
