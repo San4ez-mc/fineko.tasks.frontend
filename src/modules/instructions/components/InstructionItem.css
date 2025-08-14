@@ -1,0 +1,21 @@
+.instruction-item {
+    padding: 16px;
+}
+
+.instruction-item__title {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.instruction-item__body {
+    margin-bottom: 12px;
+}
+
+.instruction-item__access {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.instruction-item__access > div + div {
+    margin-top: 8px;
+}

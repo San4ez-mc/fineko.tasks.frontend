@@ -1,0 +1,15 @@
+.instructions-page {
+    padding: 20px;
+}
+
+.instructions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.instructions-loader,
+.instructions-empty {
+    margin-top: 20px;
+}

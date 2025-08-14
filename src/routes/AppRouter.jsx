@@ -12,6 +12,7 @@ import BpEditorPage from "../modules/bp/pages/BpEditorPage";
 import OrgPage from "../modules/org/pages/OrgPage";
 import Layout from "../components/layout/Layout";
 import TelegramGroupPage from "../modules/telegram/pages/TelegramGroupPage";
+import InstructionsPage from "../modules/instructions/pages/InstructionsPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
 import ForgotPasswordPage from "../modules/auth/pages/ForgotPasswordPage";
 import ResetPasswordPage from "../modules/auth/pages/ResetPasswordPage";
@@ -117,6 +118,14 @@ export default function AppRouter() {
                 <Route element={<RequireAuth><Layout><Outlet /></Layout></RequireAuth>}>
                     <Route path="/org" element={<OrgPage />} />
                 </Route>
+                <Route
+                    path="/instructions"
+                    element={
+                        <RequireAuth>
+                            <InstructionsPage />
+                        </RequireAuth>
+                    }
+                />
                 <Route
                     path="/telegram-group"
                     element={
