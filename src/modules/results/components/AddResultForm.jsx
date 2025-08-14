@@ -7,6 +7,7 @@ export default function AddResultForm({ onSaved, onCancel }) {
   const [form, setForm] = useState({
     title: '',
     final_result: '',
+    due_date: '',
     urgent: false,
     description: '',
     responsible_id: '',
@@ -14,6 +15,7 @@ export default function AddResultForm({ onSaved, onCancel }) {
   });
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
+  const [dueDateValid, setDueDateValid] = useState(true);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -29,7 +31,12 @@ export default function AddResultForm({ onSaved, onCancel }) {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    const val = type === 'checkbox' ? checked : value;
+    setForm((prev) => ({ ...prev, [name]: val }));
+    if (name === 'due_date') {
+      const re = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/;
+      setDueDateValid(re.test(val) || val === '');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -39,6 +46,7 @@ export default function AddResultForm({ onSaved, onCancel }) {
       const payload = {
         title: form.title,
         final_result: form.final_result,
+        due_date: form.due_date,
         urgent: form.urgent,
         description: form.description,
         responsible_id: Number(form.responsible_id)
@@ -90,6 +98,20 @@ export default function AddResultForm({ onSaved, onCancel }) {
               onChange={handleChange}
               required
             />
+          </label>
+          <label className="arf-field">
+            <span>Кінцевий термін</span>
+            <input
+              type="text"
+              name="due_date"
+              className={`input${!dueDateValid && form.due_date ? ' invalid' : ''}`}
+              placeholder="ДД.ММ.РРРР гг:хх"
+              value={form.due_date}
+              onChange={handleChange}
+            />
+            {!dueDateValid && form.due_date && (
+              <span className="arf-hint">Формат: ДД.ММ.РРРР гг:хх</span>
+            )}
           </label>
           <label className="arf-check">
             <input

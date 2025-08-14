@@ -7,9 +7,20 @@
 }
 
 .add-result-form .arf-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
   gap: 12px;
-  align-items: flex-end;
+  align-items: end;
+}
+
+@media (max-width: 640px) {
+  .add-result-form .arf-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .add-result-form .arf-check {
+    grid-column: 1 / -1;
+  }
 }
 
 .add-result-form .arf-field {
@@ -23,6 +34,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.add-result-form .arf-hint {
+  font-size: var(--fz-sm);
+  color: var(--text-muted);
+}
+
+.add-result-form .input.invalid {
+  border-color: var(--critical);
 }
 
 .add-result-form textarea {
