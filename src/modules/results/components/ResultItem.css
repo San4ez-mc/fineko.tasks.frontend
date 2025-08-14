@@ -1,0 +1,83 @@
+@import "../../../styles/variables.css";
+
+.result-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.result-item + .result-item {
+  margin-top: var(--space-2);
+}
+
+.result-item.expanded {
+  box-shadow: var(--shadow);
+}
+
+.ri-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.ri-title {
+  flex: 1 1 auto;
+  color: var(--navy);
+  font-weight: 600;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.ri-actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.ri-action {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+}
+
+.ri-action:hover {
+  color: var(--primary);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.ri-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--fz-sm);
+  color: var(--text-muted);
+}
+
+.ri-deadline {
+  margin-right: var(--space-2);
+}
+
+/* статусні бейджі */
+.badge.status-new { border-color: var(--text-muted); color: var(--text-muted); }
+.badge.status-progress { border-color: var(--blue); color: var(--blue); }
+.badge.status-done { border-color: #10B981; color: #065F46; }
+.badge.status-postponed { border-color: var(--rush); color: var(--rush-dark); }
+
+@media (max-width: 600px) {
+  .ri-top {
+    flex-wrap: wrap;
+  }
+  .ri-actions {
+    margin-left: auto;
+  }
+}
