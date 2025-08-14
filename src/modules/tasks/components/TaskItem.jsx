@@ -257,12 +257,11 @@ export default function TaskItem({
 
                     {/* Коментарі */}
                     <TaskComments
+                        taskId={task.id}
+                        author="Я"
                         comments={task.comments}
-                        onAddComment={(text) =>
-                            onUpdateField(task.id, "comments", [
-                                ...task.comments,
-                                { author: "Я", text, replies: [] },
-                            ])
+                        onCommentsChange={(updated) =>
+                            onUpdateField(task.id, "comments", updated)
                         }
                     />
                 </div>

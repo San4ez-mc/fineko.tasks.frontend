@@ -753,21 +753,20 @@ export default function DailyTasksPage() {
                                     </label>
 
                                     <TaskComments
+                                        taskId={task.id}
+                                        author={user?.name || "Я"}
                                         comments={task.comments}
-                                        onAddComment={({ text, parentId }) => {
-                                            const author = user?.name || "Я";
-                                            const updated = [...task.comments];
-                                            if (parentId === null) {
-                                                updated.push({ author, text, replies: [] });
-                                            } else if (updated[parentId]) {
-                                                const replies = updated[parentId].replies || [];
-                                                updated[parentId] = {
-                                                    ...updated[parentId],
-                                                    replies: [...replies, { author, text }],
-                                                };
-                                            }
-                                            updateTaskField(task.id, "comments", updated);
-                                        }}
+                                        onCommentsChange={(updated) =>
+                                            setTasks((prev) =>
+                                                sortTasks(
+                                                    prev.map((t) =>
+                                                        t.id === task.id
+                                                            ? { ...t, comments: updated }
+                                                            : t
+                                                    )
+                                                )
+                                            )
+                                        }
                                     />
                                 </div>
                             )}
