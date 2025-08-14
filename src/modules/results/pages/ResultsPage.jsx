@@ -12,6 +12,7 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [parentId, setParentId] = useState(null);
   const [tasksLoading, setTasksLoading] = useState({});
 
   const fetchResults = async () => {
@@ -31,6 +32,7 @@ export default function ResultsPage() {
 
   const handleSaved = () => {
     setShowAddForm(false);
+    setParentId(null);
     fetchResults();
   };
 
@@ -60,13 +62,24 @@ export default function ResultsPage() {
     });
   };
 
+  const handleAddSubresult = (id) => {
+    setParentId(id);
+    setShowAddForm(true);
+  };
+
   return (
     <Layout>
       <div className="results-page">
         <div className="results-page__header">
           <h1>Результати</h1>
           {!showAddForm && (
-            <button className="btn primary" onClick={() => setShowAddForm(true)}>
+            <button
+              className="btn primary"
+              onClick={() => {
+                setParentId(null);
+                setShowAddForm(true);
+              }}
+            >
               Додати результат
             </button>
           )}
@@ -74,14 +87,25 @@ export default function ResultsPage() {
 
         {showAddForm && (
           <ResultForm
+            parentId={parentId}
             onSaved={handleSaved}
-            onCancel={() => setShowAddForm(false)}
+            onCancel={() => {
+              setShowAddForm(false);
+              setParentId(null);
+            }}
           />
         )}
 
         {loading && <div className="results-loader">Завантаження…</div>}
 
-        {!loading && results.length === 0 && <ResultsEmpty onCreate={() => setShowAddForm(true)} />}
+        {!loading && results.length === 0 && (
+          <ResultsEmpty
+            onCreate={() => {
+              setParentId(null);
+              setShowAddForm(true);
+            }}
+          />
+        )}
 
         {!loading && results.length > 0 && (
           <div className="results-list">
@@ -93,7 +117,10 @@ export default function ResultsPage() {
                   onToggleExpand={toggleExpand}
                 />
                 {expanded === r.id && (
-                  <ResultDetails result={r} tasksLoading={tasksLoading[r.id]} />
+                  <ResultDetails
+                    result={r}
+                    onAddSubresult={handleAddSubresult}
+                  />
                 )}
               </React.Fragment>
             ))}
