@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
-import './AddResultForm.css';
+import './ResultForm.css';
 
-export default function AddResultForm({ onSaved, onCancel }) {
+export default function ResultForm({ onSaved, onCancel }) {
   const [form, setForm] = useState({
     title: '',
     final_result: '',
@@ -67,33 +67,35 @@ export default function AddResultForm({ onSaved, onCancel }) {
   };
 
   return (
-    <div className="add-result-form card">
+    <div className="result-form card">
       <form onSubmit={handleSubmit}>
-        <label className="arf-field">
+        <label className="rf-field">
           <span>Назва*</span>
           <input
             type="text"
             name="title"
             className="input"
             value={form.title}
+            placeholder="Введіть назву"
             onChange={handleChange}
             required
           />
         </label>
 
-        <div className="arf-row">
-          <label className="arf-field">
+        <div className="rf-row">
+          <label className="rf-field">
             <span>Кінцевий результат*</span>
             <input
               type="text"
               name="final_result"
               className="input"
               value={form.final_result}
+              placeholder="Опишіть результат"
               onChange={handleChange}
               required
             />
           </label>
-          <label className="arf-field">
+          <label className="rf-field">
             <span>Кінцевий термін</span>
             <input
               type="text"
@@ -104,10 +106,10 @@ export default function AddResultForm({ onSaved, onCancel }) {
               onChange={handleChange}
             />
             {!dueDateValid && form.due_date && (
-              <span className="arf-hint">Формат: ДД.ММ.РРРР гг:хх</span>
+              <span className="rf-hint">Формат: ДД.ММ.РРРР гг:хх</span>
             )}
           </label>
-          <label className="arf-check">
+          <label className="rf-check">
             <input
               type="checkbox"
               name="urgent"
@@ -118,17 +120,18 @@ export default function AddResultForm({ onSaved, onCancel }) {
           </label>
         </div>
 
-        <label className="arf-field">
+        <label className="rf-field">
           <span>Опис</span>
           <textarea
             name="description"
             className="input"
             value={form.description}
+            placeholder="Додайте опис"
             onChange={handleChange}
           />
         </label>
 
-        <label className="arf-field">
+        <label className="rf-field">
           <span>Відповідальний*</span>
           <select
             name="responsible_id"
@@ -137,16 +140,16 @@ export default function AddResultForm({ onSaved, onCancel }) {
             onChange={handleChange}
             required
           >
-            <option value="">—</option>
+            <option value="">Оберіть відповідального</option>
             {users.map((u) => (
               <option key={u.id} value={u.id}>{labelForUser(u)}</option>
             ))}
           </select>
         </label>
 
-        {error && <div className="arf-error">{error}</div>}
+        {error && <div className="rf-error">{error}</div>}
 
-        <div className="arf-actions">
+        <div className="rf-actions">
           <button type="submit" className="btn primary">Зберегти</button>
           <button type="button" className="btn ghost" onClick={onCancel}>Скасувати</button>
         </div>
