@@ -1,8 +1,9 @@
 .page-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 12px;
+  position: relative;
 }
 
 .page-header-left {
@@ -14,6 +15,8 @@
 .page-header-actions {
   display: flex;
   gap: 10px;
+  position: absolute;
+  right: 0;
 }
 
 .muted {
@@ -165,11 +168,12 @@
 @media (max-width: 600px) {
   .page-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
   }
 
   .page-header-actions {
+    position: static;
     width: 100%;
     flex-wrap: wrap;
     justify-content: flex-start;
