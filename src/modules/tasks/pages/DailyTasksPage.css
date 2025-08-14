@@ -130,14 +130,16 @@
 
 .add-task-form {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  align-items: center;
+  align-items: flex-start;
   padding: 12px;
   margin-bottom: 16px;
 }
 
 .add-task-form input,
-.add-task-form select {
+.add-task-form select,
+.add-task-form textarea {
   padding: 4px 8px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -145,6 +147,10 @@
 
 .add-task-form .title-input {
   flex: 1;
+}
+
+.add-task-form .full-width {
+  flex: 1 1 100%;
 }
 
 .add-task-form input.error {

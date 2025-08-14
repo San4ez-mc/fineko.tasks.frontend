@@ -86,16 +86,29 @@
     margin-top: 10px;
 }
 
-/* Поле опису */
-.task-description {
-    width: 100%;
+/* Очікуваний та фактичний результати */
+.task-results-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.task-results-row label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.task-results-row textarea {
+    flex: 1;
     resize: vertical;
     font-size: 14px;
     padding: 8px;
     border-radius: 6px;
     border: 1px solid #ddd;
     background: #fafafa;
-    margin-bottom: 10px;
 }
 
 /* ==== Поля в один рядок ==== */
