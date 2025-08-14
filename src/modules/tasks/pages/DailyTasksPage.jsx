@@ -37,9 +37,6 @@ export default function DailyTasksPage() {
     const [results, setResults] = useState([]);
     const [titleError, setTitleError] = useState(false);
     const { user } = useAuth();
-    const [isFiltersOpen, setIsFiltersOpen] = useState(() =>
-        typeof window !== "undefined" ? window.innerWidth > 600 : true
-    );
 
     useEffect(() => {
         if (user?.name) {
@@ -60,6 +57,7 @@ export default function DailyTasksPage() {
         rush: { background: "purple", color: "#fff" },
         neutral: { background: "transparent", color: "inherit" },
     };
+
     const sortTasks = (arr) =>
         [...arr].sort((a, b) => {
             if (a.status === "done" && b.status !== "done") return 1;
@@ -92,6 +90,9 @@ export default function DailyTasksPage() {
                     actual_result: t.result || "",
                     description: t.description || "",
                     manager: t.manager || "",
+                    // додано, щоб коректно працювало посилання на результат
+                    result_id: t.result_id ?? t.resultId ?? null,
+                    result_title: t.result_title ?? t.resultTitle ?? "",
                     comments: (() => {
                         try {
                             return Array.isArray(t.comments)
@@ -141,9 +142,7 @@ export default function DailyTasksPage() {
             .catch(() => { });
         setTasks((prev) =>
             sortTasks(
-                prev.map((t) =>
-                    t.id === id ? { ...t, status: newStatus } : t
-                )
+                prev.map((t) => (t.id === id ? { ...t, status: newStatus } : t))
             )
         );
     };
@@ -179,6 +178,7 @@ export default function DailyTasksPage() {
         if (type === "важлива термінова") return "type-important-urgent";
         if (type === "важлива нетермінова") return "type-important-not-urgent";
         if (type === "неважлива термінова") return "type-not-important-urgent";
+        if (type === "неважлива нетермінова") return "type-not-important-not-urgent";
         return "";
     };
 
@@ -189,19 +189,14 @@ export default function DailyTasksPage() {
             .then(() => {
                 setTasks((prev) =>
                     sortTasks(
-                        prev.map((t) =>
-                            t.id === id ? { ...t, [field]: value } : t
-                        )
+                        prev.map((t) => (t.id === id ? { ...t, [field]: value } : t))
                     )
                 );
             })
             .catch(() => { });
     };
 
-    const totalExpected = tasks.reduce(
-        (sum, t) => sum + (t.expected_time || 0),
-        0
-    );
+    const totalExpected = tasks.reduce((sum, t) => sum + (t.expected_time || 0), 0);
 
     const formattedDate = selectedDate.toLocaleDateString("uk-UA", {
         year: "numeric",
@@ -279,6 +274,7 @@ export default function DailyTasksPage() {
                 : JSON.stringify([]),
         };
         if (newTaskResultId) payload.resultId = newTaskResultId;
+
         api
             .post(`/tasks/daily`, payload)
             .then((res) => {
@@ -362,15 +358,17 @@ export default function DailyTasksPage() {
                 </div>
             </div>
 
+            {/* Фільтри */}
             <div className="tpl-filters card">
-
                 <div className="tf-row">
                     <div className="tf-group">
                         <label className="tf-field">
                             <span>Статус</span>
                             <select
                                 value={filters.status}
-                                onChange={(e) => handleFilterChange({ status: e.target.value })}
+                                onChange={(e) =>
+                                    handleFilterChange({ status: e.target.value })
+                                }
                             >
                                 <option value="any">Будь‑який</option>
                                 <option value="new">нове</option>
@@ -378,98 +376,71 @@ export default function DailyTasksPage() {
                                 <option value="done">виконано</option>
                                 <option value="postponed">відкладено</option>
                             </select>
-
                         </label>
 
-                        <div className="tf-group">
-                            <label className="tf-field">
-                                <span>Статус</span>
-                                <select
-                                    value={filters.status}
-                                    onChange={(e) =>
-                                        handleFilterChange({ status: e.target.value })
-                                    }
-                                >
-                                    <option value="any">Будь‑який</option>
-                                    <option value="new">нове</option>
-                                    <option value="in_progress">в роботі</option>
-                                    <option value="done">виконано</option>
-                                    <option value="postponed">відкладено</option>
-                                </select>
-                            </label>
+                        <label className="tf-field">
+                            <span>Тип</span>
+                            <select
+                                value={filters.priority}
+                                onChange={(e) =>
+                                    handleFilterChange({ priority: e.target.value })
+                                }
+                                style={priorityStyles[filters.priority] || {}}
+                            >
+                                <option value="any">Будь‑який</option>
+                                <option value="critical" style={priorityStyles.critical}>
+                                    Важлива термінова
+                                </option>
+                                <option value="important" style={priorityStyles.important}>
+                                    Важлива нетермінова
+                                </option>
+                                <option value="rush" style={priorityStyles.rush}>
+                                    Неважлива термінова
+                                </option>
+                                <option value="neutral" style={priorityStyles.neutral}>
+                                    Неважлива нетермінова
+                                </option>
+                            </select>
+                        </label>
 
-                            <label className="tf-field">
-                                <span>Тип</span>
-                                <select
-                                    value={filters.priority}
-                                    onChange={(e) =>
-                                        handleFilterChange({ priority: e.target.value })
-                                    }
-                                    style={priorityStyles[filters.priority] || {}}
-                                >
-                                    <option value="any">Будь‑який</option>
-                                    <option
-                                        value="critical"
-                                        style={priorityStyles.critical}
-                                    >
-                                        Важлива термінова
+                        <label className="tf-field">
+                            <span>Активний таймер</span>
+                            <select
+                                value={filters.timer}
+                                onChange={(e) =>
+                                    handleFilterChange({ timer: e.target.value })
+                                }
+                            >
+                                <option value="any">будь‑який</option>
+                                <option value="yes">є</option>
+                                <option value="no">нема</option>
+                            </select>
+                        </label>
+
+                        <label className="tf-field">
+                            <span>Прив’язаний результат</span>
+                            <select
+                                value={filters.result}
+                                onChange={(e) =>
+                                    handleFilterChange({ result: e.target.value })
+                                }
+                            >
+                                <option value="any">Будь‑який</option>
+                                {results.map((r) => (
+                                    <option key={r.id} value={String(r.id)}>
+                                        {r.title}
                                     </option>
-                                    <option
-                                        value="important"
-                                        style={priorityStyles.important}
-                                    >
-                                        Важлива нетермінова
-                                    </option>
-                                    <option
-                                        value="rush"
-                                        style={priorityStyles.rush}
-                                    >
-                                        Неважлива термінова
-                                    </option>
-                                    <option
-                                        value="neutral"
-                                        style={priorityStyles.neutral}
-                                    >
-                                        Неважлива нетермінова
-                                    </option>
-                                </select>
-                            </label>
-
-                            <label className="tf-field">
-                                <span>Активний таймер</span>
-                                <select
-                                    value={filters.timer}
-                                    onChange={(e) =>
-                                        handleFilterChange({ timer: e.target.value })
-                                    }
-                                >
-                                    <option value="any">будь‑який</option>
-                                    <option value="yes">є</option>
-                                    <option value="no">нема</option>
-                                </select>
-                            </label>
-
-                            <label className="tf-field">
-                                <span>Прив’язаний результат</span>
-                                <select
-                                    value={filters.result}
-                                    onChange={(e) =>
-                                        handleFilterChange({ result: e.target.value })
-                                    }
-                                >
-                                    <option value="any">Будь‑який</option>
-                                </select>
-                            </label>
-
-                        </div>
-
-                        <div className="tf-actions">
-                            <button className="btn ghost" onClick={resetFilters}>
-                                Скинути фільтри
-                            </button>
-                        </div>
+                                ))}
+                            </select>
+                        </label>
                     </div>
-                )}
+
+                    <div className="tf-actions">
+                        <button className="btn ghost" onClick={resetFilters}>
+                            Скинути фільтри
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {isFormOpen && (
@@ -555,7 +526,8 @@ export default function DailyTasksPage() {
                     {tasks.map((task) => (
                         <React.Fragment key={task.id}>
                             <div
-                                className={`task-row ${task.status === "done" ? "is-completed" : ""}`}
+                                className={`task-row ${task.status === "done" ? "is-completed" : ""
+                                    }`}
                                 onClick={() =>
                                     setExpandedTask(
                                         expandedTask === task.id ? null : task.id
@@ -691,7 +663,7 @@ export default function DailyTasksPage() {
                                             }
                                         />
                                     </label>
-                                    
+
                                     <label className="td-line">
                                         <span className="k">Тип</span>
                                         <select
@@ -789,4 +761,3 @@ export default function DailyTasksPage() {
         </Layout>
     );
 }
-
