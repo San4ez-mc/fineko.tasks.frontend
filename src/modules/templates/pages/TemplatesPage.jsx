@@ -148,6 +148,29 @@ export default function TemplatesPage() {
     setModalOpen(true);
   };
 
+  const handleVoiceTemplate = (data) => {
+    setForm((s) => ({
+      ...s,
+      name: data.name || s.name,
+      flags: { ...s.flags, ...(data.flags || {}) },
+      payload: {
+        ...s.payload,
+        ...(data.payload || {
+          title: data.title,
+          expected_result: data.expected_result,
+          result: data.result,
+          type: data.type,
+          planned_time: data.planned_time,
+          actual_time: data.actual_time,
+          manager: data.manager,
+          comments: data.comments,
+          resultId: data.resultId,
+          repeat: data.repeat,
+        }),
+      },
+    }));
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -166,26 +189,6 @@ export default function TemplatesPage() {
               : { type: form.payload.repeat?.type || "none", interval: 1 },
         },
       };
-
-  const handleVoiceTemplate = (data) => {
-    setForm((s) => ({
-      ...s,
-      name: data.name || s.name,
-      flags: { ...s.flags, ...(data.flags || {}) },
-      payload: { ...s.payload, ...(data.payload || {
-        title: data.title,
-        expected_result: data.expected_result,
-        result: data.result,
-        type: data.type,
-        planned_time: data.planned_time,
-        actual_time: data.actual_time,
-        manager: data.manager,
-        comments: data.comments,
-        resultId: data.resultId,
-        repeat: data.repeat
-      })}
-    }));
-  };
       if (!payload.name) {
         setError("Назва шаблону обов’язкова");
         return;
