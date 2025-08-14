@@ -126,7 +126,8 @@
 }
 
 .bp-node-flags {
-  display: none;
+  display: flex;
+  gap: 4px;
 }
 
 .icon { width: 22px; height: 22px; border-radius: 6px; border: 1px solid #ddd; }
@@ -135,7 +136,12 @@
 .icon.problem { background: #fff5f5; }
 .icon.on { outline: 2px solid #00000022; }
 
-.bp-node-bottom { display: none; }
+.bp-node-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
 
 .bp-node-assignee {
   min-width: 220px;
@@ -196,3 +202,12 @@
 
 .cp-footer { display: flex; gap: 6px; margin-top: 6px; }
 .cp-footer input { flex: 1; border: 1px solid #ddd; border-radius: 10px; padding: 6px 10px; }
+
+.cp-body textarea {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 6px 10px;
+  resize: vertical;
+}
