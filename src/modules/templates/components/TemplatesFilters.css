@@ -1,13 +1,13 @@
 @import "../../../styles/variables.css";
 
-.tpl-filters{ padding:12px; }
+.tpl-filters{ padding:8px; }
 
-.tf-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.tf-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 
 .tf-search{
-  display:flex; align-items:center; gap:10px;
+  display:flex; align-items:center; gap:8px;
   border:1px solid var(--border); border-radius: var(--radius-sm);
-  padding:6px 10px; background:#fff; min-width:320px; flex:1;
+  padding:4px 8px; background:#fff; min-width:320px; flex:1;
 }
 .tf-search .ico{ width:18px; height:18px; color: var(--text-muted); }
 .tf-search input{
@@ -15,14 +15,14 @@
   font-size: var(--fz-base); color: var(--text);
 }
 
-.tf-group{ display:flex; gap:10px; flex-wrap:wrap; }
+.tf-group{ display:flex; gap:8px; flex-wrap:wrap; }
 .tf-field{
-  display:flex; flex-direction:column; gap:6px;
+  display:flex; flex-direction:column; gap:4px;
   font-size: var(--fz-sm); color: var(--text-muted);
 }
 .tf-field select{
   border:1px solid var(--border); border-radius: var(--radius-sm);
-  background:#fff; padding:8px 10px; min-width:160px;
+  background:#fff; padding:6px 8px; min-width:160px;
 }
 
 .tf-actions{ margin-left:auto; display:flex; gap:8px; }
