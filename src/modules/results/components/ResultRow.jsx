@@ -23,7 +23,7 @@ export default function ResultRow({
 }) {
   const statusClass = mapStatus(result.status);
   return (
-    <div className={`result-row ${expanded ? "expanded" : ""}`}>
+    <div className={`result-row ${expanded ? "expanded" : ""} ${result.status === "done" ? "done" : ""}`}>
       <button className="caret" aria-label="Розгорнути" onClick={() => onToggleExpand && onToggleExpand(result.id)}>
         {expanded ? "▾" : "▸"}
       </button>
