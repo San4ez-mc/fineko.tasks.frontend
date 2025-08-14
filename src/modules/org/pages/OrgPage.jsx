@@ -134,32 +134,16 @@ export default function OrgPage() {
 
 /* ----------------- helpers / demo data (замінити API) ----------------- */
 function demoTree() {
+  // Попередня структура для демонстрації – реальні дані будуть отримані з API
   return [
-    {
-      id: "div1", type: "division", name: "Відділення А",
-      head: { id: 101, name: "Олена Р." },
-      productValue: "Планування і P&L підрозділу",
-      order: 1,
-      departments: [
-        {
-          id: "dep1", type: "department", name: "Відділ Продажів", head: { id: 102, name: "Ігор С." },
-          productValue: "Нові контракти",
-          order: 1,
-          employees: [
-            { id: "pos1", type: "position", title: "Менеджер з продажу", user: { id: 201, name: "Наталія К." }, isManager: false },
-            { id: "pos2", type: "position", title: "Аккаунт-менеджер", user: { id: 202, name: "Дмитро П." }, isManager: false }
-          ]
-        },
-        {
-          id: "dep2", type: "department", name: "Маркетинг", head: { id: 103, name: "Світлана Л." },
-          productValue: "Ліди і бренд",
-          order: 2,
-          employees: [
-            { id: "pos3", type: "position", title: "Контент-маркетолог", user: { id: 203, name: "Марія Д." }, isManager: false }
-          ]
-        }
-      ]
-    }
+    { id: "div-admin", type: "division", name: "Адміністративне відділення", head: null, productValue: "", order: 1, departments: [] },
+    { id: "div-build-1", type: "division", name: "Відділення побудови", head: null, productValue: "", order: 2, departments: [] },
+    { id: "div-build-2", type: "division", name: "Відділення побудови", head: null, productValue: "", order: 3, departments: [] },
+    { id: "div-spread", type: "division", name: "Відділення поширення", head: null, productValue: "", order: 4, departments: [] },
+    { id: "div-finance", type: "division", name: "Фінансове відділення", head: null, productValue: "", order: 5, departments: [] },
+    { id: "div-tech", type: "division", name: "Технічне відділення", head: null, productValue: "", order: 6, departments: [] },
+    { id: "div-qual", type: "division", name: "Відділення кваліфікації", head: null, productValue: "", order: 7, departments: [] },
+    { id: "div-public", type: "division", name: "Відділення по роботі з публікою", head: null, productValue: "", order: 8, departments: [] }
   ];
 }
 function demoPositions(tree) {

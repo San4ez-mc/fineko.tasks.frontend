@@ -16,4 +16,5 @@
 .org-canvas{
   overflow:auto;
   background: var(--bg);
+  min-width:0;
 }
