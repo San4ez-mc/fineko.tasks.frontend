@@ -1,4 +1,166 @@
 @import "../../../styles/variables.css";
 
-.templates-page{ display:flex; flex-direction:column; gap:16px; }
-.tpl-list{ display:grid; }
+.templates-page {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.tp-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.tp-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tp-error {
+  color: var(--critical);
+  font-size: var(--fz-sm);
+}
+
+.tp-table {
+  overflow: hidden;
+}
+
+.tp-row {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.tp-row--head {
+  background: var(--bg-soft);
+  font-weight: 600;
+}
+
+.tp-empty {
+  padding: 16px;
+  color: var(--text-muted);
+}
+
+.c-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-weak);
+  color: var(--accent-text);
+  font-size: var(--fz-xs);
+}
+
+.badge.muted {
+  background: var(--bg-soft);
+  color: var(--text-muted);
+}
+
+.flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Modal */
+.tp-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.3);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.tp-modal__dialog {
+  max-width: 960px;
+  width: 100%;
+  padding: 16px;
+}
+
+.tp-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.tp-modal__body {
+  display: grid;
+  gap: 12px;
+}
+
+.tp-modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Form elements */
+.field {
+  display: grid;
+  gap: 4px;
+}
+
+.field.row {
+  grid-template-columns: 120px auto;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 860px) {
+  .tp-row {
+    grid-template-columns: 1.5fr 1.5fr 1fr auto;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .tp-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .tp-actions {
+    justify-content: space-between;
+  }
+  .tp-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .c-actions {
+    justify-content: flex-start;
+  }
+  .row2 {
+    grid-template-columns: 1fr;
+  }
+}
+

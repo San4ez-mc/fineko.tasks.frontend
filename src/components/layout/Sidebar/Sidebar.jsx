@@ -31,7 +31,6 @@ export default function Sidebar({
     const location = useLocation();
     const tasksActive =
         location.pathname.startsWith("/results") ||
-        location.pathname.startsWith("/templates") ||
         location.pathname.startsWith("/tasks");
     const { activeCompany } = useCompany();
 
@@ -101,20 +100,6 @@ export default function Sidebar({
                                     </li>
                                     <li>
                                         <NavLink
-                                            to="/templates"
-                                            className={({ isActive }) =>
-                                                `${isActive ? "active" : ""} nav-subitem`
-                                            }
-                                            onClick={handleNavClick}
-                                        >
-                                            <FiGrid className="submenu-icon" />
-                                            <span className="menu-text">
-                                                Шаблони
-                                            </span>
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink
                                             to="/tasks"
                                             className={({ isActive }) =>
                                                 `${isActive ? "active" : ""} nav-subitem`
@@ -129,6 +114,22 @@ export default function Sidebar({
                                     </li>
                                 </ul>
                             )}
+                        </li>
+                        <li>
+                            <NavLink
+                                to="/templates"
+                                className={({ isActive }) =>
+                                    isActive ? "active" : ""
+                                }
+                                onClick={handleNavClick}
+                            >
+                                <FiGrid className="menu-icon" />
+                                {isOpen && (
+                                    <span className="menu-text">
+                                        Шаблони
+                                    </span>
+                                )}
+                            </NavLink>
                         </li>
                         <li className="sidebar-divider" aria-hidden="true"></li>
                         <li>
