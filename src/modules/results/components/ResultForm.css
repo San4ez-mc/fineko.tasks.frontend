@@ -1,0 +1,92 @@
+@import "../../../styles/variables.css";
+
+/* Контейнер форми */
+.result-form {
+  padding: 16px;
+}
+
+/* Сітка рядка з кількома полями */
+.rf-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  /* result, date, due, urgent */
+  gap: 12px;
+  align-items: end;
+}
+
+/* Адаптив під мобільний */
+@media (max-width: 640px) {
+  .rf-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rf-check {
+    grid-column: 1 / -1;
+  }
+
+  .rf-due {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Базове поле */
+.rf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+/* Чекбокс "Терміново" */
+.rf-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Підказки/помилки */
+.rf-hint {
+  font-size: var(--fz-sm);
+  color: var(--text-muted);
+}
+
+.input.invalid {
+  border-color: var(--critical);
+}
+
+/* Текстова область */
+textarea.input {
+  min-height: 200px;
+  resize: vertical;
+}
+
+/* Блок помилки під формою */
+.rf-error {
+  color: var(--critical);
+  font-size: var(--fz-sm);
+  min-height: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* Панель дій (кнопки) — праве вирівнювання */
+.rf-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid transparent;
+  /* легкий поділ без явної лінії */
+}
+
+/* На мобільному — кнопки в стовпчик, 100% ширини */
+@media (max-width: 576px) {
+  .rf-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rf-actions .btn {
+    width: 100%;
+  }
+}

@@ -4,7 +4,7 @@ import { getResults } from '../api/results';
 import ResultRow from '../components/ResultRow.jsx';
 import ResultDetails from '../components/ResultDetails.jsx';
 import ResultsEmpty from '../components/ResultsEmpty.jsx';
-import AddResultForm from '../components/AddResultForm.jsx';
+import ResultForm from '../components/ResultForm.jsx';
 import './ResultsPage.css';
 
 export default function ResultsPage() {
@@ -50,7 +50,7 @@ export default function ResultsPage() {
         </div>
 
         {showAddForm && (
-          <AddResultForm
+          <ResultForm
             onSaved={handleSaved}
             onCancel={() => setShowAddForm(false)}
           />

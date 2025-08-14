@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
-import './AddResultForm.css';
+import './ResultForm.css';
 
-export default function AddResultForm({ onSaved, onCancel }) {
+export default function ResultForm({ onSaved, onCancel }) {
   const [form, setForm] = useState({
     title: '',
     final_result: '',
@@ -33,11 +33,15 @@ export default function AddResultForm({ onSaved, onCancel }) {
     const { name, value, type, checked } = e.target;
     const val = type === 'checkbox' ? checked : value;
     setForm((prev) => ({ ...prev, [name]: val }));
+
     if (name === 'due_date') {
+      // очікуємо формат гг:хх (24h), напр. 09:30
       const re = /^\d{2}:\d{2}$/;
       setDueDateValid(re.test(val) || val === '');
     }
+
     if (name === 'date') {
+      // дата не може бути в минулому
       const selected = new Date(val);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -50,6 +54,7 @@ export default function AddResultForm({ onSaved, onCancel }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     try {
       if (form.date) {
         const selected = new Date(form.date);
@@ -61,22 +66,38 @@ export default function AddResultForm({ onSaved, onCancel }) {
         }
       }
 
+      if (form.due_date && !/^\d{2}:\d{2}$/.test(form.due_date)) {
+        setDueDateValid(false);
+        return;
+      }
+
       const payload = {
         title: form.title,
         final_result: form.final_result,
-        date: form.date,
-        due_date: form.due_date,
-        urgent: form.urgent,
+        date: form.date || null,
+        due_date: form.due_date || null,
+        urgent: !!form.urgent,
         description: form.description,
-        responsible_id: Number(form.responsible_id)
+        responsible_id: form.responsible_id ? Number(form.responsible_id) : null
       };
+
       await api.post('/results', payload);
+
       onSaved && onSaved();
-      setForm({ title: '', final_result: '', date: '', due_date: '', urgent: false, description: '', responsible_id: '' });
+
+      setForm({
+        title: '',
+        final_result: '',
+        date: '',
+        due_date: '',
+        urgent: false,
+        description: '',
+        responsible_id: ''
+      });
       setDueDateValid(true);
       setDateValid(true);
     } catch (e) {
-      const msg = e.response?.data?.message || 'Не вдалося створити результат';
+      const msg = e?.response?.data?.message || 'Не вдалося створити результат';
       setError(msg);
     }
   };
@@ -89,33 +110,36 @@ export default function AddResultForm({ onSaved, onCancel }) {
   };
 
   return (
-    <div className="add-result-form card">
+    <div className="result-form card">
       <form onSubmit={handleSubmit}>
-        <label className="arf-field">
+        <label className="rf-field">
           <span>Назва*</span>
           <input
             type="text"
             name="title"
             className="input"
             value={form.title}
+            placeholder="Введіть назву"
             onChange={handleChange}
             required
           />
         </label>
 
-        <div className="arf-row">
-          <label className="arf-field">
+        <div className="rf-row">
+          <label className="rf-field">
             <span>Кінцевий результат*</span>
             <input
               type="text"
               name="final_result"
               className="input"
               value={form.final_result}
+              placeholder="Опишіть результат"
               onChange={handleChange}
               required
             />
           </label>
-          <label className="arf-field">
+
+          <label className="rf-field">
             <span>Дата</span>
             <input
               type="date"
@@ -126,10 +150,11 @@ export default function AddResultForm({ onSaved, onCancel }) {
               onChange={handleChange}
             />
             {!dateValid && form.date && (
-              <span className="arf-hint">Дата не може бути в минулому</span>
+              <span className="rf-hint">Дата не може бути в минулому</span>
             )}
           </label>
-          <label className="arf-field arf-due">
+
+          <label className="rf-field rf-due">
             <span>Кінцевий термін</span>
             <input
               type="text"
@@ -140,10 +165,11 @@ export default function AddResultForm({ onSaved, onCancel }) {
               onChange={handleChange}
             />
             {!dueDateValid && form.due_date && (
-              <span className="arf-hint">Формат: гг:хх</span>
+              <span className="rf-hint">Формат: гг:хх</span>
             )}
           </label>
-          <label className="arf-check">
+
+          <label className="rf-check">
             <input
               type="checkbox"
               name="urgent"
@@ -154,17 +180,18 @@ export default function AddResultForm({ onSaved, onCancel }) {
           </label>
         </div>
 
-        <label className="arf-field">
+        <label className="rf-field">
           <span>Опис</span>
           <textarea
             name="description"
             className="input"
             value={form.description}
+            placeholder="Додайте опис"
             onChange={handleChange}
           />
         </label>
 
-        <label className="arf-field">
+        <label className="rf-field">
           <span>Відповідальний*</span>
           <select
             name="responsible_id"
@@ -173,16 +200,18 @@ export default function AddResultForm({ onSaved, onCancel }) {
             onChange={handleChange}
             required
           >
-            <option value="">—</option>
+            <option value="">Оберіть відповідального</option>
             {users.map((u) => (
-              <option key={u.id} value={u.id}>{labelForUser(u)}</option>
+              <option key={u.id} value={u.id}>
+                {labelForUser(u)}
+              </option>
             ))}
           </select>
         </label>
 
-        <div className="arf-error" aria-live="polite">{error}</div>
+        <div className="rf-error" aria-live="polite">{error}</div>
 
-        <div className="arf-actions">
+        <div className="rf-actions">
           <button type="submit" className="btn primary">Зберегти</button>
           <button type="button" className="btn ghost" onClick={onCancel}>Скасувати</button>
         </div>
