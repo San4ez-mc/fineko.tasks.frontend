@@ -193,7 +193,7 @@ export default function DailyTasksPage() {
                     )
                 );
             })
-            .catch(() => {});
+            .catch(() => { });
     };
 
     const totalExpected = tasks.reduce(
@@ -257,12 +257,12 @@ export default function DailyTasksPage() {
             manager: taskManager.trim(),
             comments: newTaskComments
                 ? JSON.stringify([
-                      {
-                          author: taskManager.trim() || user?.name || "Я",
-                          text: newTaskComments.trim(),
-                          replies: [],
-                      },
-                  ])
+                    {
+                        author: taskManager.trim() || user?.name || "Я",
+                        text: newTaskComments.trim(),
+                        replies: [],
+                    },
+                ])
                 : JSON.stringify([]),
         };
         if (newTaskResultId) payload.resultId = newTaskResultId;
@@ -538,221 +538,222 @@ export default function DailyTasksPage() {
             ) : (
                 <div className="tasks-list">
                     {tasks.map((task) => (
-                    <React.Fragment key={task.id}>
-                        <div
-                            className={`task-row ${task.status === "done" ? "is-completed" : ""
-                                }`}
-                        >
-                            <input
-                                type="checkbox"
-                                className="chk"
-                                checked={task.status === "done"}
-                                onChange={() => toggleTaskCompletion(task.id)}
-                            />
-
-                            <div className="title-cell">
-                                <a className="title" href={`/tasks/${task.id}`}>
-                                    {task.title}
-                                </a>
-                                {task.type && (
-                                    <span className={`badge ${getTypeClass(task.type)}`}>
-                                        {task.type}
-                                    </span>
-                                )}
-                                {task.result_id && (
-                                    <a className="link" href={`/results/${task.result_id}`}>
-                                        Результат: {task.result_title || task.result_id}
-                                    </a>
-                                )}
-                            </div>
-
-                            <span className="badge neutral">
-                                {formatMinutesToHours(task.expected_time)}
-                            </span>
-
-                            <span className="task-date">{task.dueDate}</span>
-
-                            <div className="timer-cell">
-                                {activeTimerId === task.id ? (
-                                    <button
-                                        className="btn ghost"
-                                        onClick={() => pauseTimer(task.id)}
-                                    >
-                                        ⏸
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="btn ghost"
-                                        onClick={() => startTimer(task.id)}
-                                    >
-                                        ▶
-                                    </button>
-                                )}
-                                <button
-                                    className="btn ghost"
-                                    onClick={() => stopTimer(task.id)}
-                                >
-                                    ⏹
-                                </button>
-                                <span className="timer">
-                                    {formatTimer(timers[task.id] || 0)}
-                                </span>
-                            </div>
-
-                            <div className="actions">
-                                <button className="btn ghost">Перенести</button>
-                                <button
-                                    className="caret"
-                                    onClick={() =>
-                                        setExpandedTask(expandedTask === task.id ? null : task.id)
-                                    }
-                                >
-                                    {expandedTask === task.id ? "▾" : "▸"}
-                                </button>
-                            </div>
-                        </div>
-
-                        {expandedTask === task.id && (
-                            <div className="task-details">
-                                <label className="td-line">
-                                    <span className="k">Опис</span>
-                                    <textarea
-                                        className="input"
-                                        defaultValue={task.description}
-                                        onBlur={(e) =>
-                                            updateTaskField(
-                                                task.id,
-                                                "description",
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                </label>
-
-                                <label className="td-line">
-                                    <span className="k">Очікуваний результат</span>
-                                    <textarea
-                                        className="input"
-                                        defaultValue={task.expected_result}
-                                        onBlur={(e) =>
-                                            updateTaskField(
-                                                task.id,
-                                                "expected_result",
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                </label>
-
-                                <label className="td-line">
-                                    <span className="k">Результат</span>
-                                    <textarea
-                                        className="input"
-                                        defaultValue={task.actual_result}
-                                        onBlur={(e) =>
-                                            updateTaskField(
-                                                task.id,
-                                                "actual_result",
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                </label>
-
-                                <label className="td-line">
-                                    <span className="k">Тип</span>
-                                    <select
-                                        className="input"
-                                        defaultValue={task.type}
-                                        onChange={(e) =>
-                                            updateTaskField(task.id, "type", e.target.value)
-                                        }
-                                    >
-                                        <option value="важлива термінова">Важлива - термінова</option>
-                                        <option value="важлива нетермінова">Важлива - не термінова</option>
-                                        <option value="неважлива термінова">Неважлива - термінова</option>
-                                        <option value="неважлива нетермінова">Неважлива - нетермінова</option>
-                                    </select>
-                                </label>
-
-                                <label className="td-line">
-                                    <span className="k">Очікуваний час (хв)</span>
-                                    <input
-                                        type="number"
-                                        className="input"
-                                        defaultValue={task.expected_time}
-                                        onBlur={(e) =>
-                                            updateTaskField(
-                                                task.id,
-                                                "expected_time",
-                                                parseInt(e.target.value, 10) || 0
-                                            )
-                                        }
-                                    />
-                                </label>
-
-                                <label className="td-line">
-                                    <span className="k">Фактичний час (хв)</span>
-                                    <input
-                                        type="number"
-                                        className="input"
-                                        defaultValue={task.actual_time}
-                                        onBlur={(e) =>
-                                            updateTaskField(
-                                                task.id,
-                                                "actual_time",
-                                                parseInt(e.target.value, 10) || 0
-                                            )
-                                        }
-                                    />
-                                </label>
-
-                                <label className="td-line">
-                                    <span className="k">Хто призначив</span>
-                                    <input
-                                        type="text"
-                                        className="input"
-                                        defaultValue={task.manager}
-                                        onBlur={(e) =>
-                                            updateTaskField(task.id, "manager", e.target.value)
-                                        }
-                                    />
-                                </label>
-
-                                <TaskComments
-                                    comments={task.comments}
-                                    onAddComment={({ text, parentId }) => {
-                                        const author = user?.name || "Я";
-                                        const updated = [...task.comments];
-                                        if (parentId === null) {
-                                            updated.push({ author, text, replies: [] });
-                                        } else if (updated[parentId]) {
-                                            const replies = updated[parentId].replies || [];
-                                            updated[parentId] = {
-                                                ...updated[parentId],
-                                                replies: [...replies, { author, text }],
-                                            };
-                                        }
-                                        updateTaskField(task.id, "comments", updated);
-                                    }}
+                        <React.Fragment key={task.id}>
+                            <div
+                                className={`task-row ${task.status === "done" ? "is-completed" : ""
+                                    }`}
+                            >
+                                <input
+                                    type="checkbox"
+                                    className="chk"
+                                    checked={task.status === "done"}
+                                    onChange={() => toggleTaskCompletion(task.id)}
                                 />
+
+                                <div className="title-cell">
+                                    <a className="title" href={`/tasks/${task.id}`}>
+                                        {task.title}
+                                    </a>
+                                    {task.type && (
+                                        <span className={`badge ${getTypeClass(task.type)}`}>
+                                            {task.type}
+                                        </span>
+                                    )}
+                                    {task.result_id && (
+                                        <a className="link" href={`/results/${task.result_id}`}>
+                                            Результат: {task.result_title || task.result_id}
+                                        </a>
+                                    )}
+                                </div>
+
+                                <span className="badge neutral">
+                                    {formatMinutesToHours(task.expected_time)}
+                                </span>
+
+                                <span className="task-date">{task.dueDate}</span>
+
+                                <div className="timer-cell">
+                                    {activeTimerId === task.id ? (
+                                        <button
+                                            className="btn ghost"
+                                            onClick={() => pauseTimer(task.id)}
+                                        >
+                                            ⏸
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="btn ghost"
+                                            onClick={() => startTimer(task.id)}
+                                        >
+                                            ▶
+                                        </button>
+                                    )}
+                                    <button
+                                        className="btn ghost"
+                                        onClick={() => stopTimer(task.id)}
+                                    >
+                                        ⏹
+                                    </button>
+                                    <span className="timer">
+                                        {formatTimer(timers[task.id] || 0)}
+                                    </span>
+                                </div>
+
+                                <div className="actions">
+                                    <button className="btn ghost">Перенести</button>
+                                    <button
+                                        className="caret"
+                                        onClick={() =>
+                                            setExpandedTask(expandedTask === task.id ? null : task.id)
+                                        }
+                                    >
+                                        {expandedTask === task.id ? "▾" : "▸"}
+                                    </button>
+                                </div>
                             </div>
-                        )}
-                    </React.Fragment>
-                ))}
-            {totalExpected > 0 && (
-                <div className="task-row tasks-summary">
-                    <span></span>
-                    <div className="title-cell">Сумарний очікуваний час</div>
-                    <span className="badge neutral">
-                        {formatMinutesToHours(totalExpected)}
-                    </span>
-                    <span className="task-date"></span>
-                    <div className="timer-cell"></div>
-                    <div className="actions"></div>
+
+                            {expandedTask === task.id && (
+                                <div className="task-details">
+                                    <label className="td-line">
+                                        <span className="k">Опис</span>
+                                        <textarea
+                                            className="input"
+                                            defaultValue={task.description}
+                                            onBlur={(e) =>
+                                                updateTaskField(
+                                                    task.id,
+                                                    "description",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                    </label>
+
+                                    <label className="td-line">
+                                        <span className="k">Очікуваний результат</span>
+                                        <textarea
+                                            className="input"
+                                            defaultValue={task.expected_result}
+                                            onBlur={(e) =>
+                                                updateTaskField(
+                                                    task.id,
+                                                    "expected_result",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                    </label>
+
+                                    <label className="td-line">
+                                        <span className="k">Результат</span>
+                                        <textarea
+                                            className="input"
+                                            defaultValue={task.actual_result}
+                                            onBlur={(e) =>
+                                                updateTaskField(
+                                                    task.id,
+                                                    "actual_result",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                    </label>
+
+                                    <label className="td-line">
+                                        <span className="k">Тип</span>
+                                        <select
+                                            className="input"
+                                            defaultValue={task.type}
+                                            onChange={(e) =>
+                                                updateTaskField(task.id, "type", e.target.value)
+                                            }
+                                        >
+                                            <option value="важлива термінова">Важлива - термінова</option>
+                                            <option value="важлива нетермінова">Важлива - не термінова</option>
+                                            <option value="неважлива термінова">Неважлива - термінова</option>
+                                            <option value="неважлива нетермінова">Неважлива - нетермінова</option>
+                                        </select>
+                                    </label>
+
+                                    <label className="td-line">
+                                        <span className="k">Очікуваний час (хв)</span>
+                                        <input
+                                            type="number"
+                                            className="input"
+                                            defaultValue={task.expected_time}
+                                            onBlur={(e) =>
+                                                updateTaskField(
+                                                    task.id,
+                                                    "expected_time",
+                                                    parseInt(e.target.value, 10) || 0
+                                                )
+                                            }
+                                        />
+                                    </label>
+
+                                    <label className="td-line">
+                                        <span className="k">Фактичний час (хв)</span>
+                                        <input
+                                            type="number"
+                                            className="input"
+                                            defaultValue={task.actual_time}
+                                            onBlur={(e) =>
+                                                updateTaskField(
+                                                    task.id,
+                                                    "actual_time",
+                                                    parseInt(e.target.value, 10) || 0
+                                                )
+                                            }
+                                        />
+                                    </label>
+
+                                    <label className="td-line">
+                                        <span className="k">Хто призначив</span>
+                                        <input
+                                            type="text"
+                                            className="input"
+                                            defaultValue={task.manager}
+                                            onBlur={(e) =>
+                                                updateTaskField(task.id, "manager", e.target.value)
+                                            }
+                                        />
+                                    </label>
+
+                                    <TaskComments
+                                        comments={task.comments}
+                                        onAddComment={({ text, parentId }) => {
+                                            const author = user?.name || "Я";
+                                            const updated = [...task.comments];
+                                            if (parentId === null) {
+                                                updated.push({ author, text, replies: [] });
+                                            } else if (updated[parentId]) {
+                                                const replies = updated[parentId].replies || [];
+                                                updated[parentId] = {
+                                                    ...updated[parentId],
+                                                    replies: [...replies, { author, text }],
+                                                };
+                                            }
+                                            updateTaskField(task.id, "comments", updated);
+                                        }}
+                                    />
+                                </div>
+                            )}
+                        </React.Fragment>
+                    ))}
+                    {totalExpected > 0 && (
+                        <div className="task-row tasks-summary">
+                            <span></span>
+                            <div className="title-cell">Сумарний очікуваний час</div>
+                            <span className="badge neutral">
+                                {formatMinutesToHours(totalExpected)}
+                            </span>
+                            <span className="task-date"></span>
+                            <div className="timer-cell"></div>
+                            <div className="actions"></div>
+                        </div>
+                    )}
                 </div>
             )}
-            </div>
         </Layout>
     );
 }
