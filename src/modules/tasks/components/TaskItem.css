@@ -158,6 +158,15 @@
     color: #555;
 }
 
+.comment-author {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.comment-text {
+    margin-bottom: 4px;
+}
+
 .add-comment {
     margin-top: 8px;
     display: flex;
