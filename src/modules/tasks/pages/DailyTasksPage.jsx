@@ -7,6 +7,7 @@ import { formatMinutesToHours } from "../../../utils/timeFormatter";
 import { FiCalendar } from "react-icons/fi";
 import { getResults } from "../../results/api/results";
 import { useAuth } from "../../../context/AuthContext";
+import TaskComments from "../components/TaskComments";
 
 export default function DailyTasksPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -28,7 +29,7 @@ export default function DailyTasksPage() {
     const [newTaskType, setNewTaskType] = useState("важлива термінова");
     const [plannedTime, setPlannedTime] = useState("00:00");
     const [newTaskExpectedResult, setNewTaskExpectedResult] = useState("");
-    const [newTaskActualResult, setNewTaskActualResult] = useState("");
+    const [newTaskDescription, setNewTaskDescription] = useState("");
     const [taskManager, setTaskManager] = useState("");
     const [newTaskComments, setNewTaskComments] = useState("");
     const [newTaskResultId, setNewTaskResultId] = useState("");
@@ -80,8 +81,17 @@ export default function DailyTasksPage() {
                     actual_time: Number(t.actual_time || 0),
                     expected_result: t.expected_result || "",
                     actual_result: t.result || "",
+                    description: t.description || "",
                     manager: t.manager || "",
-                    comments: t.comments || "",
+                    comments: (() => {
+                        try {
+                            return Array.isArray(t.comments)
+                                ? t.comments
+                                : JSON.parse(t.comments || "[]");
+                        } catch {
+                            return [];
+                        }
+                    })(),
                 }));
                 setTasks(sortTasks(mapped));
             })
@@ -154,17 +164,27 @@ export default function DailyTasksPage() {
         return `${h}:${m}:${s}`;
     };
 
+    const getTypeClass = (type) => {
+        if (type === "важлива термінова") return "type-important-urgent";
+        if (type === "важлива нетермінова") return "type-important-not-urgent";
+        if (type === "неважлива термінова") return "type-not-important-urgent";
+        return "";
+    };
+
     const updateTaskField = (id, field, value) => {
+        const payloadValue = field === "comments" ? JSON.stringify(value) : value;
         api
-            .patch(`/task/update-field?id=${id}`, { field, value })
+            .patch(`/task/update-field?id=${id}`, { field, value: payloadValue })
             .then(() => {
                 setTasks((prev) =>
                     sortTasks(
-                        prev.map((t) => (t.id === id ? { ...t, [field]: value } : t))
+                        prev.map((t) =>
+                            t.id === id ? { ...t, [field]: value } : t
+                        )
                     )
                 );
             })
-            .catch(() => { });
+            .catch(() => {});
     };
 
     const totalExpected = tasks.reduce(
@@ -224,9 +244,17 @@ export default function DailyTasksPage() {
             plannedMinutes: h * 60 + m,
             actualMinutes: 0,
             expected_result: newTaskExpectedResult.trim(),
-            result: newTaskActualResult.trim(),
+            description: newTaskDescription.trim(),
             manager: taskManager.trim(),
-            comments: newTaskComments.trim(),
+            comments: newTaskComments
+                ? JSON.stringify([
+                      {
+                          author: taskManager.trim() || user?.name || "Я",
+                          text: newTaskComments.trim(),
+                          replies: [],
+                      },
+                  ])
+                : JSON.stringify([]),
         };
         if (newTaskResultId) payload.resultId = newTaskResultId;
         api
@@ -241,9 +269,10 @@ export default function DailyTasksPage() {
                     expected_time: payload.plannedMinutes,
                     actual_time: payload.actualMinutes,
                     expected_result: payload.expected_result,
-                    actual_result: payload.result,
+                    actual_result: "",
+                    description: payload.description,
                     manager: payload.manager,
-                    comments: payload.comments,
+                    comments: JSON.parse(payload.comments),
                 };
                 setTasks((prev) => sortTasks([...prev, newTask]));
                 window.dispatchEvent(
@@ -259,7 +288,7 @@ export default function DailyTasksPage() {
                 setNewTaskType("важлива термінова");
                 setPlannedTime("00:00");
                 setNewTaskExpectedResult("");
-                setNewTaskActualResult("");
+                setNewTaskDescription("");
                 setTaskManager(user?.name || "");
                 setNewTaskComments("");
                 setNewTaskResultId("");
@@ -427,15 +456,15 @@ export default function DailyTasksPage() {
                     />
                     <textarea
                         className="full-width"
-                        placeholder="Очікуваний результат"
-                        value={newTaskExpectedResult}
-                        onChange={(e) => setNewTaskExpectedResult(e.target.value)}
+                        placeholder="Опис задачі"
+                        value={newTaskDescription}
+                        onChange={(e) => setNewTaskDescription(e.target.value)}
                     />
                     <textarea
                         className="full-width"
-                        placeholder="Результат"
-                        value={newTaskActualResult}
-                        onChange={(e) => setNewTaskActualResult(e.target.value)}
+                        placeholder="Очікуваний результат"
+                        value={newTaskExpectedResult}
+                        onChange={(e) => setNewTaskExpectedResult(e.target.value)}
                     />
                     <select
                         value={newTaskType}
@@ -509,7 +538,11 @@ export default function DailyTasksPage() {
                                 <a className="title" href={`/tasks/${task.id}`}>
                                     {task.title}
                                 </a>
-                                {task.type && <span className="badge">{task.type}</span>}
+                                {task.type && (
+                                    <span className={`badge ${getTypeClass(task.type)}`}>
+                                        {task.type}
+                                    </span>
+                                )}
                                 {task.result_id && (
                                     <a className="link" href={`/results/${task.result_id}`}>
                                         Результат: {task.result_title || task.result_id}
@@ -565,6 +598,21 @@ export default function DailyTasksPage() {
 
                         {expandedTask === task.id && (
                             <div className="task-details">
+                                <label className="td-line">
+                                    <span className="k">Опис</span>
+                                    <textarea
+                                        className="input"
+                                        defaultValue={task.description}
+                                        onBlur={(e) =>
+                                            updateTaskField(
+                                                task.id,
+                                                "description",
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                </label>
+
                                 <label className="td-line">
                                     <span className="k">Очікуваний результат</span>
                                     <textarea
@@ -655,16 +703,23 @@ export default function DailyTasksPage() {
                                     />
                                 </label>
 
-                                <label className="td-line">
-                                    <span className="k">Коментарі</span>
-                                    <textarea
-                                        className="input"
-                                        defaultValue={task.comments}
-                                        onBlur={(e) =>
-                                            updateTaskField(task.id, "comments", e.target.value)
+                                <TaskComments
+                                    comments={task.comments}
+                                    onAddComment={({ text, parentId }) => {
+                                        const author = user?.name || "Я";
+                                        const updated = [...task.comments];
+                                        if (parentId === null) {
+                                            updated.push({ author, text, replies: [] });
+                                        } else if (updated[parentId]) {
+                                            const replies = updated[parentId].replies || [];
+                                            updated[parentId] = {
+                                                ...updated[parentId],
+                                                replies: [...replies, { author, text }],
+                                            };
                                         }
-                                    />
-                                </label>
+                                        updateTaskField(task.id, "comments", updated);
+                                    }}
+                                />
                             </div>
                         )}
                     </React.Fragment>
