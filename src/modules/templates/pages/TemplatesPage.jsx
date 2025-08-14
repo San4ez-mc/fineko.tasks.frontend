@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import Layout from "../../../components/layout/Layout";
 import "./TemplatesPage.css";
 import {
   listTemplates,
@@ -200,56 +201,57 @@ export default function TemplatesPage() {
     setForm((s) => ({ ...s, payload: { ...s.payload, [key]: val } }));
 
   return (
-    <div className="templates-page">
-      <div className="tp-head">
-        <h1>Шаблони</h1>
-        <div className="tp-actions">
-          <input
-            className="input"
-            placeholder="Пошук за назвою…"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
-          <button className="btn primary" onClick={openCreate}>
-            + Новий шаблон
-          </button>
+    <Layout>
+      <div className="templates-page">
+        <div className="tp-head">
+          <h1>Шаблони</h1>
+          <div className="tp-actions">
+            <input
+              className="input"
+              placeholder="Пошук за назвою…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+            <button className="btn primary" onClick={openCreate}>
+              + Новий шаблон
+            </button>
+          </div>
         </div>
-      </div>
 
-      {error && <div className="tp-error">{error}</div>}
+        {error && <div className="tp-error">{error}</div>}
 
-      <div className="tp-table card">
-        <div className="tp-row tp-row--head">
-          <div className="c-name">Назва</div>
-          <div className="c-flags">Що зберігає</div>
-          <div className="c-meta">Оновлено</div>
-          <div className="c-actions">Дії</div>
+        <div className="tp-table card">
+          <div className="tp-row tp-row--head">
+            <div className="c-name">Назва</div>
+            <div className="c-flags">Що зберігає</div>
+            <div className="c-meta">Оновлено</div>
+            <div className="c-actions">Дії</div>
+          </div>
+          {loading ? (
+            <div className="tp-empty">Завантаження…</div>
+          ) : filtered.length ? (
+            filtered.map((t) => (
+              <div key={t.id} className="tp-row">
+                <div className="c-name">{t.name}</div>
+                <div className="c-flags"><FlagsBadge flags={t.flags} /></div>
+                <div className="c-meta">
+                  {t.updated_at
+                    ? new Date(t.updated_at * 1000).toLocaleString()
+                    : "—"}
+                </div>
+                <div className="c-actions">
+                  <RowActions
+                    busy={busyId === t.id}
+                    onEdit={() => openEdit(t)}
+                    onDelete={() => onDelete(t.id)}
+                  />
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="tp-empty">Поки що немає шаблонів</div>
+          )}
         </div>
-        {loading ? (
-          <div className="tp-empty">Завантаження…</div>
-        ) : filtered.length ? (
-          filtered.map((t) => (
-            <div key={t.id} className="tp-row">
-              <div className="c-name">{t.name}</div>
-              <div className="c-flags"><FlagsBadge flags={t.flags} /></div>
-              <div className="c-meta">
-                {t.updated_at
-                  ? new Date(t.updated_at * 1000).toLocaleString()
-                  : "—"}
-              </div>
-              <div className="c-actions">
-                <RowActions
-                  busy={busyId === t.id}
-                  onEdit={() => openEdit(t)}
-                  onDelete={() => onDelete(t.id)}
-                />
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="tp-empty">Поки що немає шаблонів</div>
-        )}
-      </div>
 
       {modalOpen && (
         <div className="tp-modal">
@@ -384,7 +386,8 @@ export default function TemplatesPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </Layout>
   );
 }
 
