@@ -42,11 +42,35 @@ export default function TaskFilters({
         <div className="task-filters-wrapper">
             {/* 🔹 Рядок із фільтрами */}
             <div className="filters-row">
-                <select className="filter-select" onChange={(e) => onTypeFilterChange(e.target.value)}>
+                <select
+                    className="filter-select"
+                    onChange={(e) => onTypeFilterChange(e.target.value)}
+                >
                     <option value="">Всі типи</option>
-                    <option value="важлива">Важлива</option>
-                    <option value="термінова">Термінова</option>
-                    <option value="звичайна">Звичайна</option>
+                    <option
+                        value="важлива термінова"
+                        style={{ background: "red", color: "#fff" }}
+                    >
+                        Важлива термінова
+                    </option>
+                    <option
+                        value="важлива нетермінова"
+                        style={{ background: "blue", color: "#fff" }}
+                    >
+                        Важлива нетермінова
+                    </option>
+                    <option
+                        value="неважлива термінова"
+                        style={{ background: "purple", color: "#fff" }}
+                    >
+                        Неважлива термінова
+                    </option>
+                    <option
+                        value="неважлива нетермінова"
+                        style={{ background: "transparent", color: "inherit" }}
+                    >
+                        Неважлива нетермінова
+                    </option>
                 </select>
 
                 <select className="filter-select" onChange={(e) => onCreatorFilterChange(e.target.value)}>

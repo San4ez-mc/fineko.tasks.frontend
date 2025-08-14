@@ -50,6 +50,13 @@ export default function DailyTasksPage() {
         "неважлива термінова": 3,
         "неважлива нетермінова": 4,
     };
+
+    const priorityStyles = {
+        critical: { background: "red", color: "#fff" },
+        important: { background: "blue", color: "#fff" },
+        rush: { background: "purple", color: "#fff" },
+        neutral: { background: "transparent", color: "inherit" },
+    };
     const sortTasks = (arr) =>
         [...arr].sort((a, b) => {
             if (a.status === "done" && b.status !== "done") return 1;
@@ -358,18 +365,36 @@ export default function DailyTasksPage() {
                         </label>
 
                         <label className="tf-field">
-                            <span>Пріоритет/тип</span>
+                            <span>Тип</span>
                             <select
                                 value={filters.priority}
                                 onChange={(e) =>
                                     handleFilterChange({ priority: e.target.value })
                                 }
+                                style={priorityStyles[filters.priority] || {}}
                             >
                                 <option value="any">Будь‑який</option>
-                                <option value="critical">critical</option>
-                                <option value="important">important</option>
-                                <option value="rush">rush</option>
-                                <option value="neutral">neutral</option>
+                                <option
+                                    value="critical"
+                                    style={priorityStyles.critical}
+                                >
+                                    Важлива термінова
+                                </option>
+                                <option
+                                    value="important"
+                                    style={priorityStyles.important}
+                                >
+                                    Важлива нетермінова
+                                </option>
+                                <option value="rush" style={priorityStyles.rush}>
+                                    Неважлива термінова
+                                </option>
+                                <option
+                                    value="neutral"
+                                    style={priorityStyles.neutral}
+                                >
+                                    Неважлива нетермінова
+                                </option>
                             </select>
                         </label>
 
