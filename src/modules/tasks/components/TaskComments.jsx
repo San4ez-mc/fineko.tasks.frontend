@@ -1,23 +1,54 @@
 import React, { useState } from "react";
+import api from "../../../services/api";
 
-export default function TaskComments({ comments = [], onAddComment }) {
+export default function TaskComments({
+    taskId,
+    author = "Я",
+    comments = [],
+    onCommentsChange,
+}) {
     const [newComment, setNewComment] = useState("");
     const [replyTo, setReplyTo] = useState(null); // ID або індекс коментаря, на який відповідаємо
     const [replyText, setReplyText] = useState("");
 
     // Додаємо головний коментар
-    const handleAddMainComment = () => {
+    const handleAddMainComment = async () => {
         if (!newComment.trim()) return;
-        onAddComment({ text: newComment, parentId: null });
-        setNewComment("");
+        const updated = [...comments, { author, text: newComment, replies: [] }];
+        try {
+            await api.patch(`/task/update-field?id=${taskId}`, {
+                field: "comments",
+                value: JSON.stringify(updated),
+            });
+            onCommentsChange?.(updated);
+            setNewComment("");
+        } catch (e) {
+            console.error("Помилка додавання коментаря:", e);
+        }
     };
 
     // Додаємо підкоментар
-    const handleAddReply = (parentId) => {
+    const handleAddReply = async (parentId) => {
         if (!replyText.trim()) return;
-        onAddComment({ text: replyText, parentId });
-        setReplyText("");
-        setReplyTo(null); // закриваємо форму відповіді
+        const updated = [...comments];
+        if (updated[parentId]) {
+            const replies = updated[parentId].replies || [];
+            updated[parentId] = {
+                ...updated[parentId],
+                replies: [...replies, { author, text: replyText }],
+            };
+        }
+        try {
+            await api.patch(`/task/update-field?id=${taskId}`, {
+                field: "comments",
+                value: JSON.stringify(updated),
+            });
+            onCommentsChange?.(updated);
+            setReplyText("");
+            setReplyTo(null); // закриваємо форму відповіді
+        } catch (e) {
+            console.error("Помилка додавання коментаря:", e);
+        }
     };
 
     return (
