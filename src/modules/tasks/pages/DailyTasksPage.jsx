@@ -669,10 +669,18 @@ export default function DailyTasksPage() {
                         )}
                     </React.Fragment>
                 ))}
-            </div>
-
-            <div className="card tasks-summary">
-                Сумарний очікуваний час: {formatMinutesToHours(totalExpected)}
+            {totalExpected > 0 && (
+                <div className="task-row tasks-summary">
+                    <span></span>
+                    <div className="title-cell">Сумарний очікуваний час</div>
+                    <span className="badge neutral">
+                        {formatMinutesToHours(totalExpected)}
+                    </span>
+                    <span className="task-date"></span>
+                    <div className="timer-cell"></div>
+                    <div className="actions"></div>
+                </div>
+            )}
             </div>
         </Layout>
     );
