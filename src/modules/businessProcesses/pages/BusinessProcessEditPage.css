@@ -47,6 +47,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
 }
 
 .add-lane-top {
@@ -152,6 +153,24 @@
 .btn.ghost { background: #f3f4f6; color: #111827; }
 .btn.small { padding: 6px 10px; border-radius: 8px; }
 .btn.tiny { padding: 4px 8px; border-radius: 8px; font-size: 12px; }
+
+.bp-edges-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.bp-edges-svg line {
+  stroke: #9ca3af;
+  stroke-width: 2px;
+}
+
+.bp-edges-svg line.new { stroke: #16a34a; }
+.bp-edges-svg line.outdated { stroke: #7c3aed; }
+.bp-edges-svg line.problem { stroke: #dc2626; }
 
 .edges-panel {
   margin-top: 8px;
