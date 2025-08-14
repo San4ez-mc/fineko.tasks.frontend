@@ -40,6 +40,38 @@
   white-space:nowrap;
 }
 
+.result-row .done-toggle{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:8px;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.result-row .done-toggle.checked{
+  background:#10B981;
+  border-color:#10B981;
+  color:#fff;
+}
+.result-row .done-toggle:disabled{
+  opacity:.6;
+  cursor:default;
+}
+.result-row .done-toggle .spinner{
+  width:16px;
+  height:16px;
+  border:2px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius:50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin{
+  to{ transform: rotate(360deg); }
+}
+
 @media (max-width: 1100px){
   .result-row{
     grid-template-columns: 28px 1fr auto;

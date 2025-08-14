@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./ResultRow.css";
+import { toggleResultComplete } from "../api/results";
 
 /**
  * result: {
@@ -15,13 +16,35 @@ import "./ResultRow.css";
  * onEdit(id)
  * onArchive(id)
  * onDelete(id)  // має перевіряти права вище
- * onMarkDone(id) // підтвердження робити вище
+ * onMarkDone(id, isCompleted) // підтвердження робити вище
  */
 export default function ResultRow({
   result, expanded,
   onToggleExpand, onCreateTemplate, onCreateTask, onViewTasks, onEdit, onArchive, onDelete, onMarkDone
 }) {
-  const statusClass = mapStatus(result.status);
+  const [status, setStatus] = useState(result.status);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setStatus(result.status);
+  }, [result.status]);
+
+  const statusClass = mapStatus(status);
+
+  const handleToggleDone = async () => {
+    const newStatus = status === "done" ? "in_progress" : "done";
+    setStatus(newStatus);
+    setLoading(true);
+    try {
+      if (onMarkDone) {
+        await onMarkDone(result.id, newStatus === "done");
+      } else {
+        await toggleResultComplete(result.id, newStatus === "done");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className={`result-row ${expanded ? "expanded" : ""}`}>
       <button className="caret" aria-label="Розгорнути" onClick={() => onToggleExpand && onToggleExpand(result.id)}>
@@ -33,7 +56,7 @@ export default function ResultRow({
       <div className="meta">
         {result.deadline && <span className="k">До</span>}
         {result.deadline && <span className="v">{result.deadline}</span>}
-        <span className={`badge ${statusClass}`}>{humanStatus(result.status)}</span>
+        <span className={`badge ${statusClass}`}>{humanStatus(status)}</span>
         {result.urgent && <span className="badge critical">Терміново</span>}
         <span className="badge neutral">Щоденних: {result.dailyTasksCount ?? 0}</span>
       </div>
@@ -51,7 +74,16 @@ export default function ResultRow({
         {onDelete && (
           <button className="btn ghost" onClick={() => onDelete(result.id)}>Видалити</button>
         )}
-        <button className="btn primary" onClick={() => onMarkDone && onMarkDone(result.id)}>Позначити виконаним</button>
+        <button
+          className={`done-toggle ${status === "done" ? "checked" : ""}`}
+          onClick={handleToggleDone}
+          aria-label="Виконано"
+          aria-pressed={status === "done"}
+          title="Виконано"
+          disabled={loading}
+        >
+          {loading ? <span className="spinner" /> : status === "done" ? "✓" : ""}
+        </button>
       </div>
     </div>
   );
