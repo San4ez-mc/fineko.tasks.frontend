@@ -140,10 +140,10 @@ export default function Sidebar({
                                 }
                                 onClick={handleNavClick}
                             >
-                                <FiGitBranch className="menu-icon" />
+                                <span className="menu-icon">🧩</span>
                                 {isOpen && (
                                     <span className="menu-text">
-                                        Бізнес-процеси
+                                        Бізнес процеси
                                     </span>
                                 )}
                             </NavLink>
