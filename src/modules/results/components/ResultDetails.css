@@ -24,6 +24,7 @@
   display:flex; align-items:center; gap:10px; padding:8px; border:1px solid var(--border);
   border-radius: var(--radius-sm); text-decoration:none; color: var(--text);
 }
+.rd-no-tasks{ font-size: var(--fz-base); color: var(--text-muted); }
 .rd-task .t-title{ flex:1; }
 .rd-task .t-date{ font-size: var(--fz-sm); color: var(--text-muted); }
 
