@@ -112,6 +112,16 @@
   gap: 8px;
 }
 
+.group {
+  display: grid;
+  gap: 8px;
+}
+
+.group-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
 /* Form elements */
 .field {
   display: grid;
