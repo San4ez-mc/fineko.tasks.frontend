@@ -7,6 +7,45 @@ import {
   deleteTemplate,
 } from "../../templates/api/templatesApi";
 
+const FIELD_LABELS = {
+  title: "Назва задачі",
+  expected_result: "Очікуваний результат",
+  result: "Результат",
+  type: "Тип",
+  planned_time: "Запланований час",
+  actual_time: "Фактичний час",
+  manager: "Хто назначив",
+  comments: "Коментарі",
+  resultId: "ID результату",
+  repeat: "Повторення",
+};
+
+const defaultFlags = {
+  title: true,
+  expected_result: true,
+  result: true,
+  type: true,
+  planned_time: true,
+  actual_time: true,
+  manager: true,
+  comments: true,
+  resultId: true,
+  repeat: true,
+};
+
+const defaultPayload = {
+  title: "",
+  expected_result: "",
+  result: "",
+  type: "важлива термінова",
+  planned_time: "00:00",
+  actual_time: "00:00",
+  manager: "",
+  comments: "",
+  resultId: "",
+  repeat: { type: "none", interval: 1 },
+};
+
 function FlagsBadge({ flags = {} }) {
   const enabled = Object.keys(flags).filter((k) => flags[k]);
   if (!enabled.length) return <span className="badge muted">Порожній</span>;
@@ -14,7 +53,7 @@ function FlagsBadge({ flags = {} }) {
     <div className="flags">
       {enabled.map((k) => (
         <span key={k} className="badge">
-          {k}
+          {FIELD_LABELS[k] || k}
         </span>
       ))}
     </div>
@@ -48,24 +87,8 @@ export default function TemplatesPage() {
   const [form, setForm] = useState({
     id: null,
     name: "",
-    flags: {
-      title: true,
-      final_result: true,
-      description: true,
-      urgent: true,
-      responsible_id: true,
-      date: true,
-      due_date: true,
-    },
-    payload: {
-      title: "",
-      final_result: "",
-      description: "",
-      urgent: false,
-      responsible_id: null,
-      date: "",
-      due_date: "",
-    },
+    flags: { ...defaultFlags },
+    payload: { ...defaultPayload },
   });
   const [error, setError] = useState("");
 
@@ -96,24 +119,8 @@ export default function TemplatesPage() {
     setForm({
       id: null,
       name: "",
-      flags: {
-        title: true,
-        final_result: true,
-        description: true,
-        urgent: true,
-        responsible_id: true,
-        date: true,
-        due_date: true,
-      },
-      payload: {
-        title: "",
-        final_result: "",
-        description: "",
-        urgent: false,
-        responsible_id: null,
-        date: "",
-        due_date: "",
-      },
+      flags: { ...defaultFlags },
+      payload: { ...defaultPayload },
     });
     setModalOpen(true);
   };
@@ -122,24 +129,18 @@ export default function TemplatesPage() {
     setForm({
       id: t.id,
       name: t.name || "",
-      flags: {
-        title: !!t.flags?.title,
-        final_result: !!t.flags?.final_result,
-        description: !!t.flags?.description,
-        urgent: !!t.flags?.urgent,
-        responsible_id: !!t.flags?.responsible_id,
-        date: !!t.flags?.date,
-        due_date: !!t.flags?.due_date,
-      },
+      flags: { ...defaultFlags, ...(t.flags || {}) },
       payload: {
         title: t.payload?.title ?? "",
-        final_result: t.payload?.final_result ?? "",
-        description: t.payload?.description ?? "",
-        urgent: !!t.payload?.urgent,
-        responsible_id:
-          t.payload?.responsible_id === null ? null : Number(t.payload?.responsible_id || 0),
-        date: t.payload?.date ?? "",
-        due_date: t.payload?.due_date ?? "",
+        expected_result: t.payload?.expected_result ?? "",
+        result: t.payload?.result ?? "",
+        type: t.payload?.type ?? "важлива термінова",
+        planned_time: t.payload?.planned_time ?? "00:00",
+        actual_time: t.payload?.actual_time ?? "00:00",
+        manager: t.payload?.manager ?? "",
+        comments: t.payload?.comments ?? "",
+        resultId: t.payload?.resultId ?? "",
+        repeat: t.payload?.repeat ?? { type: "none", interval: 1 },
       },
     });
     setModalOpen(true);
@@ -154,10 +155,13 @@ export default function TemplatesPage() {
         flags: form.flags,
         payload: {
           ...form.payload,
-          responsible_id:
-            form.payload.responsible_id === "" || form.payload.responsible_id === null
-              ? null
-              : Number(form.payload.responsible_id),
+          repeat:
+            form.payload.repeat?.type === "custom"
+              ? {
+                  type: "custom",
+                  interval: Number(form.payload.repeat.interval || 1),
+                }
+              : { type: form.payload.repeat?.type || "none", interval: 1 },
         },
       };
       if (!payload.name) {
@@ -275,14 +279,14 @@ export default function TemplatesPage() {
                 <div className="col">
                   <div className="group">
                     <div className="group-title">Поля для збереження</div>
-                    {Object.entries(form.flags).map(([k, v]) => (
+                    {Object.entries(FIELD_LABELS).map(([k, label]) => (
                       <label key={k} className="chk">
                         <input
                           type="checkbox"
-                          checked={!!v}
+                          checked={!!form.flags[k]}
                           onChange={(e) => setFlag(k, e.target.checked)}
                         />
-                        <span>{k}</span>
+                        <span>{label}</span>
                       </label>
                     ))}
                   </div>
@@ -293,7 +297,7 @@ export default function TemplatesPage() {
                     <div className="group-title">Значення полів</div>
 
                     <label className="field">
-                      <span>title</span>
+                      <span>Назва задачі</span>
                       <input
                         className="input"
                         value={form.payload.title}
@@ -302,69 +306,125 @@ export default function TemplatesPage() {
                     </label>
 
                     <label className="field">
-                      <span>final_result</span>
-                      <input
-                        className="input"
-                        value={form.payload.final_result}
-                        onChange={(e) => setPayload("final_result", e.target.value)}
-                      />
-                    </label>
-
-                    <label className="field">
-                      <span>description</span>
+                      <span>Очікуваний результат</span>
                       <textarea
                         className="input"
-                        value={form.payload.description}
-                        onChange={(e) => setPayload("description", e.target.value)}
-                      />
-                    </label>
-
-                    <label className="field row">
-                      <span>urgent</span>
-                      <input
-                        type="checkbox"
-                        checked={!!form.payload.urgent}
-                        onChange={(e) => setPayload("urgent", e.target.checked)}
+                        value={form.payload.expected_result}
+                        onChange={(e) => setPayload("expected_result", e.target.value)}
                       />
                     </label>
 
                     <label className="field">
-                      <span>responsible_id</span>
+                      <span>Результат</span>
+                      <textarea
+                        className="input"
+                        value={form.payload.result}
+                        onChange={(e) => setPayload("result", e.target.value)}
+                      />
+                    </label>
+
+                    <label className="field">
+                      <span>Тип</span>
+                      <select
+                        className="input"
+                        value={form.payload.type}
+                        onChange={(e) => setPayload("type", e.target.value)}
+                      >
+                        <option value="важлива термінова">Важлива - термінова</option>
+                        <option value="важлива нетермінова">Важлива - не термінова</option>
+                        <option value="неважлива термінова">Неважлива - термінова</option>
+                        <option value="неважлива нетермінова">Неважлива - нетермінова</option>
+                      </select>
+                    </label>
+
+                    <div className="row2">
+                      <label className="field">
+                        <span>Запланований час</span>
+                        <input
+                          className="input"
+                          type="time"
+                          value={form.payload.planned_time}
+                          onChange={(e) => setPayload("planned_time", e.target.value)}
+                        />
+                      </label>
+
+                      <label className="field">
+                        <span>Фактичний час</span>
+                        <input
+                          className="input"
+                          type="time"
+                          value={form.payload.actual_time}
+                          onChange={(e) => setPayload("actual_time", e.target.value)}
+                        />
+                      </label>
+                    </div>
+
+                    <label className="field">
+                      <span>Хто назначив</span>
                       <input
                         className="input"
-                        type="number"
-                        min="0"
-                        step="1"
-                        value={form.payload.responsible_id ?? ""}
-                        onChange={(e) =>
-                          setPayload(
-                            "responsible_id",
-                            e.target.value === "" ? null : Number(e.target.value)
-                          )
-                        }
+                        value={form.payload.manager}
+                        onChange={(e) => setPayload("manager", e.target.value)}
+                      />
+                    </label>
+
+                    <label className="field">
+                      <span>Коментарі</span>
+                      <textarea
+                        className="input"
+                        value={form.payload.comments}
+                        onChange={(e) => setPayload("comments", e.target.value)}
+                      />
+                    </label>
+
+                    <label className="field">
+                      <span>ID результату</span>
+                      <input
+                        className="input"
+                        value={form.payload.resultId}
+                        onChange={(e) => setPayload("resultId", e.target.value)}
                       />
                     </label>
 
                     <div className="row2">
                       <label className="field">
-                        <span>date (YYYY-MM-DD)</span>
-                        <input
+                        <span>Повторення</span>
+                        <select
                           className="input"
-                          type="date"
-                          value={form.payload.date}
-                          onChange={(e) => setPayload("date", e.target.value)}
-                        />
+                          value={form.payload.repeat.type}
+                          onChange={(e) =>
+                            setPayload("repeat", {
+                              ...form.payload.repeat,
+                              type: e.target.value,
+                            })
+                          }
+                        >
+                          <option value="none">Не повторювати</option>
+                          <option value="daily">Щодня</option>
+                          <option value="weekly">Щотижня</option>
+                          <option value="monthly">Щомісяця</option>
+                          <option value="yearly">Щороку</option>
+                          <option value="custom">Кожні N днів</option>
+                        </select>
                       </label>
 
-                      <label className="field">
-                        <span>due_date (HH:mm)</span>
-                        <input
-                          className="input"
-                          placeholder="09:30"
-                          value={form.payload.due_date}
-                          onChange={(e) => setPayload("due_date", e.target.value)}
-                        />
-                      </label>
+                      {form.payload.repeat.type === "custom" && (
+                        <label className="field">
+                          <span>Кількість днів</span>
+                          <input
+                            className="input"
+                            type="number"
+                            min="2"
+                            value={form.payload.repeat.interval}
+                            onChange={(e) =>
+                              setPayload("repeat", {
+                                ...form.payload.repeat,
+                                interval: Number(e.target.value),
+                              })
+                            }
+                          />
+                        </label>
+                      )}
                     </div>
                   </div>
                 </div>
