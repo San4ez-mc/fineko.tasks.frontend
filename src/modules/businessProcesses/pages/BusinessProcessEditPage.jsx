@@ -8,10 +8,10 @@ function uid(prefix = "id") {
 }
 
 export default function BusinessProcessEditPage() {
-  const { id } = useParams(); // ":id" або "new"
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const isNew = id === "new";
+  const isNew = !id || id === "new";
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);

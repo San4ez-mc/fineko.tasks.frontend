@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../../../components/layout/Layout";
 import "./BusinessProcessesPage.css";
 import api from "../../../services/api";
 
 export default function BusinessProcessesPage() {
+  const navigate = useNavigate();
+
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [q, setQ] = useState("");
@@ -30,8 +33,7 @@ export default function BusinessProcessesPage() {
   }, []);
 
   const onCreate = () => {
-    // TODO: відкривати модалку/сторінку створення процесу
-    alert("Створення бізнес‑процесу (скоро)");
+    navigate("/business-processes/new");
   };
 
   const filtered = q.trim()
@@ -81,7 +83,13 @@ export default function BusinessProcessesPage() {
                 <div className="bp-item__top">
                   <div className="bp-item__title">{bp.name}</div>
                   <div className="bp-item__actions">
-                    <button className="btn xs ghost" title="Редагувати">✏️</button>
+                    <button
+                      className="btn xs ghost"
+                      title="Редагувати"
+                      onClick={() => navigate(`/business-processes/${bp.id}/edit`)}
+                    >
+                      ✏️
+                    </button>
                     <button className="btn xs danger" title="Видалити">🗑️</button>
                   </div>
                 </div>
