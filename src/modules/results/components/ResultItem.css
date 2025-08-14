@@ -40,6 +40,38 @@
   gap: var(--space-1);
 }
 
+.ri-done-wrapper {
+  position: relative;
+}
+
+.ri-done-wrapper .check-toggle {
+  padding: var(--space-1);
+}
+
+.ri-done-wrapper.loading .check-toggle {
+  visibility: hidden;
+}
+
+.ri-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  margin-left: -8px;
+  border: 2px solid var(--primary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: ri-spin 0.8s linear infinite;
+}
+
+@keyframes ri-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .ri-action {
   background: transparent;
   border: none;
