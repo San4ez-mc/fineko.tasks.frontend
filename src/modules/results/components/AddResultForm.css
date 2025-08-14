@@ -8,7 +8,7 @@
 
 .add-result-form .arf-row {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr 1fr auto;
   gap: 12px;
   align-items: end;
 }
@@ -19,6 +19,10 @@
   }
 
   .add-result-form .arf-check {
+    grid-column: 1 / -1;
+  }
+
+  .add-result-form .arf-due {
     grid-column: 1 / -1;
   }
 }
