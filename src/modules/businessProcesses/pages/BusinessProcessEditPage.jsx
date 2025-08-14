@@ -1,8 +1,21 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useLayoutEffect,
+} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../../../components/layout/Layout";
 import api from "../../../services/api";
 import "./BusinessProcessEditPage.css";
+
+const EDGE_COLORS = {
+  default: "#9ca3af",
+  new: "#16a34a",
+  outdated: "#7c3aed",
+  problem: "#dc2626",
+};
 
 function uid(prefix = "id") {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
@@ -27,6 +40,9 @@ export default function BusinessProcessEditPage() {
   const [noteText, setNoteText] = useState("");
 
   const autosaveTimer = useRef(null);
+  const canvasRef = useRef(null);
+  const nodeRefs = useRef({});
+  const [edgePaths, setEdgePaths] = useState([]);
 
   const schemaByLane = useMemo(() => {
     const byLane = {};
@@ -47,6 +63,43 @@ export default function BusinessProcessEditPage() {
       );
     });
     return byLane;
+  }, [schema]);
+
+  useLayoutEffect(() => {
+    const update = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const canvasRect = canvas.getBoundingClientRect();
+      const rects = {};
+      Object.keys(nodeRefs.current).forEach((id) => {
+        const el = nodeRefs.current[id];
+        if (el) {
+          const r = el.getBoundingClientRect();
+          rects[id] = {
+            x: r.left + r.width / 2 - canvasRect.left,
+            y: r.top + r.height / 2 - canvasRect.top,
+          };
+        }
+      });
+      const paths = (schema.edges || [])
+        .map((e) => {
+          const from = rects[e.from];
+          const to = rects[e.to];
+          if (!from || !to) return null;
+          return {
+            ...e,
+            x1: from.x,
+            y1: from.y,
+            x2: to.x,
+            y2: to.y,
+          };
+        })
+        .filter(Boolean);
+      setEdgePaths(paths);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, [schema]);
 
   // -------- Helpers to mark dirty & schedule autosave --------
@@ -356,7 +409,50 @@ export default function BusinessProcessEditPage() {
 
       {error && <div className="bp-error">{error}</div>}
 
-      <div className="bp-canvas">
+      <div className="bp-canvas" ref={canvasRef}>
+        <svg className="bp-edges-svg">
+          <defs>
+            {Object.entries(EDGE_COLORS).map(([k, color]) => (
+              <marker
+                key={k}
+                id={`arrow-${k}`}
+                markerWidth="10"
+                markerHeight="10"
+                refX="8"
+                refY="3"
+                orient="auto"
+                markerUnits="strokeWidth"
+              >
+                <path d="M0,0 L0,6 L9,3 z" fill={color} />
+              </marker>
+            ))}
+          </defs>
+          {edgePaths.map((e) => (
+            <g key={e.id} className={`edge ${e.kind}`}>
+              <line
+                className={e.kind}
+                x1={e.x1}
+                y1={e.y1}
+                x2={e.x2}
+                y2={e.y2}
+                stroke={EDGE_COLORS[e.kind] || EDGE_COLORS.default}
+                strokeWidth="2"
+                markerEnd={`url(#arrow-${e.kind})`}
+              />
+              {e.label ? (
+                <text
+                  x={(e.x1 + e.x2) / 2}
+                  y={(e.y1 + e.y2) / 2 - 4}
+                  textAnchor="middle"
+                  fontSize="12"
+                  fill={EDGE_COLORS[e.kind] || EDGE_COLORS.default}
+                >
+                  {e.label}
+                </text>
+              ) : null}
+            </g>
+          ))}
+        </svg>
         {/* кнопка додати лейн зверху */}
         <button className="btn small ghost add-lane-top" onClick={() => addLaneAfter(null)}>+ Додати посаду зверху</button>
 
@@ -397,6 +493,7 @@ export default function BusinessProcessEditPage() {
                           ${node.flags?.isNew ? "flag-new" : ""} \
                           ${node.flags?.isOutdated ? "flag-outdated" : ""} \
                           ${node.flags?.isProblem ? "flag-problem" : ""}`}
+                        ref={(el) => (nodeRefs.current[node.id] = el)}
                         draggable
                         onDragStart={(e) => onNodeDragStart(e, node.id)}
                         onDragOver={(e) => e.preventDefault()}
