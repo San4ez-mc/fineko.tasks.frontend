@@ -6,6 +6,7 @@ import api from "../../../services/api";
 import { formatMinutesToHours } from "../../../utils/timeFormatter";
 import { FiCalendar } from "react-icons/fi";
 import { getResults } from "../../results/api/results";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function DailyTasksPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -26,7 +27,6 @@ export default function DailyTasksPage() {
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [newTaskType, setNewTaskType] = useState("важлива термінова");
     const [plannedTime, setPlannedTime] = useState("00:00");
-    const [actualTime, setActualTime] = useState("00:00");
     const [newTaskExpectedResult, setNewTaskExpectedResult] = useState("");
     const [newTaskActualResult, setNewTaskActualResult] = useState("");
     const [taskManager, setTaskManager] = useState("");
@@ -36,6 +36,13 @@ export default function DailyTasksPage() {
     const [selectedTemplate, setSelectedTemplate] = useState("");
     const [results, setResults] = useState([]);
     const [titleError, setTitleError] = useState(false);
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (user?.name) {
+            setTaskManager(user.name);
+        }
+    }, [user]);
 
     const priorityMap = {
         "важлива термінова": 1,
@@ -210,13 +217,12 @@ export default function DailyTasksPage() {
         }
         setTitleError(false);
         const [h, m] = plannedTime.split(":").map((n) => parseInt(n, 10) || 0);
-        const [ah, am] = actualTime.split(":").map((n) => parseInt(n, 10) || 0);
         const payload = {
             date: formatDateForApi(selectedDate),
             title: newTaskTitle.trim(),
             type: newTaskType,
             plannedMinutes: h * 60 + m,
-            actualMinutes: ah * 60 + am,
+            actualMinutes: 0,
             expected_result: newTaskExpectedResult.trim(),
             result: newTaskActualResult.trim(),
             manager: taskManager.trim(),
@@ -252,10 +258,9 @@ export default function DailyTasksPage() {
                 setNewTaskTitle("");
                 setNewTaskType("важлива термінова");
                 setPlannedTime("00:00");
-                setActualTime("00:00");
                 setNewTaskExpectedResult("");
                 setNewTaskActualResult("");
-                setTaskManager("");
+                setTaskManager(user?.name || "");
                 setNewTaskComments("");
                 setNewTaskResultId("");
                 setSelectedTemplate("");
@@ -447,15 +452,10 @@ export default function DailyTasksPage() {
                         onChange={(e) => setPlannedTime(e.target.value)}
                     />
                     <input
-                        type="time"
-                        value={actualTime}
-                        onChange={(e) => setActualTime(e.target.value)}
-                    />
-                    <input
                         type="text"
                         placeholder="Хто назначив задачу"
                         value={taskManager}
-                        onChange={(e) => setTaskManager(e.target.value)}
+                        disabled
                     />
                     <textarea
                         className="full-width"
@@ -485,7 +485,7 @@ export default function DailyTasksPage() {
                             </option>
                         ))}
                     </select>
-                    <button className="btn" onClick={handleCreateTask}>
+                    <button className="btn primary" onClick={handleCreateTask}>
                         Створити
                     </button>
                 </div>
