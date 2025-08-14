@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import Layout from "../../../components/layout/Layout";
 import api from "../../../services/api";
 import "./BusinessProcessEditPage.css";
 
@@ -328,15 +329,23 @@ export default function BusinessProcessEditPage() {
     }
   };
 
-  if (loading) return <div className="bp-edit-page"><div className="loader">Завантаження…</div></div>;
+  if (loading)
+    return (
+      <Layout>
+        <div className="bp-edit-page">
+          <div className="loader">Завантаження…</div>
+        </div>
+      </Layout>
+    );
 
   return (
-    <div className="bp-edit-page">
-      <div className="bp-header">
-        <div className="bp-title">
-          <span>Бізнес процес — </span>
-          <input
-            className="bp-name-input"
+    <Layout>
+      <div className="bp-edit-page">
+        <div className="bp-header">
+          <div className="bp-title">
+            <span>Бізнес процес — </span>
+            <input
+              className="bp-name-input"
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -521,6 +530,7 @@ export default function BusinessProcessEditPage() {
       {/* Панель простого додавання зв’язків (edges) */}
       <EdgesPanel schema={schema} onAdd={addEdge} onRemove={removeEdge} />
     </div>
+    </Layout>
   );
 }
 
