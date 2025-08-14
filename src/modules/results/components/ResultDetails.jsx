@@ -13,7 +13,7 @@ import "./ResultDetails.css";
  * - onCreateTemplate(id)
  * - onCreateTask(id)
  */
-export default function ResultDetails({ result, onAddSubresult, onCreateTemplate, onCreateTask }) {
+export default function ResultDetails({ result, tasksLoading, onAddSubresult, onCreateTemplate, onCreateTask }) {
   return (
     <div className="result-details">
       <div className="rd-col">
@@ -53,13 +53,19 @@ export default function ResultDetails({ result, onAddSubresult, onCreateTemplate
         <div className="rd-block">
           <h4>Пов’язані задачі</h4>
           <div className="rd-tasks">
-            {(result.tasks || []).map(t => (
-              <a key={t.id} href={`/tasks/${t.id}`} className="rd-task">
-                <span className="t-title">{t.title}</span>
-                <span className="t-date">{t.date || ""}</span>
-                <span className={`badge ${t.status === "done" ? "status-done" : "neutral"}`}>{t.status === "done" ? "виконано" : "активна"}</span>
-              </a>
-            ))}
+            {tasksLoading ? (
+              <div>Завантаження…</div>
+            ) : result.tasks && result.tasks.length > 0 ? (
+              result.tasks.map(t => (
+                <a key={t.id} href={`/tasks/${t.id}`} className="rd-task">
+                  <span className="t-title">{t.title}</span>
+                  <span className="t-date">{t.date || ""}</span>
+                  <span className={`badge ${t.status === "done" ? "status-done" : "neutral"}`}>{t.status === "done" ? "виконано" : "активна"}</span>
+                </a>
+              ))
+            ) : (
+              <div className="rd-no-tasks">Пов’язаних задач не знайдено</div>
+            )}
           </div>
         </div>
 
