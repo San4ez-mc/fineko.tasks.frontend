@@ -6,6 +6,7 @@ export default function AddResultForm({ onSaved, onCancel }) {
   const [form, setForm] = useState({
     title: '',
     final_result: '',
+    date: '',
     due_date: '',
     urgent: false,
     description: '',
@@ -14,6 +15,7 @@ export default function AddResultForm({ onSaved, onCancel }) {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
   const [dueDateValid, setDueDateValid] = useState(true);
+  const [dateValid, setDateValid] = useState(true);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -32,18 +34,37 @@ export default function AddResultForm({ onSaved, onCancel }) {
     const val = type === 'checkbox' ? checked : value;
     setForm((prev) => ({ ...prev, [name]: val }));
     if (name === 'due_date') {
-      const re = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/;
+      const re = /^\d{2}:\d{2}$/;
       setDueDateValid(re.test(val) || val === '');
     }
+    if (name === 'date') {
+      const selected = new Date(val);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      setDateValid(selected >= today || val === '');
+    }
   };
+
+  const todayStr = new Date().toISOString().split('T')[0];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
+      if (form.date) {
+        const selected = new Date(form.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selected < today) {
+          setDateValid(false);
+          return;
+        }
+      }
+
       const payload = {
         title: form.title,
         final_result: form.final_result,
+        date: form.date,
         due_date: form.due_date,
         urgent: form.urgent,
         description: form.description,
@@ -51,8 +72,9 @@ export default function AddResultForm({ onSaved, onCancel }) {
       };
       await api.post('/results', payload);
       onSaved && onSaved();
-      setForm({ title: '', final_result: '', due_date: '', urgent: false, description: '', responsible_id: '' });
+      setForm({ title: '', final_result: '', date: '', due_date: '', urgent: false, description: '', responsible_id: '' });
       setDueDateValid(true);
+      setDateValid(true);
     } catch (e) {
       const msg = e.response?.data?.message || 'Не вдалося створити результат';
       setError(msg);
@@ -94,17 +116,31 @@ export default function AddResultForm({ onSaved, onCancel }) {
             />
           </label>
           <label className="arf-field">
+            <span>Дата</span>
+            <input
+              type="date"
+              name="date"
+              className={`input${!dateValid && form.date ? ' invalid' : ''}`}
+              value={form.date}
+              min={todayStr}
+              onChange={handleChange}
+            />
+            {!dateValid && form.date && (
+              <span className="arf-hint">Дата не може бути в минулому</span>
+            )}
+          </label>
+          <label className="arf-field arf-due">
             <span>Кінцевий термін</span>
             <input
               type="text"
               name="due_date"
               className={`input${!dueDateValid && form.due_date ? ' invalid' : ''}`}
-              placeholder="ДД.ММ.РРРР гг:хх"
+              placeholder="гг:хх"
               value={form.due_date}
               onChange={handleChange}
             />
             {!dueDateValid && form.due_date && (
-              <span className="arf-hint">Формат: ДД.ММ.РРРР гг:хх</span>
+              <span className="arf-hint">Формат: гг:хх</span>
             )}
           </label>
           <label className="arf-check">
