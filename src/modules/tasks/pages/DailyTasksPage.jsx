@@ -309,86 +309,6 @@ export default function DailyTasksPage() {
                 </div>
             </div>
 
-            {isFormOpen && (
-                <div className="add-task-form card">
-                    <input
-                        type="text"
-                        className={`title-input ${titleError ? "error" : ""}`}
-                        placeholder="Назва задачі*"
-                        value={newTaskTitle}
-                        onChange={(e) => setNewTaskTitle(e.target.value)}
-                    />
-                    <textarea
-                        className="full-width"
-                        placeholder="Очікуваний результат"
-                        value={newTaskExpectedResult}
-                        onChange={(e) => setNewTaskExpectedResult(e.target.value)}
-                    />
-                    <textarea
-                        className="full-width"
-                        placeholder="Результат"
-                        value={newTaskActualResult}
-                        onChange={(e) => setNewTaskActualResult(e.target.value)}
-                    />
-                    <select
-                        value={newTaskType}
-                        onChange={(e) => setNewTaskType(e.target.value)}
-                    >
-                        <option value="важлива термінова">Важлива - термінова</option>
-                        <option value="важлива нетермінова">Важлива - не термінова</option>
-                        <option value="неважлива термінова">Неважлива - термінова</option>
-                        <option value="неважлива нетермінова">Неважлива - нетермінова</option>
-                    </select>
-                    <input
-                        type="time"
-                        value={plannedTime}
-                        onChange={(e) => setPlannedTime(e.target.value)}
-                    />
-                    <input
-                        type="time"
-                        value={actualTime}
-                        onChange={(e) => setActualTime(e.target.value)}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Хто назначив задачу"
-                        value={taskManager}
-                        onChange={(e) => setTaskManager(e.target.value)}
-                    />
-                    <textarea
-                        className="full-width"
-                        placeholder="Коментарі"
-                        value={newTaskComments}
-                        onChange={(e) => setNewTaskComments(e.target.value)}
-                    />
-                    <select
-                        value={newTaskResultId}
-                        onChange={(e) => setNewTaskResultId(e.target.value)}
-                    >
-                        <option value="">Без результату</option>
-                        {results.map((r) => (
-                            <option key={r.id} value={r.id}>
-                                {r.title}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        value={selectedTemplate}
-                        onChange={(e) => handleTemplateSelect(e.target.value)}
-                    >
-                        <option value="">З шаблону…</option>
-                        {templates.map((t) => (
-                            <option key={t.id} value={t.id}>
-                                {t.title}
-                            </option>
-                        ))}
-                    </select>
-                    <button className="btn" onClick={handleCreateTask}>
-                        Створити
-                    </button>
-                </div>
-            )}
-
             <div className="tpl-filters card">
                 <div className="tf-row">
                     <label className="tf-search" aria-label="Пошук по всіх полях">
@@ -491,6 +411,86 @@ export default function DailyTasksPage() {
                     </div>
                 </div>
             </div>
+
+            {isFormOpen && (
+                <div className="add-task-form card">
+                    <input
+                        type="text"
+                        className={`title-input ${titleError ? "error" : ""}`}
+                        placeholder="Назва задачі*"
+                        value={newTaskTitle}
+                        onChange={(e) => setNewTaskTitle(e.target.value)}
+                    />
+                    <textarea
+                        className="full-width"
+                        placeholder="Очікуваний результат"
+                        value={newTaskExpectedResult}
+                        onChange={(e) => setNewTaskExpectedResult(e.target.value)}
+                    />
+                    <textarea
+                        className="full-width"
+                        placeholder="Результат"
+                        value={newTaskActualResult}
+                        onChange={(e) => setNewTaskActualResult(e.target.value)}
+                    />
+                    <select
+                        value={newTaskType}
+                        onChange={(e) => setNewTaskType(e.target.value)}
+                    >
+                        <option value="важлива термінова">Важлива - термінова</option>
+                        <option value="важлива нетермінова">Важлива - не термінова</option>
+                        <option value="неважлива термінова">Неважлива - термінова</option>
+                        <option value="неважлива нетермінова">Неважлива - нетермінова</option>
+                    </select>
+                    <input
+                        type="time"
+                        value={plannedTime}
+                        onChange={(e) => setPlannedTime(e.target.value)}
+                    />
+                    <input
+                        type="time"
+                        value={actualTime}
+                        onChange={(e) => setActualTime(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Хто назначив задачу"
+                        value={taskManager}
+                        onChange={(e) => setTaskManager(e.target.value)}
+                    />
+                    <textarea
+                        className="full-width"
+                        placeholder="Коментарі"
+                        value={newTaskComments}
+                        onChange={(e) => setNewTaskComments(e.target.value)}
+                    />
+                    <select
+                        value={newTaskResultId}
+                        onChange={(e) => setNewTaskResultId(e.target.value)}
+                    >
+                        <option value="">Без результату</option>
+                        {results.map((r) => (
+                            <option key={r.id} value={r.id}>
+                                {r.title}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        value={selectedTemplate}
+                        onChange={(e) => handleTemplateSelect(e.target.value)}
+                    >
+                        <option value="">З шаблону…</option>
+                        {templates.map((t) => (
+                            <option key={t.id} value={t.id}>
+                                {t.title}
+                            </option>
+                        ))}
+                    </select>
+                    <button className="btn" onClick={handleCreateTask}>
+                        Створити
+                    </button>
+                </div>
+            )}
 
             <div className="tasks-list">
                 {tasks.map((task) => (
