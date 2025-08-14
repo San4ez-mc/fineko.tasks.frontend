@@ -12,6 +12,7 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [parentId, setParentId] = useState(null);
 
   const fetchResults = async () => {
     setLoading(true);
@@ -30,11 +31,17 @@ export default function ResultsPage() {
 
   const handleSaved = () => {
     setShowAddForm(false);
+    setParentId(null);
     fetchResults();
   };
 
   const toggleExpand = (id) => {
     setExpanded((prev) => (prev === id ? null : id));
+  };
+
+  const handleAddSubresult = (id) => {
+    setParentId(id);
+    setShowAddForm(true);
   };
 
   return (
@@ -43,7 +50,13 @@ export default function ResultsPage() {
         <div className="results-page__header">
           <h1>Результати</h1>
           {!showAddForm && (
-            <button className="btn primary" onClick={() => setShowAddForm(true)}>
+            <button
+              className="btn primary"
+              onClick={() => {
+                setParentId(null);
+                setShowAddForm(true);
+              }}
+            >
               Додати результат
             </button>
           )}
@@ -51,14 +64,25 @@ export default function ResultsPage() {
 
         {showAddForm && (
           <ResultForm
+            parentId={parentId}
             onSaved={handleSaved}
-            onCancel={() => setShowAddForm(false)}
+            onCancel={() => {
+              setShowAddForm(false);
+              setParentId(null);
+            }}
           />
         )}
 
         {loading && <div className="results-loader">Завантаження…</div>}
 
-        {!loading && results.length === 0 && <ResultsEmpty onCreate={() => setShowAddForm(true)} />}
+        {!loading && results.length === 0 && (
+          <ResultsEmpty
+            onCreate={() => {
+              setParentId(null);
+              setShowAddForm(true);
+            }}
+          />
+        )}
 
         {!loading && results.length > 0 && (
           <div className="results-list">
@@ -69,7 +93,12 @@ export default function ResultsPage() {
                   expanded={expanded === r.id}
                   onToggleExpand={toggleExpand}
                 />
-                {expanded === r.id && <ResultDetails result={r} />}
+                {expanded === r.id && (
+                  <ResultDetails
+                    result={r}
+                    onAddSubresult={handleAddSubresult}
+                  />
+                )}
               </React.Fragment>
             ))}
           </div>

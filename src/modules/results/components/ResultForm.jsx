@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import './ResultForm.css';
 
-export default function ResultForm({ onSaved, onCancel }) {
+export default function ResultForm({ onSaved, onCancel, parentId }) {
   const [form, setForm] = useState({
     title: '',
     final_result: '',
@@ -81,7 +81,11 @@ export default function ResultForm({ onSaved, onCancel }) {
         responsible_id: form.responsible_id ? Number(form.responsible_id) : null
       };
 
-      await api.post('/results', payload);
+      if (parentId) {
+        await api.post(`/results/${parentId}/children`, payload);
+      } else {
+        await api.post('/results', payload);
+      }
 
       onSaved && onSaved();
 
