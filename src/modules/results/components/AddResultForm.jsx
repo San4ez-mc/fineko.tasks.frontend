@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 import api from '../../../services/api';
 import './AddResultForm.css';
 
@@ -9,7 +10,8 @@ export default function AddResultForm({ onSaved, onCancel }) {
     due_date: '',
     urgent: false,
     description: '',
-    responsible_id: ''
+    responsible_id: '',
+    due_date: ''
   });
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
@@ -49,10 +51,14 @@ export default function AddResultForm({ onSaved, onCancel }) {
         description: form.description,
         responsible_id: Number(form.responsible_id)
       };
+
+      if (form.due_date) {
+        payload.due_date = format(new Date(form.due_date), 'dd.MM.yyyy HH:mm');
+      }
+
       await api.post('/results', payload);
       onSaved && onSaved();
-      setForm({ title: '', final_result: '', due_date: '', urgent: false, description: '', responsible_id: '' });
-      setDueDateValid(true);
+      setForm({ title: '', final_result: '', urgent: false, description: '', responsible_id: '', due_date: '' });
     } catch (e) {
       const msg = e.response?.data?.message || 'Не вдалося створити результат';
       setError(msg);
@@ -117,6 +123,17 @@ export default function AddResultForm({ onSaved, onCancel }) {
             <span>Терміново</span>
           </label>
         </div>
+
+        <label className="arf-field">
+          <span>Дедлайн</span>
+          <input
+            type="datetime-local"
+            name="due_date"
+            className="input"
+            value={form.due_date}
+            onChange={handleChange}
+          />
+        </label>
 
         <label className="arf-field">
           <span>Опис</span>
