@@ -653,110 +653,25 @@ export default function BusinessProcessEditPage() {
                               className="btn tiny ghost"
                               onClick={() => createTaskFromNode(node)}
                               title="Створити задачу з цієї дії"
-
                             >
-                              <div className="bp-node-top">
-                                <input
-                                  className="bp-node-title"
-                                  value={node.title}
-                                  onChange={(e) =>
-                                    updateNode(node.id, { title: e.target.value })
-                                  }
-                                />
-                                <div className="bp-node-flags">
-                                  <button
-                                    className={`icon new ${node.flags?.isNew ? "on" : ""}`}
-                                    title="Позначити як Новий (зел.)"
-                                    onClick={() => toggleFlag(node.id, "isNew")}
-                                  />
-                                  <button
-                                    className={`icon outdated ${node.flags?.isOutdated ? "on" : ""}`}
-                                    title="Позначити як Застарілий (фіол.)"
-                                    onClick={() => toggleFlag(node.id, "isOutdated")}
-                                  />
-                                  <button
-                                    className={`icon problem ${node.flags?.isProblem ? "on" : ""}`}
-                                    title="Позначити як Проблемний (черв.)"
-                                    onClick={() => toggleFlag(node.id, "isProblem")}
-                                  />
-                                </div>
-                              </div>
-
-                              <div className="bp-node-bottom">
-                                <select
-                                  className="bp-node-assignee"
-                                  value={node.assignee_user_id || ""}
-                                  onChange={(e) =>
-                                    updateNode(node.id, {
-                                      assignee_user_id: e.target.value
-                                        ? Number(e.target.value)
-                                        : undefined,
-                                    })
-                                  }
-                                >
-                                  <option value="">Виконавець (користувач)</option>
-                                  {users.map((u) => {
-                                    const label =
-                                      [u.first_name, u.last_name]
-                                        .filter(Boolean)
-                                        .join(" ") ||
-                                      u.username ||
-                                      `ID ${u.id}`;
-                                    return (
-                                      <option key={u.id} value={u.id}>
-                                        {label}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-
-                                <div className="bp-node-actions">
-                                  <button
-                                    className="btn tiny ghost"
-                                    onClick={() => addNode(lane.id, "action", node.id)}
-                                  >
-                                    + Дію між
-                                  </button>
-                                  <button
-                                    className="btn tiny ghost"
-                                    onClick={() => addNode(lane.id, "if", node.id)}
-                                  >
-                                    + IF між
-                                  </button>
-                                  <button
-                                    className="btn tiny"
-                                    onClick={() => openNote(node)}
-                                    title="Нотатка"
-                                  >
-                                    Коментувати
-                                  </button>
-                                  <button
-                                    className="btn tiny ghost"
-                                    onClick={() => createTaskFromNode(node)}
-                                    title="Створити задачу з цієї дії"
-                                  >
-                                    Ств. задачу
-                                  </button>
-                                </div>
-                              </div>
-
-                              {activeNoteNode === node.id && (
-                                <NotePopover
-                                  value={noteText}
-                                  onChange={setNoteText}
-                                  onSave={saveNote}
-                                  onClose={closeNote}
-                                />
-                              )}
-                            </div>
+                              Ств. задачу
+                            </button>
                           </div>
+                        </div>
+
+                        {activeNoteNode === node.id && (
+                          <NotePopover
+                            value={noteText}
+                            onChange={setNoteText}
+                            onSave={saveNote}
+                            onClose={closeNote}
+                          />
                         )}
                       </div>
                     );
                   })}
 
-
-                  <div className="bp-add-blocks">
+                <div className="bp-add-blocks">
                     <button className="btn small" onClick={() => addNode(lane.id, "action", null)}>
                       + Додати дію
                     </button>
