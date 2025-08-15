@@ -3,6 +3,7 @@ import Header from "./Header/Header";
 import Sidebar, { RightSidebar } from "./Sidebar/Sidebar";
 import Footer from "./Footer/Footer";
 import "./Layout.css";
+import useTelegramCounts from "../../modules/telegram/hooks/useTelegramCounts";
 
 const LEFT_KEY = "layout:left";
 const RIGHT_KEY = "layout:right";
@@ -10,6 +11,7 @@ const RIGHT_KEY = "layout:right";
 export default function Layout({ children }) {
     const [leftOpen, setLeftOpen] = useState(false);
     const [rightOpen, setRightOpen] = useState(false);
+    const { groups: telegramGroups } = useTelegramCounts();
 
     const toggleLeft = useCallback(() => {
         setLeftOpen((prev) => {
@@ -63,7 +65,7 @@ export default function Layout({ children }) {
                 isOpen={leftOpen}
                 onToggle={toggleLeft}
                 resultsCount={3}
-                telegramCount={2}
+                telegramCount={telegramGroups}
             />
             <div className="layout-column">
                 <Header />
