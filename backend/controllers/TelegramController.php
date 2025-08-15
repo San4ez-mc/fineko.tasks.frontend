@@ -5,6 +5,7 @@ use Yii;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\TooManyRequestsHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\helpers\Json;
 use app\models\TelegramGroups;
 use app\models\TelegramPendingGroups;
@@ -20,7 +21,62 @@ class TelegramController extends Controller
 
     public function verbs()
     {
-        return ['webhook' => ['POST']];
+        return [
+            'webhook' => ['POST'],
+            'pending' => ['GET'],
+            'groups' => ['GET'],
+            'users' => ['GET'],
+        ];
+    }
+
+    public function actionPending()
+    {
+        $items = TelegramPendingGroups::find()->asArray()->all();
+        foreach ($items as &$item) {
+            if (isset($item['invite_code'])) {
+                $item['invite_code'] = substr($item['invite_code'], 0, 4) . str_repeat('*', max(0, strlen($item['invite_code']) - 4));
+            }
+        }
+        return $items;
+    }
+
+    public function actionGroups($company_id)
+    {
+        $this->checkCompanyAccess($company_id);
+        return TelegramGroups::find()->where(['company_id' => $company_id])->asArray()->all();
+    }
+
+    public function actionUsers($company_id, $q = null)
+    {
+        $this->checkCompanyAccess($company_id);
+        $query = TelegramUsers::find()->where(['company_id' => $company_id]);
+        if ($q) {
+            $query->andWhere(['or',
+                ['like', 'display_name', $q],
+                ['like', 'username', $q],
+                ['like', 'first_name', $q],
+                ['like', 'last_name', $q],
+            ]);
+        }
+        $items = $query->asArray()->all();
+        return ['items' => $items];
+    }
+
+    protected function checkCompanyAccess($companyId): void
+    {
+        $identity = Yii::$app->user->identity;
+        $companies = $identity->companies ?? [];
+        $ids = [];
+        foreach ($companies as $c) {
+            if (is_array($c)) {
+                $ids[] = $c['id'] ?? null;
+            } elseif (is_object($c)) {
+                $ids[] = $c->id ?? null;
+            }
+        }
+        if (!in_array((int)$companyId, $ids, true)) {
+            throw new ForbiddenHttpException('No access to this company');
+        }
     }
 
     public function actionWebhook()
