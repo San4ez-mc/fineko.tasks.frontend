@@ -656,6 +656,7 @@ export default function BusinessProcessEditPage() {
                     );
                   })}
 
+
                   <div className="bp-add-blocks">
                     <button className="btn small" onClick={() => addNode(lane.id, "action", null)}>
                       + Додати дію
@@ -678,6 +679,60 @@ export default function BusinessProcessEditPage() {
 }
 
 // ---------------- Subcomponents ----------------
+
+function AddSlot({ laneId, addNode, onNodeDropAfter }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleAdd = (type) => {
+    addNode(laneId, type, null);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="bp-slot"
+      ref={ref}
+      onClick={() => setOpen(true)}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => onNodeDropAfter(e, laneId, null)}
+    >
+      <span className="bp-slot-plus">+</span>
+      {open && (
+        <div className="bp-slot-popup" onClick={(e) => e.stopPropagation()}>
+          <button
+            className="btn tiny"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAdd("action");
+            }}
+          >
+            Створити дію
+          </button>
+          <button
+            className="btn tiny ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAdd("if");
+            }}
+          >
+            Створити розгалуження (if)
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function EdgesPanel({ schema, onAdd, onRemove }) {
   const [from, setFrom] = useState("");
