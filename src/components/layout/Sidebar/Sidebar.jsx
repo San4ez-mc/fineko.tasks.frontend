@@ -212,31 +212,40 @@ export default function Sidebar({
 
 export function RightSidebar() {
     const navigate = useNavigate();
-    const [tasks, setTasks] = useState([
-        {
-            id: 1,
-            title: "Перевірити звіт",
-            type: "critical",
-            planned: 90,
-            status: "new",
-        },
-        {
-            id: 2,
-            title: "Підготувати презентацію",
-            type: "important",
-            planned: 60,
-            status: "in_progress",
-            timer: 0,
-        },
-        {
-            id: 3,
-            title: "Зустріч з клієнтом",
-            type: "other",
-            planned: 30,
-            status: "done",
-        },
-    ]);
+    const mapType = (raw) => {
+        switch (raw) {
+            case "важлива термінова":
+                return "critical";
+            case "важлива нетермінова":
+                return "important";
+            default:
+                return "other";
+        }
+    };
+
+    const [tasks, setTasks] = useState([]);
     const [search, setSearch] = useState("");
+
+    useEffect(() => {
+        const today = new Date().toISOString().split("T")[0];
+        api
+            .get(`/task/filter?date=${today}`)
+            .then((res) => {
+                const backendTasks = res.data?.tasks || [];
+                const mapped = backendTasks.map((t) => ({
+                    id: t.id,
+                    title: t.title,
+                    type: mapType(t.type),
+                    planned: Number(t.expected_time || 0),
+                    status: t.status || "new",
+                    timer: Number(t.actual_time || 0),
+                }));
+                setTasks(mapped);
+            })
+            .catch((err) =>
+                console.error("Помилка завантаження задач:", err)
+            );
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -259,9 +268,10 @@ export function RightSidebar() {
                 {
                     id: t.id,
                     title: t.title,
-                    type: t.type,
+                    type: mapType(t.type),
                     planned: t.expected_time,
                     status: t.status,
+                    timer: Number(t.actual_time || 0),
                 },
             ]);
         };
