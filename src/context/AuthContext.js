@@ -23,6 +23,15 @@ export function AuthProvider({ children }) {
     // опційно редірект на /login
   };
 
+  const telegramLogin = async (token) => {
+    const { data } = await api.post("/auth/telegram", { token });
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setUser(data.user);
+    return data.user;
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -63,7 +72,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, telegramLogin }}>
       {children}
     </AuthContext.Provider>
   );

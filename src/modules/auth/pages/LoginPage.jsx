@@ -56,12 +56,7 @@ export default function LoginPage() {
                 <button
                     type="button"
                     className="telegram-btn"
-                    onClick={() =>
-                        window.open(
-                            "https://t.me/finekobot?start=login",
-                            "_blank"
-                        )
-                    }
+                    onClick={() => navigate("/auth/telegram")}
                 >
                     Увійти через Telegram
                 </button>
