@@ -1,15 +1,16 @@
 .page-header {
   display: flex;
   justify-content: center;
-  /* 🔹 центр по горизонталі */
+  /* центр по горизонталі */
   align-items: center;
   padding: 8px 0;
   margin-bottom: 8px;
+  width: 100%;
 }
 
 /* Заголовок з кнопками навігації дати */
 .tasks-title {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   margin: 0;
@@ -36,7 +37,7 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .date-trigger:hover {
@@ -55,6 +56,7 @@
   height: 0;
 }
 
+/* ===== Список ===== */
 .tasks-list {
   display: grid;
 }
@@ -71,6 +73,14 @@
   box-shadow: var(--shadow);
 }
 
+.title-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  /* щоб працював text-overflow */
+}
+
 .task-row .title {
   font-weight: 600;
   color: var(--navy);
@@ -85,8 +95,59 @@
   display: block;
 }
 
+.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.badge.neutral {
+  background: #f3f4f6;
+  color: #111;
+  border: 1px solid var(--border);
+}
+
+/* Кольорові типи задач */
+.badge.type-important-urgent {
+  background: red;
+  color: #fff;
+}
+
+.badge.type-important-not-urgent {
+  background: blue;
+  color: #fff;
+}
+
+.badge.type-not-important-urgent {
+  background: purple;
+  color: #fff;
+}
+
+.timer-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .task-row .timer {
   font-family: monospace;
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  /* для поповера перенесення */
+}
+
+.icon-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
 }
 
 .task-row.is-completed {
@@ -95,7 +156,7 @@
   opacity: 0.7;
 }
 
-/* Деталі задачі */
+/* ===== Деталі задачі ===== */
 .task-details {
   background: #fff;
   border: 1px solid var(--border);
@@ -110,7 +171,7 @@
   min-height: 40px;
 }
 
-/* 🔹 Опис — 4 рядки мінімум */
+/* Опис — 4 рядки мінімум */
 .task-details .description-input {
   min-height: calc(1.25em * 4 + 16px);
   /* ~4 рядки з падінгами */
@@ -147,7 +208,7 @@
   text-align: center;
 }
 
-/* Форма додавання */
+/* ===== Форма додавання ===== */
 .add-task-form {
   display: flex;
   flex-wrap: wrap;
@@ -176,12 +237,12 @@
 .add-task-form select,
 .add-task-form textarea {
   width: 100%;
-  padding: 4px 8px;
+  padding: 6px 8px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
 }
 
-/* 🔹 Опис у формі — 4 рядки мінімум */
+/* Опис у формі — 4 рядки мінімум */
 .add-task-form textarea {
   min-height: calc(1.25em * 4 + 16px);
   line-height: 1.25em;
@@ -199,30 +260,7 @@
   border-color: var(--red, #e00);
 }
 
-/* Кольорові типи задач */
-.badge.type-important-urgent {
-  background: red;
-  color: #fff;
-}
-
-.badge.type-important-not-urgent {
-  background: blue;
-  color: #fff;
-}
-
-.badge.type-not-important-urgent {
-  background: purple;
-  color: #fff;
-}
-
-/* 🔹 Іконка перенесення і поповер у списку задач */
-.icon-btn {
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 4px;
-}
-
+/* ===== Поповер перенесення ===== */
 .reschedule-popover {
   position: absolute;
   top: 28px;
@@ -250,6 +288,30 @@
   font-size: 12px;
 }
 
+/* ===== FAB “+” у правому нижньому куті ===== */
+.fab-add {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 40;
+}
+
+.fab-add:hover {
+  filter: brightness(1.05);
+}
+
+/* ===== Mobile ===== */
 @media (max-width: 600px) {
   .page-header {
     flex-direction: column;

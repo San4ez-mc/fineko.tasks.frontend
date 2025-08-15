@@ -4,7 +4,7 @@ import "./DailyTasksPage.css";
 import "../../templates/components/TemplatesFilters.css";
 import api from "../../../services/api";
 import { formatMinutesToHours } from "../../../utils/timeFormatter";
-import { FiCalendar } from "react-icons/fi";
+import { FiCalendar, FiPlus } from "react-icons/fi";
 import { getResults } from "../../results/api/results";
 import { useAuth } from "../../../context/AuthContext";
 import TaskComments from "../components/TaskComments";
@@ -39,7 +39,7 @@ export default function DailyTasksPage() {
     const [newTaskExecutorId, setNewTaskExecutorId] = useState("");
     const [titleError, setTitleError] = useState(false);
 
-    // 🔹 popover "перенести дату" для конкретної задачі
+    // popover "перенести дату" для конкретної задачі
     const [rescheduleForId, setRescheduleForId] = useState(null);
     const [rescheduleValue, setRescheduleValue] = useState("");
     const rescheduleRef = useRef(null);
@@ -98,7 +98,7 @@ export default function DailyTasksPage() {
                     id: t.id,
                     title: t.title,
                     status: t.status,
-                    dueDate: t.planned_date,
+                    dueDate: t.planned_date || "",
                     type: t.type || "неважлива нетермінова",
                     expected_time: Number(t.expected_time || 0),
                     actual_time: Number(t.actual_time || 0),
@@ -185,7 +185,7 @@ export default function DailyTasksPage() {
     const formatTimer = (seconds) => {
         const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
         const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
-        const s = String(seconds % 60).padStart(2, "0");
+        const s = String(seconds % 60).toString().padStart(2, "0");
         return `${h}:${m}:${s}`;
     };
 
@@ -266,7 +266,7 @@ export default function DailyTasksPage() {
         if (data.resultId) setNewTaskResultId(String(data.resultId));
     };
 
-    const handleCreateTask = () => {
+    const handleCreateTask = async () => {
         if (!newTaskTitle.trim()) {
             setTitleError(true);
             return;
@@ -295,27 +295,27 @@ export default function DailyTasksPage() {
         };
         if (newTaskResultId) payload.resultId = newTaskResultId;
 
-        api
-            .post(`/tasks/daily`, payload)
-            .then(() => {
-                // ✅ без оптимістичного додавання — просто перезавантажуємо список на обрану дату
-                setIsFormOpen(false);
-                setNewTaskTitle("");
-                setNewTaskType("важлива термінова");
-                setPlannedTime("00:00");
-                setNewTaskExpectedResult("");
-                setNewTaskDescription("");
-                setTaskManager(userLabel(user) || "");
-                setNewTaskExecutorId(user?.id ? String(user.id) : "");
-                setNewTaskComments("");
-                setNewTaskResultId("");
-                setSelectedTemplate("");
-                loadTasks(formatDateForApi(selectedDate), filters);
-            })
-            .catch((err) => console.error("Помилка створення задачі", err));
+        try {
+            console.log("POST /tasks/daily →", payload);
+            await api.post(`/tasks/daily`, payload);
+            setIsFormOpen(false);
+            setNewTaskTitle("");
+            setNewTaskType("важлива термінова");
+            setPlannedTime("00:00");
+            setNewTaskExpectedResult("");
+            setNewTaskDescription("");
+            setTaskManager(userLabel(user) || "");
+            setNewTaskExecutorId(user?.id ? String(user.id) : "");
+            setNewTaskComments("");
+            setNewTaskResultId("");
+            setSelectedTemplate("");
+            loadTasks(formatDateForApi(selectedDate), filters);
+        } catch (err) {
+            console.error("Помилка створення задачі", err);
+        }
     };
 
-    // 🔹 закриття поповера “перенести” по кліку поза ним
+    // закриття поповера “перенести” по кліку поза ним
     useEffect(() => {
         const onDocClick = (e) => {
             if (
@@ -332,10 +332,10 @@ export default function DailyTasksPage() {
 
     return (
         <Layout>
-            {/* 🔹 Заголовок + календар по центру */}
+            {/* Заголовок + календар по центру */}
             <div className="page-header">
                 <h1 className="tasks-title">
-                    Мої задачі&nbsp;
+                    Мої задачі
                     <button className="btn ghost icon" onClick={goPrevDay} aria-label="Попередній день">←</button>
                     <button
                         className="date-trigger"
@@ -356,15 +356,15 @@ export default function DailyTasksPage() {
                 </h1>
             </div>
 
-            {/* Кнопки дій (у потоці, без fixed/absolute) */}
+            {/* Кнопка додавання під заголовком, по центру */}
             <div className="page-header-actions">
                 <button
+                    type="button"
                     className="btn primary"
                     onClick={() => setIsFormOpen((o) => !o)}
                 >
                     {isFormOpen ? "Скасувати" : "Додати задачу"}
                 </button>
-                {/* Прибрано кнопку "Перенести вибрані..." — тепер перенесення у кожній задачі */}
             </div>
 
             {/* Фільтри */}
@@ -465,7 +465,7 @@ export default function DailyTasksPage() {
                         />
                     </label>
 
-                    {/* 🔹 Опис задачі — 4 рядки */}
+                    {/* Опис задачі — 4 рядки */}
                     <label className="at-field full-width">
                         <span>Опис задачі</span>
                         <textarea
@@ -478,10 +478,12 @@ export default function DailyTasksPage() {
                     <label className="at-field full-width">
                         <span>Очікуваний результат</span>
                         <textarea
+                            rows={4}
                             value={newTaskExpectedResult}
                             onChange={(e) => setNewTaskExpectedResult(e.target.value)}
                         />
                     </label>
+
                     <label className="at-field">
                         <span>Тип</span>
                         <select
@@ -494,6 +496,7 @@ export default function DailyTasksPage() {
                             <option value="неважлива нетермінова">Неважлива - нетермінова</option>
                         </select>
                     </label>
+
                     <label className="at-field">
                         <span>Очікуваний час</span>
                         <input
@@ -502,10 +505,12 @@ export default function DailyTasksPage() {
                             onChange={(e) => setPlannedTime(e.target.value)}
                         />
                     </label>
+
                     <label className="at-field">
                         <span>Хто призначив</span>
                         <input type="text" value={taskManager} disabled />
                     </label>
+
                     <label className="at-field">
                         <span>Виконавець</span>
                         <select
@@ -520,6 +525,7 @@ export default function DailyTasksPage() {
                             ))}
                         </select>
                     </label>
+
                     <label className="at-field full-width">
                         <span>Коментарі</span>
                         <textarea
@@ -527,6 +533,7 @@ export default function DailyTasksPage() {
                             onChange={(e) => setNewTaskComments(e.target.value)}
                         />
                     </label>
+
                     <label className="at-field">
                         <span>Результат</span>
                         <select
@@ -541,6 +548,7 @@ export default function DailyTasksPage() {
                             ))}
                         </select>
                     </label>
+
                     <label className="at-field">
                         <span>Шаблон</span>
                         <select
@@ -555,9 +563,12 @@ export default function DailyTasksPage() {
                             ))}
                         </select>
                     </label>
-                    <button className="btn primary" onClick={handleCreateTask}>
-                        Створити
-                    </button>
+
+                    <div className="at-actions">
+                        <button type="button" className="btn primary" onClick={handleCreateTask}>
+                            Створити
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -643,7 +654,7 @@ export default function DailyTasksPage() {
                                     </span>
                                 </div>
 
-                                {/* 🔹 Іконка перенесення дати + поповер */}
+                                {/* Іконка перенесення дати + поповер */}
                                 <div className="actions" style={{ position: "relative" }}>
                                     <button
                                         className="icon-btn"
@@ -670,7 +681,6 @@ export default function DailyTasksPage() {
                                                 className="btn primary small"
                                                 onClick={(ev) => {
                                                     ev.stopPropagation();
-                                                    // Поле для апі узгоджене з рештою коду
                                                     updateTaskField(task.id, "dueDate", rescheduleValue);
                                                     setRescheduleForId(null);
                                                 }}
@@ -685,7 +695,7 @@ export default function DailyTasksPage() {
 
                             {expandedTask === task.id && (
                                 <div className="task-details">
-                                    {/* 🔹 Опис — 4 рядки */}
+                                    {/* Опис — 4 рядки */}
                                     <label className="td-line">
                                         <span className="k">Опис</span>
                                         <textarea
@@ -828,6 +838,16 @@ export default function DailyTasksPage() {
                     )}
                 </div>
             )}
+
+            {/* FAB у правому нижньому куті */}
+            <button
+                type="button"
+                className="fab-add"
+                aria-label="Додати задачу"
+                onClick={() => setIsFormOpen(true)}
+            >
+                <FiPlus size={24} />
+            </button>
         </Layout>
     );
 }
