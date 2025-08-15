@@ -16,6 +16,7 @@ import InstructionsPage from "../modules/instructions/pages/InstructionsPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
 import ForgotPasswordPage from "../modules/auth/pages/ForgotPasswordPage";
 import ResetPasswordPage from "../modules/auth/pages/ResetPasswordPage";
+import TelegramAuthPage from "../modules/auth/pages/TelegramAuthPage";
 import NotFound from "../pages/NotFound";
 
 import { useAuth } from "../context/AuthContext";
@@ -33,6 +34,7 @@ export default function AppRouter() {
                 <Route path="/auth" element={<LoginPage />} />
                 <Route path="/auth/forgot" element={<ForgotPasswordPage />} />
                 <Route path="/auth/reset/:token" element={<ResetPasswordPage />} />
+                <Route path="/auth/telegram" element={<TelegramAuthPage />} />
 
                 {/* Приватні */}
                 <Route
