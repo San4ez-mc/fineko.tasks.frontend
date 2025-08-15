@@ -172,6 +172,16 @@ POST /results/:id/complete — {"is_completed": true|false}
 Пагінація: бек повертає { items, pagination: { page, pageCount, pageSize, totalCount } }.
 На фронті використовуємо Pagination.jsx.
 
+Telegram
+POST /telegram/webhook — тіло: payload від Telegram (as-is). Відповідь: 200 OK.
+
+POST /telegram/link/by-code — { "invite_code", "company_id" } → { ok, chat_id, title }
+Помилки: 400 invalid_code, 410 code_expired, 409 already_linked
+
+GET /telegram/groups?company_id=ID → [{id, chat_id, title, is_active, linked_at}]
+GET /telegram/users?company_id=ID&q=olen → пагінований список користувачів
+PUT /telegram/users/{id} — { employee_id?, synonyms? }
+
 Потік авторизації у SPA
 Користувач заходить на /auth, логіниться (бек ставить cookie).
 

@@ -1,0 +1,21 @@
+.telegram-page section {
+    margin-bottom: 40px;
+}
+
+.telegram-page .link-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.telegram-page table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.telegram-page table th,
+.telegram-page table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #ddd;
+}
