@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createDailyTask } from "../../../services/api/tasks";
 
 /**
  * Компонент для додавання задачі
@@ -18,10 +19,18 @@ export default function AddTaskRow({
 }) {
     const [newTaskTitle, setNewTaskTitle] = useState("");
 
-    const handleAddNew = () => {
+    const handleAddNew = async () => {
         if (!newTaskTitle.trim()) return;
-        onAddTask({ isNew: true, title: newTaskTitle.trim() });
-        setNewTaskTitle("");
+        try {
+            await createDailyTask({
+                title: newTaskTitle.trim(),
+                date: new Date().toISOString().split("T")[0],
+            });
+            onAddTask({ isNew: true, title: newTaskTitle.trim() });
+            setNewTaskTitle("");
+        } catch (err) {
+            console.error("Помилка створення задачі", err);
+        }
     };
 
     return (
