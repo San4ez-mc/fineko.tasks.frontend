@@ -254,8 +254,11 @@ RTK Query/React Query для кешу списків (коли з’являть
 ```js
 const config = {
   apiBaseUrl: "https://api.tasks.fineko.space",
-  // telegramBotToken: "...",
+  telegramBotToken: "", // токен бота Telegram (необов'язково)
   // threadsApiKey: "...",
 };
 
 export default config;
+```
+
+`telegramBotToken` береться з `REACT_APP_TELEGRAM_BOT_TOKEN` або `window.__TELEGRAM_BOT_TOKEN__` і може залишатися порожнім, якщо бот не використовується.
