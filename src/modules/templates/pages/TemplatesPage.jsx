@@ -8,6 +8,7 @@ import {
   updateTemplate,
   deleteTemplate,
 } from "../../templates/api/templatesApi";
+import { getResults } from "../../results/api/results";
 
 const FIELD_LABELS = {
   title: "Назва задачі",
@@ -18,7 +19,7 @@ const FIELD_LABELS = {
   actual_time: "Фактичний час",
   manager: "Хто назначив",
   comments: "Коментарі",
-  resultId: "ID результату",
+  resultId: "Результат",
   repeat: "Повторення",
 };
 
@@ -93,6 +94,7 @@ export default function TemplatesPage() {
     payload: { ...defaultPayload },
   });
   const [error, setError] = useState("");
+  const [results, setResults] = useState([]);
 
   const load = async () => {
     setLoading(true);
@@ -109,6 +111,9 @@ export default function TemplatesPage() {
 
   useEffect(() => {
     load();
+    getResults({ status: "active" })
+      .then((data) => setResults(data.results || []))
+      .catch(() => {});
   }, []);
 
   const filtered = useMemo(() => {
@@ -315,6 +320,7 @@ export default function TemplatesPage() {
                       <span>Очікуваний результат</span>
                       <textarea
                         className="input"
+                        rows={3}
                         value={form.payload.expected_result}
                         onChange={(e) => setPayload("expected_result", e.target.value)}
                       />
@@ -322,7 +328,7 @@ export default function TemplatesPage() {
 
                     <label className="field">
                       <span>Результат</span>
-                      <textarea
+                      <input
                         className="input"
                         value={form.payload.result}
                         onChange={(e) => setPayload("result", e.target.value)}
@@ -376,7 +382,7 @@ export default function TemplatesPage() {
 
                     <label className="field">
                       <span>Коментарі</span>
-                      <textarea
+                      <input
                         className="input"
                         value={form.payload.comments}
                         onChange={(e) => setPayload("comments", e.target.value)}
@@ -384,12 +390,19 @@ export default function TemplatesPage() {
                     </label>
 
                     <label className="field">
-                      <span>ID результату</span>
-                      <input
+                      <span>Результат</span>
+                      <select
                         className="input"
                         value={form.payload.resultId}
                         onChange={(e) => setPayload("resultId", e.target.value)}
-                      />
+                      >
+                        <option value="">—</option>
+                        {results.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.title}
+                          </option>
+                        ))}
+                      </select>
                     </label>
 
                     <div className="row2">
