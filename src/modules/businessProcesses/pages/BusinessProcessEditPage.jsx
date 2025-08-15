@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useLayoutEffect,
-} from "react";
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../../../components/layout/Layout";
 import Breadcrumbs from "../../../components/ui/Breadcrumbs";
@@ -44,27 +38,31 @@ export default function BusinessProcessEditPage() {
   const canvasRef = useRef(null);
   const nodeRefs = useRef({});
   const [edgePaths, setEdgePaths] = useState([]);
+  const slotRefs = useRef({});
+  const [laneSlots, setLaneSlots] = useState({});
+  const [hoverSlot, setHoverSlot] = useState({ laneId: null, index: null });
 
-  const schemaByLane = useMemo(() => {
-    const byLane = {};
-    schema.lanes
-      .slice()
-      .sort((a, b) => a.order - b.order)
-      .forEach((l) => (byLane[l.id] = []));
-    schema.nodes.forEach((n) => {
-      if (!byLane[n.lane_id]) byLane[n.lane_id] = [];
-      byLane[n.lane_id].push(n);
-    });
-    // порядок у межах лейну = порядок у масиві nodes, тому відсортуємо за індексом схемно
-    Object.keys(byLane).forEach((laneId) => {
-      byLane[laneId].sort(
-        (a, b) =>
-          schema.nodes.findIndex((n) => n.id === a.id) -
-          schema.nodes.findIndex((n) => n.id === b.id)
-      );
-    });
-    return byLane;
-  }, [schema]);
+
+  useEffect(() => {
+    if (schema.lanes.length && Object.keys(laneSlots).length === 0) {
+      const byLaneIds = {};
+      schema.lanes.forEach((l) => (byLaneIds[l.id] = []));
+      schema.nodes.forEach((n) => {
+        if (!byLaneIds[n.lane_id]) byLaneIds[n.lane_id] = [];
+        byLaneIds[n.lane_id].push(n.id);
+      });
+      const max = Math.max(1, ...Object.values(byLaneIds).map((a) => a.length));
+      const slots = {};
+      schema.lanes.forEach((l) => {
+        const arr = byLaneIds[l.id] || [];
+        slots[l.id] = Array.from({ length: max }, (_, i) => ({
+          id: uid("slot"),
+          nodeId: arr[i] || null,
+        }));
+      });
+      setLaneSlots(slots);
+    }
+  }, [schema, laneSlots]);
 
   useLayoutEffect(() => {
     const update = () => {
@@ -204,6 +202,13 @@ export default function BusinessProcessEditPage() {
         .forEach((l, idx) => (l.order = idx + 1));
       return { ...prev, lanes };
     });
+    setLaneSlots((prev) => {
+      const slotCount = Object.values(prev)[0]?.length || 1;
+      return {
+        ...prev,
+        [newLane.id]: Array.from({ length: slotCount }, () => ({ id: uid("slot"), nodeId: null })),
+      };
+    });
   };
 
   const updateLaneTitle = (laneId, title) => {
@@ -240,27 +245,34 @@ export default function BusinessProcessEditPage() {
       type,
       lane_id: laneId,
       title: type === "if" ? "IF" : "Нова дія",
-      assignee_user_id: undefined, // задається окремо
+      assignee_user_id: undefined,
       flags: {},
       comment: "",
     };
-    setSchemaSafe((prev) => {
-      const nodes = prev.nodes.slice();
-      if (!afterNodeId) {
-        // в кінець lane
-        const lastIndex = nodes
-          .map((n, idx) => ({ n, idx }))
-          .filter((x) => x.n.lane_id === laneId)
-          .map((x) => x.idx)
-          .pop();
-        if (lastIndex == null) nodes.push(newNode);
-        else nodes.splice(lastIndex + 1, 0, newNode);
+    setSchemaSafe((prev) => ({ ...prev, nodes: [...prev.nodes, newNode] }));
+    setLaneSlots((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((lid) => {
+        if (!next[lid]) next[lid] = [];
+      });
+      let idx;
+      if (afterNodeId) {
+        idx = next[laneId]?.findIndex((s) => s.nodeId === afterNodeId) + 1;
       } else {
-        const idx = nodes.findIndex((n) => n.id === afterNodeId);
-        if (idx >= 0) nodes.splice(idx + 1, 0, newNode);
-        else nodes.push(newNode);
+        idx = next[laneId]?.findIndex((s) => s.nodeId == null);
+        if (idx == null || idx === -1) idx = next[laneId]?.length || 0;
       }
-      return { ...prev, nodes };
+      if (next[laneId] && idx >= next[laneId].length) {
+        Object.keys(next).forEach((lid) =>
+          next[lid].push({ id: uid("slot"), nodeId: null })
+        );
+      } else if (next[laneId] && next[laneId][idx]?.nodeId != null) {
+        Object.keys(next).forEach((lid) =>
+          next[lid].splice(idx, 0, { id: uid("slot"), nodeId: null })
+        );
+      }
+      next[laneId][idx] = { id: next[laneId][idx].id || uid("slot"), nodeId: newNode.id };
+      return next;
     });
   };
 
@@ -296,31 +308,48 @@ export default function BusinessProcessEditPage() {
     e.dataTransfer.setData("nodeId", nodeId);
   };
 
-  const onNodeDropAfter = (e, laneId, afterNodeId = null) => {
+  const onLaneDragOver = (e, laneId) => {
+    e.preventDefault();
+    const refs = slotRefs.current[laneId] || [];
+    const idx = refs.findIndex(
+      (el) => e.clientX < el.getBoundingClientRect().left + el.offsetWidth / 2
+    );
+    const index = idx === -1 ? refs.length - 1 : idx;
+    setHoverSlot({ laneId, index });
+  };
+
+  const onLaneDrop = (e, laneId) => {
+    e.preventDefault();
     const nodeId = e.dataTransfer.getData("nodeId");
     if (!nodeId) return;
-    setSchemaSafe((prev) => {
-      const nodes = prev.nodes.slice();
-      const idx = nodes.findIndex((n) => n.id === nodeId);
-      if (idx < 0) return prev;
-      const moving = nodes[idx];
-      // вилучаємо
-      nodes.splice(idx, 1);
-      moving.lane_id = laneId;
-      if (!afterNodeId) {
-        // в кінець lane
-        let lastIndex = -1;
-        nodes.forEach((n, i) => {
-          if (n.lane_id === laneId) lastIndex = i;
-        });
-        if (lastIndex === -1) nodes.push(moving);
-        else nodes.splice(lastIndex + 1, 0, moving);
-      } else {
-        const insertAfter = nodes.findIndex((n) => n.id === afterNodeId);
-        nodes.splice(insertAfter + 1, 0, moving);
+    const index =
+      hoverSlot.laneId === laneId
+        ? hoverSlot.index
+        : (laneSlots[laneId]?.length || 0);
+    setLaneSlots((prev) => {
+      const next = {};
+      Object.keys(prev).forEach((lid) => {
+        next[lid] = prev[lid].map((s) => ({ ...s }));
+      });
+      if (next[laneId][index] && next[laneId][index].nodeId != null) {
+        Object.keys(next).forEach((lid) =>
+          next[lid].splice(index, 0, { id: uid("slot"), nodeId: null })
+        );
       }
-      return { ...prev, nodes };
+      Object.keys(next).forEach((lid) =>
+        next[lid].forEach((s) => {
+          if (s.nodeId === nodeId) s.nodeId = null;
+        })
+      );
+      if (!next[laneId][index]) next[laneId][index] = { id: uid("slot"), nodeId: null };
+      next[laneId][index].nodeId = nodeId;
+      return next;
     });
+    setSchemaSafe((prev) => ({
+      ...prev,
+      nodes: prev.nodes.map((n) => (n.id === nodeId ? { ...n, lane_id: laneId } : n)),
+    }));
+    setHoverSlot({ laneId: null, index: null });
   };
 
   // ------------------- Edges (arrows) -------------------
@@ -472,8 +501,8 @@ export default function BusinessProcessEditPage() {
         {schema.lanes
           .slice()
           .sort((a, b) => a.order - b.order)
-          .map((lane, laneIdx) => {
-            const laneNodes = schemaByLane[lane.id] || [];
+          .map((lane) => {
+            const slots = laneSlots[lane.id] || [];
             return (
               <div
                 className="bp-lane"
@@ -496,125 +525,146 @@ export default function BusinessProcessEditPage() {
 
                 <div
                   className="bp-lane-body"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => onNodeDropAfter(e, lane.id, null)}
+                  onDragOver={(e) => onLaneDragOver(e, lane.id)}
+                  onDrop={(e) => onLaneDrop(e, lane.id)}
+                  onDragLeave={() => setHoverSlot({ laneId: null, index: null })}
                 >
-                  {laneNodes.map((node, idx) => (
-                    <div className="bp-node-wrap" key={node.id}>
+                  {slots.map((slot, slotIdx) => {
+                    const node = schema.nodes.find((n) => n.id === slot.nodeId);
+                    return (
                       <div
-                        className={`bp-node ${node.type === "if" ? "if" : "action"} \
-                          ${node.flags?.isNew ? "flag-new" : ""} \
-                          ${node.flags?.isOutdated ? "flag-outdated" : ""} \
-                          ${node.flags?.isProblem ? "flag-problem" : ""}`}
-                        ref={(el) => (nodeRefs.current[node.id] = el)}
-                        draggable
-                        onDragStart={(e) => onNodeDragStart(e, node.id)}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => onNodeDropAfter(e, lane.id, node.id)}
-                        title="Перетягніть для зміни порядку або lane"
+                        key={slot.id}
+                        className={`bp-slot ${slot.nodeId ? "busy" : ""} ${
+                          hoverSlot.laneId === lane.id && hoverSlot.index === slotIdx
+                            ? "active"
+                            : ""
+                        }`}
+                        ref={(el) => {
+                          if (!slotRefs.current[lane.id]) slotRefs.current[lane.id] = [];
+                          slotRefs.current[lane.id][slotIdx] = el;
+                        }}
                       >
-                        <div className="bp-node-top">
-                          <input
-                            className="bp-node-title"
-                            value={node.title}
-                            onChange={(e) =>
-                              updateNode(node.id, { title: e.target.value })
-                            }
-                          />
-                          <div className="bp-node-flags">
-                            <button
-                              className={`icon new ${node.flags?.isNew ? "on" : ""}`}
-                              title="Позначити як Новий (зел.)"
-                              onClick={() => toggleFlag(node.id, "isNew")}
-                            />
-                            <button
-                              className={`icon outdated ${node.flags?.isOutdated ? "on" : ""}`}
-                              title="Позначити як Застарілий (фіол.)"
-                              onClick={() => toggleFlag(node.id, "isOutdated")}
-                            />
-                            <button
-                              className={`icon problem ${node.flags?.isProblem ? "on" : ""}`}
-                              title="Позначити як Проблемний (черв.)"
-                              onClick={() => toggleFlag(node.id, "isProblem")}
-                            />
+                        {node && (
+                          <div className="bp-node-wrap">
+                            <div
+                              className={`bp-node ${node.type === "if" ? "if" : "action"} \
+                                ${node.flags?.isNew ? "flag-new" : ""} \
+                                ${node.flags?.isOutdated ? "flag-outdated" : ""} \
+                                ${node.flags?.isProblem ? "flag-problem" : ""}`}
+                              ref={(el) => (nodeRefs.current[node.id] = el)}
+                              draggable
+                              onDragStart={(e) => onNodeDragStart(e, node.id)}
+                              title="Перетягніть для зміни порядку або lane"
+                            >
+                              <div className="bp-node-top">
+                                <input
+                                  className="bp-node-title"
+                                  value={node.title}
+                                  onChange={(e) =>
+                                    updateNode(node.id, { title: e.target.value })
+                                  }
+                                />
+                                <div className="bp-node-flags">
+                                  <button
+                                    className={`icon new ${node.flags?.isNew ? "on" : ""}`}
+                                    title="Позначити як Новий (зел.)"
+                                    onClick={() => toggleFlag(node.id, "isNew")}
+                                  />
+                                  <button
+                                    className={`icon outdated ${node.flags?.isOutdated ? "on" : ""}`}
+                                    title="Позначити як Застарілий (фіол.)"
+                                    onClick={() => toggleFlag(node.id, "isOutdated")}
+                                  />
+                                  <button
+                                    className={`icon problem ${node.flags?.isProblem ? "on" : ""}`}
+                                    title="Позначити як Проблемний (черв.)"
+                                    onClick={() => toggleFlag(node.id, "isProblem")}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="bp-node-bottom">
+                                <select
+                                  className="bp-node-assignee"
+                                  value={node.assignee_user_id || ""}
+                                  onChange={(e) =>
+                                    updateNode(node.id, {
+                                      assignee_user_id: e.target.value
+                                        ? Number(e.target.value)
+                                        : undefined,
+                                    })
+                                  }
+                                >
+                                  <option value="">Виконавець (користувач)</option>
+                                  {users.map((u) => {
+                                    const label =
+                                      [u.first_name, u.last_name]
+                                        .filter(Boolean)
+                                        .join(" ") ||
+                                      u.username ||
+                                      `ID ${u.id}`;
+                                    return (
+                                      <option key={u.id} value={u.id}>
+                                        {label}
+                                      </option>
+                                    );
+                                  })}
+                                </select>
+
+                                <div className="bp-node-actions">
+                                  <button
+                                    className="btn tiny ghost"
+                                    onClick={() => addNode(lane.id, "action", node.id)}
+                                  >
+                                    + Дію між
+                                  </button>
+                                  <button
+                                    className="btn tiny ghost"
+                                    onClick={() => addNode(lane.id, "if", node.id)}
+                                  >
+                                    + IF між
+                                  </button>
+                                  <button
+                                    className="btn tiny"
+                                    onClick={() => openNote(node)}
+                                    title="Нотатка"
+                                  >
+                                    Коментувати
+                                  </button>
+                                  <button
+                                    className="btn tiny ghost"
+                                    onClick={() => createTaskFromNode(node)}
+                                    title="Створити задачу з цієї дії"
+                                  >
+                                    Ств. задачу
+                                  </button>
+                                </div>
+                              </div>
+
+                              {activeNoteNode === node.id && (
+                                <NotePopover
+                                  value={noteText}
+                                  onChange={setNoteText}
+                                  onSave={saveNote}
+                                  onClose={closeNote}
+                                />
+                              )}
+                            </div>
                           </div>
-                        </div>
-
-                        <div className="bp-node-bottom">
-                          <select
-                            className="bp-node-assignee"
-                            value={node.assignee_user_id || ""}
-                            onChange={(e) =>
-                              updateNode(node.id, {
-                                assignee_user_id: e.target.value ? Number(e.target.value) : undefined,
-                              })
-                            }
-                          >
-                            <option value="">Виконавець (користувач)</option>
-                            {users.map((u) => {
-                              const label =
-                                [u.first_name, u.last_name].filter(Boolean).join(" ") ||
-                                u.username ||
-                                `ID ${u.id}`;
-                              return (
-                                <option key={u.id} value={u.id}>
-                                  {label}
-                                </option>
-                              );
-                            })}
-                          </select>
-
-                          <div className="bp-node-actions">
-                            <button
-                              className="btn tiny ghost"
-                              onClick={() => addNode(lane.id, "action", node.id)}
-                            >
-                              + Дію між
-                            </button>
-                            <button
-                              className="btn tiny ghost"
-                              onClick={() => addNode(lane.id, "if", node.id)}
-                            >
-                              + IF між
-                            </button>
-                            <button
-                              className="btn tiny"
-                              onClick={() => openNote(node)}
-                              title="Нотатка"
-                            >
-                              Коментувати
-                            </button>
-                            <button
-                              className="btn tiny ghost"
-                              onClick={() => createTaskFromNode(node)}
-                              title="Створити задачу з цієї дії"
-                            >
-                              Ств. задачу
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Поповер з нотаткою */}
-                        {activeNoteNode === node.id && (
-                          <NotePopover
-                            value={noteText}
-                            onChange={setNoteText}
-                            onSave={saveNote}
-                            onClose={closeNote}
-                          />
                         )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
-                  {Array.from({ length: 10 }).map((_, idx) => (
-                    <AddSlot
-                      key={`slot-${idx}`}
-                      laneId={lane.id}
-                      addNode={addNode}
-                      onNodeDropAfter={onNodeDropAfter}
-                    />
-                  ))}
+
+                  <div className="bp-add-blocks">
+                    <button className="btn small" onClick={() => addNode(lane.id, "action", null)}>
+                      + Додати дію
+                    </button>
+                    <button className="btn small ghost" onClick={() => addNode(lane.id, "if", null)}>
+                      + Додати IF
+                    </button>
+                  </div>
                 </div>
               </div>
             );
