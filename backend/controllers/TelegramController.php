@@ -29,8 +29,9 @@ class TelegramController extends Controller
         ];
     }
 
-    public function actionPending()
+    public function actionPending($company_id)
     {
+        $this->checkCompanyAccess($company_id);
         $items = TelegramPendingGroups::find()->asArray()->all();
         foreach ($items as &$item) {
             if (isset($item['invite_code'])) {
