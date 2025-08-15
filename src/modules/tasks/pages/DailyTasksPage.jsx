@@ -38,6 +38,12 @@ export default function DailyTasksPage() {
     const [users, setUsers] = useState([]);
     const [newTaskExecutorId, setNewTaskExecutorId] = useState("");
     const [titleError, setTitleError] = useState(false);
+
+    // 🔹 popover "перенести дату" для конкретної задачі
+    const [rescheduleForId, setRescheduleForId] = useState(null);
+    const [rescheduleValue, setRescheduleValue] = useState("");
+    const rescheduleRef = useRef(null);
+
     const { user } = useAuth();
 
     const userLabel = (u) => {
@@ -100,7 +106,6 @@ export default function DailyTasksPage() {
                     actual_result: t.result || "",
                     description: t.description || "",
                     manager: t.manager || "",
-                    // додано, щоб коректно працювало посилання на результат
                     result_id: t.result_id ?? t.resultId ?? null,
                     result_title: t.result_title ?? t.resultTitle ?? "",
                     comments: (() => {
@@ -292,30 +297,8 @@ export default function DailyTasksPage() {
 
         api
             .post(`/tasks/daily`, payload)
-            .then((res) => {
-                const newTask = {
-                    id: res.data?.id || Date.now(),
-                    title: payload.title,
-                    status: "new",
-                    dueDate: formatDateForApi(selectedDate),
-                    type: payload.type,
-                    expected_time: payload.plannedMinutes,
-                    actual_time: payload.actualMinutes,
-                    expected_result: payload.expected_result,
-                    actual_result: "",
-                    description: payload.description,
-                    manager: payload.manager,
-                    comments: JSON.parse(payload.comments),
-                };
-                setTasks((prev) => sortTasks([...prev, newTask]));
-                window.dispatchEvent(
-                    new CustomEvent("today-task-added", { detail: newTask })
-                );
-                window.dispatchEvent(
-                    new CustomEvent("toast", {
-                        detail: { type: "success", message: "Додано" },
-                    })
-                );
+            .then(() => {
+                // ✅ без оптимістичного додавання — просто перезавантажуємо список на обрану дату
                 setIsFormOpen(false);
                 setNewTaskTitle("");
                 setNewTaskType("важлива термінова");
@@ -332,46 +315,56 @@ export default function DailyTasksPage() {
             .catch((err) => console.error("Помилка створення задачі", err));
     };
 
+    // 🔹 закриття поповера “перенести” по кліку поза ним
+    useEffect(() => {
+        const onDocClick = (e) => {
+            if (
+                rescheduleForId &&
+                rescheduleRef.current &&
+                !rescheduleRef.current.contains(e.target)
+            ) {
+                setRescheduleForId(null);
+            }
+        };
+        document.addEventListener("mousedown", onDocClick);
+        return () => document.removeEventListener("mousedown", onDocClick);
+    }, [rescheduleForId]);
+
     return (
         <Layout>
+            {/* 🔹 Заголовок + календар по центру */}
             <div className="page-header">
-                <div className="page-header-left">
-                    <h1 className="tasks-title">
-                        Мої задачі на
-                        <button className="btn ghost icon" onClick={goPrevDay}>
-                            ←
-                        </button>
-                        <button
-                            className="date-trigger"
-                            onClick={openDatePicker}
-                            title="Обрати дату"
-                        >
-                            {formattedDate}
-                            <FiCalendar className="ico-calendar" aria-hidden />
-                        </button>
-                        <button className="btn ghost icon" onClick={goNextDay}>
-                            →
-                        </button>
-                        <input
-                            type="date"
-                            ref={dateInputRef}
-                            className="date-input"
-                            value={formatDateForApi(selectedDate)}
-                            onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                        />
-                    </h1>
-                </div>
-                <div className="page-header-actions">
+                <h1 className="tasks-title">
+                    Мої задачі&nbsp;
+                    <button className="btn ghost icon" onClick={goPrevDay} aria-label="Попередній день">←</button>
                     <button
-                        className="btn primary"
-                        onClick={() => setIsFormOpen((o) => !o)}
+                        className="date-trigger"
+                        onClick={openDatePicker}
+                        title="Обрати дату"
                     >
-                        {isFormOpen ? "Скасувати" : "Додати задачу"}
+                        {formattedDate}
+                        <FiCalendar className="ico-calendar" aria-hidden />
                     </button>
-                    <button className="btn ghost">
-                        Перенести вибрані на іншу дату
-                    </button>
-                </div>
+                    <button className="btn ghost icon" onClick={goNextDay} aria-label="Наступний день">→</button>
+                    <input
+                        type="date"
+                        ref={dateInputRef}
+                        className="date-input"
+                        value={formatDateForApi(selectedDate)}
+                        onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                    />
+                </h1>
+            </div>
+
+            {/* Кнопки дій (у потоці, без fixed/absolute) */}
+            <div className="page-header-actions">
+                <button
+                    className="btn primary"
+                    onClick={() => setIsFormOpen((o) => !o)}
+                >
+                    {isFormOpen ? "Скасувати" : "Додати задачу"}
+                </button>
+                {/* Прибрано кнопку "Перенести вибрані..." — тепер перенесення у кожній задачі */}
             </div>
 
             {/* Фільтри */}
@@ -471,13 +464,17 @@ export default function DailyTasksPage() {
                             onChange={(e) => setNewTaskTitle(e.target.value)}
                         />
                     </label>
+
+                    {/* 🔹 Опис задачі — 4 рядки */}
                     <label className="at-field full-width">
                         <span>Опис задачі</span>
                         <textarea
+                            rows={4}
                             value={newTaskDescription}
                             onChange={(e) => setNewTaskDescription(e.target.value)}
                         />
                     </label>
+
                     <label className="at-field full-width">
                         <span>Очікуваний результат</span>
                         <textarea
@@ -571,12 +568,9 @@ export default function DailyTasksPage() {
                     {tasks.map((task) => (
                         <React.Fragment key={task.id}>
                             <div
-                                className={`task-row ${task.status === "done" ? "is-completed" : ""
-                                    }`}
+                                className={`task-row ${task.status === "done" ? "is-completed" : ""}`}
                                 onClick={() =>
-                                    setExpandedTask(
-                                        expandedTask === task.id ? null : task.id
-                                    )
+                                    setExpandedTask(expandedTask === task.id ? null : task.id)
                                 }
                             >
                                 <input
@@ -649,18 +643,49 @@ export default function DailyTasksPage() {
                                     </span>
                                 </div>
 
-                                <div className="actions">
+                                {/* 🔹 Іконка перенесення дати + поповер */}
+                                <div className="actions" style={{ position: "relative" }}>
                                     <button
-                                        className="btn ghost"
-                                        onClick={(e) => e.stopPropagation()}
+                                        className="icon-btn"
+                                        title="Перенести на іншу дату"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setRescheduleForId(
+                                                rescheduleForId === task.id ? null : task.id
+                                            );
+                                            setRescheduleValue(task.dueDate || "");
+                                        }}
                                     >
-                                        Перенести
+                                        <FiCalendar size={18} />
                                     </button>
+
+                                    {rescheduleForId === task.id && (
+                                        <div className="reschedule-popover" ref={rescheduleRef}>
+                                            <input
+                                                type="date"
+                                                value={rescheduleValue || ""}
+                                                onChange={(e) => setRescheduleValue(e.target.value)}
+                                            />
+                                            <button
+                                                className="btn primary small"
+                                                onClick={(ev) => {
+                                                    ev.stopPropagation();
+                                                    // Поле для апі узгоджене з рештою коду
+                                                    updateTaskField(task.id, "dueDate", rescheduleValue);
+                                                    setRescheduleForId(null);
+                                                }}
+                                                disabled={!rescheduleValue}
+                                            >
+                                                Ок
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
                             {expandedTask === task.id && (
                                 <div className="task-details">
+                                    {/* 🔹 Опис — 4 рядки */}
                                     <label className="td-line">
                                         <span className="k">Опис</span>
                                         <textarea

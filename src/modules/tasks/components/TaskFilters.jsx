@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "./TaskFilters.css"; // ✅ додали стилі
+import "./TaskFilters.css";
 
 export default function TaskFilters({
     selectedDate,
@@ -47,28 +47,16 @@ export default function TaskFilters({
                     onChange={(e) => onTypeFilterChange(e.target.value)}
                 >
                     <option value="">Всі типи</option>
-                    <option
-                        value="важлива термінова"
-                        style={{ background: "red", color: "#fff" }}
-                    >
+                    <option value="важлива термінова" style={{ background: "red", color: "#fff" }}>
                         Важлива термінова
                     </option>
-                    <option
-                        value="важлива нетермінова"
-                        style={{ background: "blue", color: "#fff" }}
-                    >
+                    <option value="важлива нетермінова" style={{ background: "blue", color: "#fff" }}>
                         Важлива нетермінова
                     </option>
-                    <option
-                        value="неважлива термінова"
-                        style={{ background: "purple", color: "#fff" }}
-                    >
+                    <option value="неважлива термінова" style={{ background: "purple", color: "#fff" }}>
                         Неважлива термінова
                     </option>
-                    <option
-                        value="неважлива нетермінова"
-                        style={{ background: "transparent", color: "inherit" }}
-                    >
+                    <option value="неважлива нетермінова" style={{ background: "transparent", color: "inherit" }}>
                         Неважлива нетермінова
                     </option>
                 </select>
@@ -87,22 +75,15 @@ export default function TaskFilters({
                 </select>
             </div>
 
-            {/* 🔹 Рядок із датою та стрілками */}
-            <div className="daily-header" style={{ position: "relative" }}>
-                <button className="date-arrow" onClick={onPrevDay}>
-                    ←
-                </button>
+            {/* 🔹 Рядок із датою (центр) та стрілками по краях */}
+            <div className="daily-header">
+                <button className="date-arrow" onClick={onPrevDay}>←</button>
 
-                <h2
-                    className="date-title"
-                    onClick={() => setShowCalendar((prev) => !prev)}
-                >
+                <h2 className="date-title" onClick={() => setShowCalendar((prev) => !prev)}>
                     {formatDate(selectedDate)}
                 </h2>
 
-                <button className="date-arrow" onClick={onNextDay}>
-                    →
-                </button>
+                <button className="date-arrow" onClick={onNextDay}>→</button>
 
                 {showCalendar && (
                     <div className="calendar-popup" ref={calendarRef}>

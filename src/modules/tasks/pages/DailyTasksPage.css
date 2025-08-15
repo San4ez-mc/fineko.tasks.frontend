@@ -1,32 +1,31 @@
 .page-header {
   display: flex;
   justify-content: center;
+  /* 🔹 центр по горизонталі */
   align-items: center;
   padding: 8px 0;
   margin-bottom: 8px;
 }
 
-.page-header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.page-header-actions {
-  display: flex;
-  gap: 10px;
-  position: absolute;
-  right: 0;
-}
-
-.muted {
-  color: var(--text-muted);
-}
-
+/* Заголовок з кнопками навігації дати */
 .tasks-title {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: 0;
+}
+
+/* Кнопки дій – у потоці, не fixed/absolute */
+.page-header-actions {
+  display: flex;
+  gap: 10px;
+  margin: 8px auto 12px;
+  /* по центру нижче заголовка */
+  justify-content: center;
+}
+
+.muted {
+  color: var(--text-muted);
 }
 
 .date-trigger {
@@ -96,6 +95,7 @@
   opacity: 0.7;
 }
 
+/* Деталі задачі */
 .task-details {
   background: #fff;
   border: 1px solid var(--border);
@@ -110,8 +110,11 @@
   min-height: 40px;
 }
 
+/* 🔹 Опис — 4 рядки мінімум */
 .task-details .description-input {
-  min-height: 100px;
+  min-height: calc(1.25em * 4 + 16px);
+  /* ~4 рядки з падінгами */
+  line-height: 1.25em;
 }
 
 .td-line {
@@ -144,11 +147,7 @@
   text-align: center;
 }
 
-.tf-toggle {
-  display: none;
-  margin-bottom: 8px;
-}
-
+/* Форма додавання */
 .add-task-form {
   display: flex;
   flex-wrap: wrap;
@@ -182,6 +181,12 @@
   border-radius: var(--radius-sm);
 }
 
+/* 🔹 Опис у формі — 4 рядки мінімум */
+.add-task-form textarea {
+  min-height: calc(1.25em * 4 + 16px);
+  line-height: 1.25em;
+}
+
 .add-task-form .title-input {
   flex: 1;
 }
@@ -210,12 +215,42 @@
   color: #fff;
 }
 
+/* 🔹 Іконка перенесення і поповер у списку задач */
+.icon-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.reschedule-popover {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  z-index: 20;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.reschedule-popover input[type="date"] {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+}
+
+.btn.small {
+  padding: 6px 10px;
+  font-size: 12px;
+}
 
 @media (max-width: 600px) {
-  .tf-toggle {
-    display: block;
-  }
-
   .page-header {
     flex-direction: column;
     align-items: center;
@@ -223,10 +258,9 @@
   }
 
   .page-header-actions {
-    position: static;
-    width: 100%;
+    margin: 8px 0 12px;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .task-row {

@@ -35,6 +35,60 @@
     box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
 }
 
+/* 🔹 Центрований хедер з датою/календарем */
+.daily-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* центруємо заголовок дати */
+    min-height: 40px;
+    padding: 4px 0;
+}
+
+.date-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    /* на випадок довгої дати */
+}
+
+/* Стрілки позиціонуємо по краях, щоб не зсували заголовок */
+.date-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    color: #333;
+}
+
+.date-arrow:first-of-type {
+    left: 0;
+}
+
+.date-arrow:last-of-type {
+    right: 0;
+}
+
+.calendar-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+}
+
 /* 🔹 Стилі календаря залишаються */
 .react-datepicker {
     border: none;

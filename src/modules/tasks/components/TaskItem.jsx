@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FiCheckCircle, FiPlayCircle, FiPauseCircle } from "react-icons/fi";
+import { FiCheckCircle, FiPlayCircle, FiPauseCircle, FiCalendar } from "react-icons/fi";
 import TaskComments from "./TaskComments";
 import "./TaskItem.css";
 
@@ -15,6 +15,10 @@ export default function TaskItem({
         task.actual_time ? task.actual_time * 60 : 0
     );
     const [showTimer, setShowTimer] = useState(false);
+
+    // поповер для перенесення
+    const [showReschedule, setShowReschedule] = useState(false);
+    const popoverRef = useRef(null);
 
     const intervalRef = useRef(null);
 
@@ -37,14 +41,21 @@ export default function TaskItem({
         return () => clearInterval(intervalRef.current);
     }, [isTimerRunning]);
 
+    // Закриття поповера по кліку поза ним
+    useEffect(() => {
+        const onDocClick = (e) => {
+            if (showReschedule && popoverRef.current && !popoverRef.current.contains(e.target)) {
+                setShowReschedule(false);
+            }
+        };
+        document.addEventListener("mousedown", onDocClick);
+        return () => document.removeEventListener("mousedown", onDocClick);
+    }, [showReschedule]);
+
     // Формат ГГ:ХХ:СС
     const formatTime = (seconds) => {
-        const hours = Math.floor(seconds / 3600)
-            .toString()
-            .padStart(2, "0");
-        const minutes = Math.floor((seconds % 3600) / 60)
-            .toString()
-            .padStart(2, "0");
+        const hours = Math.floor(seconds / 3600).toString().padStart(2, "0");
+        const minutes = Math.floor((seconds % 3600) / 60).toString().padStart(2, "0");
         const secs = (seconds % 60).toString().padStart(2, "0");
         return `${hours}:${minutes}:${secs}`;
     };
@@ -83,6 +94,7 @@ export default function TaskItem({
                         className={`task-complete-btn ${task.status === "done" ? "completed" : ""}`}
                         style={{ background: "none" }}
                         onClick={handleComplete}
+                        title="Позначити як виконано"
                     >
                         <FiCheckCircle size={20} />
                     </button>
@@ -91,6 +103,7 @@ export default function TaskItem({
                         className="task-timer-btn"
                         style={{ background: "none" }}
                         onClick={handleToggleTimer}
+                        title={isTimerRunning ? "Пауза" : "Старт"}
                     >
                         {isTimerRunning ? (
                             <FiPauseCircle size={20} color="green" />
@@ -106,18 +119,44 @@ export default function TaskItem({
                     className="task-title small-font task-title-center"
                     value={task.title}
                     onChange={(e) => onUpdateField(task.id, "title", e.target.value)}
+                    placeholder="Назва задачі"
                 />
 
-                {/* Правий блок - дата, тип і кнопка розкриття */}
-                <div className="task-right-meta">
+                {/* Правий блок - дата, тип, перенесення, кнопка розкриття */}
+                <div className="task-right-meta" style={{ position: "relative" }}>
+                    {/* Таймер */}
                     {showTimer && (
                         <span className="task-timer-info">{formatTime(elapsedSeconds)}</span>
                     )}
 
+                    {/* Поточна дата дедлайну */}
                     {task.dueDate && (
                         <span className="task-due-date">До {task.dueDate}</span>
                     )}
 
+                    {/* Іконка перенесення на іншу дату (перенести з “шапки” в кожну задачу) */}
+                    <button
+                        className="task-reschedule-btn"
+                        onClick={() => setShowReschedule((p) => !p)}
+                        title="Перенести на іншу дату"
+                    >
+                        <FiCalendar size={18} />
+                    </button>
+
+                    {showReschedule && (
+                        <div className="reschedule-popover" ref={popoverRef}>
+                            <input
+                                type="date"
+                                value={task.dueDate || ""}
+                                onChange={(e) => {
+                                    onUpdateField(task.id, "dueDate", e.target.value);
+                                    setShowReschedule(false);
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    {/* Тип задачі */}
                     {task.type && (
                         <span
                             className="task-type-badge"
@@ -127,17 +166,18 @@ export default function TaskItem({
                         </span>
                     )}
 
+                    {/* Розгорнути/згорнути */}
                     <button
                         className="toggle-description"
                         onClick={() =>
                             onToggleExpand(expandedTask === task.id ? null : task.id)
                         }
+                        title={expandedTask === task.id ? "Згорнути" : "Розгорнути"}
                     >
                         {expandedTask === task.id ? "▲" : "▼"}
                     </button>
                 </div>
             </div>
-
 
             {/* Посилання на результат (над назвою) */}
             {expandedTask === task.id && (
@@ -155,44 +195,33 @@ export default function TaskItem({
                         <label>
                             Очікуваний результат
                             <textarea
+                                rows={4}
                                 value={task.expected_result}
                                 onChange={(e) =>
-                                    onUpdateField(
-                                        task.id,
-                                        "expected_result",
-                                        e.target.value
-                                    )
+                                    onUpdateField(task.id, "expected_result", e.target.value)
                                 }
                             />
                         </label>
                         <label>
                             Результат
                             <textarea
+                                rows={4}
                                 value={task.actual_result}
                                 onChange={(e) =>
-                                    onUpdateField(
-                                        task.id,
-                                        "actual_result",
-                                        e.target.value
-                                    )
+                                    onUpdateField(task.id, "actual_result", e.target.value)
                                 }
                             />
                         </label>
                     </div>
 
                     {/* Поля в один рядок */}
-                    <div
-                        className="task-fields-row"
-                        style={{ display: "flex", gap: "10px", flexWrap: "nowrap" }}
-                    >
+                    <div className="task-fields-row" style={{ display: "flex", gap: "10px", flexWrap: "nowrap" }}>
                         <label>
                             Автор задачі:
                             <input
                                 type="text"
                                 value={task.manager}
-                                onChange={(e) =>
-                                    onUpdateField(task.id, "manager", e.target.value)
-                                }
+                                onChange={(e) => onUpdateField(task.id, "manager", e.target.value)}
                             />
                         </label>
 
@@ -200,9 +229,7 @@ export default function TaskItem({
                             Тип:
                             <select
                                 value={task.type || ""}
-                                onChange={(e) =>
-                                    onUpdateField(task.id, "type", e.target.value)
-                                }
+                                onChange={(e) => onUpdateField(task.id, "type", e.target.value)}
                             >
                                 <option value="важлива термінова">важлива термінова</option>
                                 <option value="важлива нетермінова">важлива нетермінова</option>
@@ -217,13 +244,7 @@ export default function TaskItem({
                                 type="number"
                                 min="1"
                                 value={task.expected_time || ""}
-                                onChange={(e) =>
-                                    onUpdateField(
-                                        task.id,
-                                        "expected_time",
-                                        parseInt(e.target.value) || 0
-                                    )
-                                }
+                                onChange={(e) => onUpdateField(task.id, "expected_time", parseInt(e.target.value) || 0)}
                             />
                         </label>
 
@@ -233,13 +254,7 @@ export default function TaskItem({
                                 type="number"
                                 min="0"
                                 value={task.actual_time || ""}
-                                onChange={(e) =>
-                                    onUpdateField(
-                                        task.id,
-                                        "actual_time",
-                                        parseInt(e.target.value) || 0
-                                    )
-                                }
+                                onChange={(e) => onUpdateField(task.id, "actual_time", parseInt(e.target.value) || 0)}
                             />
                         </label>
 
@@ -248,9 +263,7 @@ export default function TaskItem({
                             <input
                                 type="date"
                                 value={task.dueDate || ""}
-                                onChange={(e) =>
-                                    onUpdateField(task.id, "dueDate", e.target.value)
-                                }
+                                onChange={(e) => onUpdateField(task.id, "dueDate", e.target.value)}
                             />
                         </label>
                     </div>
@@ -260,9 +273,7 @@ export default function TaskItem({
                         taskId={task.id}
                         author="Я"
                         comments={task.comments}
-                        onCommentsChange={(updated) =>
-                            onUpdateField(task.id, "comments", updated)
-                        }
+                        onCommentsChange={(updated) => onUpdateField(task.id, "comments", updated)}
                     />
                 </div>
             )}

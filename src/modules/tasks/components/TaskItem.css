@@ -20,6 +20,21 @@
     gap: 10px;
 }
 
+/* Лівий блок іконок */
+.task-left-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Правий блок мети */
+.task-right-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
 /* Кнопка виконання */
 .task-complete-btn {
     border: none;
@@ -33,7 +48,6 @@
     color: green;
 }
 
-/* При ховері нічого не змінюється (прибрано оранжевий ховер) */
 .task-complete-btn:hover {
     transform: scale(1.05);
 }
@@ -51,6 +65,39 @@
     transform: scale(1.05);
 }
 
+/* Кнопка перенесення (іконка календаря) */
+.task-reschedule-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 4px;
+    transition: transform 0.1s ease-in-out;
+}
+
+.task-reschedule-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Поповер з датою перенесення */
+.reschedule-popover {
+    position: absolute;
+    top: 36px;
+    right: 0;
+    z-index: 15;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.reschedule-popover input[type="date"] {
+    padding: 6px 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
 /* Назва задачі */
 .task-title {
     flex: 1;
@@ -63,7 +110,6 @@
 
 /* Блок таймера у хедері */
 .task-timer-info {
-    margin-left: auto;
     font-size: 14px;
     color: #333;
     background: #eef6ff;
@@ -87,6 +133,7 @@
 }
 
 /* Очікуваний та фактичний результати */
+/* "Опис задачі" — робимо висотою орієнтовно на 4 рядки */
 .task-results-row {
     display: flex;
     gap: 10px;
@@ -109,6 +156,9 @@
     border-radius: 6px;
     border: 1px solid #ddd;
     background: #fafafa;
+    min-height: calc(1.25em * 4 + 16px);
+    /* ~4 рядки + падінги */
+    line-height: 1.25em;
 }
 
 /* ==== Поля в один рядок ==== */
