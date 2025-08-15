@@ -158,9 +158,25 @@
   margin-bottom: 16px;
 }
 
+.add-task-form .at-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.add-task-form .at-field.full-width {
+  flex: 1 1 100%;
+}
+
+.add-task-form .at-field span {
+  font-size: 14px;
+}
+
 .add-task-form input,
 .add-task-form select,
 .add-task-form textarea {
+  width: 100%;
   padding: 4px 8px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
