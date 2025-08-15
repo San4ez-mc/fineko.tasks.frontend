@@ -38,9 +38,8 @@ export default function BusinessProcessEditPage() {
   const canvasRef = useRef(null);
   const nodeRefs = useRef({});
   const [edgePaths, setEdgePaths] = useState([]);
-  const slotRefs = useRef({});
-  const [laneSlots, setLaneSlots] = useState({});
-  const [hoverSlot, setHoverSlot] = useState({ laneId: null, index: null });
+
+  const [edgeFrom, setEdgeFrom] = useState(null);
 
 
   useEffect(() => {
@@ -86,14 +85,30 @@ export default function BusinessProcessEditPage() {
           const to = rects[e.to];
           if (!from || !to) return null;
 
-          const midX = (from.x + to.x) / 2;
+          const fromNode = schema.nodes.find((n) => n.id === e.from);
+          const toNode = schema.nodes.find((n) => n.id === e.to);
+          const fromLane = fromNode?.lane_id;
+          const toLane = toNode?.lane_id;
+          let points;
+          if (fromLane && toLane && fromLane !== toLane) {
+            const midY = (from.y + to.y) / 2;
+            points = [
+              [from.x, from.y],
+              [from.x, midY],
+              [to.x, midY],
+              [to.x, to.y],
+            ];
+          } else {
+            points = [
+              [from.x, from.y],
+              [to.x, to.y],
+            ];
+          }
           return {
             ...e,
-            x1: from.x,
-            y1: from.y,
-            x2: to.x,
-            y2: to.y,
-            points: `${from.x},${from.y} ${midX},${from.y} ${midX},${to.y} ${to.x},${to.y}`,
+            points,
+            labelX: (from.x + to.x) / 2,
+            labelY: (from.y + to.y) / 2,
           };
         })
         .filter(Boolean);
@@ -371,6 +386,15 @@ export default function BusinessProcessEditPage() {
     }));
   };
 
+  const handleEdgeHandleClick = (nodeId) => {
+    if (edgeFrom && edgeFrom !== nodeId) {
+      addEdge(edgeFrom, nodeId);
+      setEdgeFrom(null);
+    } else {
+      setEdgeFrom(nodeId);
+    }
+  };
+
   // ------------------- Notes & Tasks -------------------
   const openNote = (node) => {
     setActiveNoteNode(node.id);
@@ -476,7 +500,8 @@ export default function BusinessProcessEditPage() {
             <g key={e.id} className={`edge ${e.kind}`}>
               <polyline
                 className={e.kind}
-                points={e.points}
+
+                points={e.points.map((p) => p.join(",")).join(" ")}
                 fill="none"
                 stroke={EDGE_COLORS[e.kind] || EDGE_COLORS.default}
                 strokeWidth="1"
@@ -484,8 +509,8 @@ export default function BusinessProcessEditPage() {
               />
               {e.label ? (
                 <text
-                  x={(e.x1 + e.x2) / 2}
-                  y={(e.y1 + e.y2) / 2 - 4}
+                  x={e.labelX}
+                  y={e.labelY - 4}
                   textAnchor="middle"
                   fontSize="12"
                   fill={EDGE_COLORS[e.kind] || EDGE_COLORS.default}
@@ -545,17 +570,90 @@ export default function BusinessProcessEditPage() {
                           slotRefs.current[lane.id][slotIdx] = el;
                         }}
                       >
-                        {node && (
-                          <div className="bp-node-wrap">
-                            <div
-                              className={`bp-node ${node.type === "if" ? "if" : "action"} \
-                                ${node.flags?.isNew ? "flag-new" : ""} \
-                                ${node.flags?.isOutdated ? "flag-outdated" : ""} \
-                                ${node.flags?.isProblem ? "flag-problem" : ""}`}
-                              ref={(el) => (nodeRefs.current[node.id] = el)}
-                              draggable
-                              onDragStart={(e) => onNodeDragStart(e, node.id)}
-                              title="Перетягніть для зміни порядку або lane"
+
+                        <div
+                          className={`bp-edge-handle ${edgeFrom === node.id ? "active" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdgeHandleClick(node.id);
+                          }}
+                        />
+                        <div className="bp-node-top">
+                          <input
+                            className="bp-node-title"
+                            value={node.title}
+                            onChange={(e) =>
+                              updateNode(node.id, { title: e.target.value })
+                            }
+                          />
+                          <div className="bp-node-flags">
+                            <button
+                              className={`icon new ${node.flags?.isNew ? "on" : ""}`}
+                              title="Позначити як Новий (зел.)"
+                              onClick={() => toggleFlag(node.id, "isNew")}
+                            />
+                            <button
+                              className={`icon outdated ${node.flags?.isOutdated ? "on" : ""}`}
+                              title="Позначити як Застарілий (фіол.)"
+                              onClick={() => toggleFlag(node.id, "isOutdated")}
+                            />
+                            <button
+                              className={`icon problem ${node.flags?.isProblem ? "on" : ""}`}
+                              title="Позначити як Проблемний (черв.)"
+                              onClick={() => toggleFlag(node.id, "isProblem")}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="bp-node-bottom">
+                          <select
+                            className="bp-node-assignee"
+                            value={node.assignee_user_id || ""}
+                            onChange={(e) =>
+                              updateNode(node.id, {
+                                assignee_user_id: e.target.value ? Number(e.target.value) : undefined,
+                              })
+                            }
+                          >
+                            <option value="">Виконавець (користувач)</option>
+                            {users.map((u) => {
+                              const label =
+                                [u.first_name, u.last_name].filter(Boolean).join(" ") ||
+                                u.username ||
+                                `ID ${u.id}`;
+                              return (
+                                <option key={u.id} value={u.id}>
+                                  {label}
+                                </option>
+                              );
+                            })}
+                          </select>
+
+                          <div className="bp-node-actions">
+                            <button
+                              className="btn tiny ghost"
+                              onClick={() => addNode(lane.id, "action", node.id)}
+                            >
+                              + Дію між
+                            </button>
+                            <button
+                              className="btn tiny ghost"
+                              onClick={() => addNode(lane.id, "if", node.id)}
+                            >
+                              + IF між
+                            </button>
+                            <button
+                              className="btn tiny"
+                              onClick={() => openNote(node)}
+                              title="Нотатка"
+                            >
+                              Коментувати
+                            </button>
+                            <button
+                              className="btn tiny ghost"
+                              onClick={() => createTaskFromNode(node)}
+                              title="Створити задачу з цієї дії"
+
                             >
                               <div className="bp-node-top">
                                 <input
@@ -672,12 +770,11 @@ export default function BusinessProcessEditPage() {
           })}
       </div>
 
-      {/* Панель простого додавання зв’язків (edges) */}
-      <EdgesPanel schema={schema} onAdd={addEdge} onRemove={removeEdge} />
     </div>
     </Layout>
   );
 }
+
 
 // ---------------- Subcomponents ----------------
 
@@ -799,25 +896,4 @@ function EdgesPanel({ schema, onAdd, onRemove }) {
   );
 }
 
-function NotePopover({ value, onChange, onSave, onClose }) {
-  return (
-    <div className="comments-popover" role="dialog">
-      <div className="cp-header">
-        <div>Нотатка</div>
-        <button className="btn tiny ghost" onClick={onClose}>×</button>
-      </div>
-      <div className="cp-body">
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
-      </div>
-      <div className="cp-footer">
-        <button className="btn small" onClick={onSave}>
-          Зберегти
-        </button>
-      </div>
-    </div>
-  );
-}
 

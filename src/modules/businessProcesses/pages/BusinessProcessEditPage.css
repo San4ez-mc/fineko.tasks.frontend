@@ -119,9 +119,26 @@
   box-shadow: 0 1px 0 rgba(0,0,0,0.03);
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .bp-node.if { border-style: dashed; }
+
+.bp-edge-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #ff7a00;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.bp-edge-handle.active {
+  background: #111827;
+}
 
 .bp-node-top {
   display: flex;
@@ -253,6 +270,7 @@
 .edge-item.new { color: #16a34a; }
 .edge-item.outdated { color: #7c3aed; }
 .edge-item.problem { color: #dc2626; }
+
 
 .comments-popover {
   position: absolute;
