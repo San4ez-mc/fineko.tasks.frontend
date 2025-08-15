@@ -33,12 +33,3 @@ export const refreshGroupAdmins = async (id) => {
     const r = await api.post(`/telegram/groups/${id}/refresh-admins`);
     return r.data;
 };
-
-export default {
-    linkGroupByCode,
-    fetchPendingGroups,
-    fetchGroups,
-    fetchUsers,
-    updateUser,
-    refreshGroupAdmins,
-};
