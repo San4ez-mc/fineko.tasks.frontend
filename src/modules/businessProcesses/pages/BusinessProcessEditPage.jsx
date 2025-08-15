@@ -44,6 +44,7 @@ export default function BusinessProcessEditPage() {
   const canvasRef = useRef(null);
   const nodeRefs = useRef({});
   const [edgePaths, setEdgePaths] = useState([]);
+  const [edgeFrom, setEdgeFrom] = useState(null);
 
   const schemaByLane = useMemo(() => {
     const byLane = {};
@@ -87,12 +88,30 @@ export default function BusinessProcessEditPage() {
           const from = rects[e.from];
           const to = rects[e.to];
           if (!from || !to) return null;
+          const fromNode = schema.nodes.find((n) => n.id === e.from);
+          const toNode = schema.nodes.find((n) => n.id === e.to);
+          const fromLane = fromNode?.lane_id;
+          const toLane = toNode?.lane_id;
+          let points;
+          if (fromLane && toLane && fromLane !== toLane) {
+            const midY = (from.y + to.y) / 2;
+            points = [
+              [from.x, from.y],
+              [from.x, midY],
+              [to.x, midY],
+              [to.x, to.y],
+            ];
+          } else {
+            points = [
+              [from.x, from.y],
+              [to.x, to.y],
+            ];
+          }
           return {
             ...e,
-            x1: from.x,
-            y1: from.y,
-            x2: to.x,
-            y2: to.y,
+            points,
+            labelX: (from.x + to.x) / 2,
+            labelY: (from.y + to.y) / 2,
           };
         })
         .filter(Boolean);
@@ -339,6 +358,15 @@ export default function BusinessProcessEditPage() {
     }));
   };
 
+  const handleEdgeHandleClick = (nodeId) => {
+    if (edgeFrom && edgeFrom !== nodeId) {
+      addEdge(edgeFrom, nodeId);
+      setEdgeFrom(null);
+    } else {
+      setEdgeFrom(nodeId);
+    }
+  };
+
   // ------------------- Notes & Tasks -------------------
   const openNote = (node) => {
     setActiveNoteNode(node.id);
@@ -442,20 +470,18 @@ export default function BusinessProcessEditPage() {
           </defs>
           {edgePaths.map((e) => (
             <g key={e.id} className={`edge ${e.kind}`}>
-              <line
+              <polyline
                 className={e.kind}
-                x1={e.x1}
-                y1={e.y1}
-                x2={e.x2}
-                y2={e.y2}
+                points={e.points.map((p) => p.join(",")).join(" ")}
+                fill="none"
                 stroke={EDGE_COLORS[e.kind] || EDGE_COLORS.default}
                 strokeWidth="2"
                 markerEnd={`url(#arrow-${e.kind})`}
               />
               {e.label ? (
                 <text
-                  x={(e.x1 + e.x2) / 2}
-                  y={(e.y1 + e.y2) / 2 - 4}
+                  x={e.labelX}
+                  y={e.labelY - 4}
                   textAnchor="middle"
                   fontSize="12"
                   fill={EDGE_COLORS[e.kind] || EDGE_COLORS.default}
@@ -513,6 +539,13 @@ export default function BusinessProcessEditPage() {
                         onDrop={(e) => onNodeDropAfter(e, lane.id, node.id)}
                         title="Перетягніть для зміни порядку або lane"
                       >
+                        <div
+                          className={`bp-edge-handle ${edgeFrom === node.id ? "active" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdgeHandleClick(node.id);
+                          }}
+                        />
                         <div className="bp-node-top">
                           <input
                             className="bp-node-title"
@@ -622,76 +655,8 @@ export default function BusinessProcessEditPage() {
           })}
       </div>
 
-      {/* Панель простого додавання зв’язків (edges) */}
-      <EdgesPanel schema={schema} onAdd={addEdge} onRemove={removeEdge} />
     </div>
     </Layout>
-  );
-}
-
-// ---------------- Subcomponents ----------------
-
-function EdgesPanel({ schema, onAdd, onRemove }) {
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [kind, setKind] = useState("default");
-  const [label, setLabel] = useState("");
-
-  const nodes = schema.nodes;
-
-  return (
-    <div className="edges-panel">
-      <div className="edges-row">
-        <select value={from} onChange={(e) => setFrom(e.target.value)}>
-          <option value="">Звідки</option>
-          {nodes.map((n) => (
-            <option key={n.id} value={n.id}>
-              {n.title}
-            </option>
-          ))}
-        </select>
-        <select value={to} onChange={(e) => setTo(e.target.value)}>
-          <option value="">Куди</option>
-          {nodes.map((n) => (
-            <option key={n.id} value={n.id}>
-              {n.title}
-            </option>
-          ))}
-        </select>
-        <select value={kind} onChange={(e) => setKind(e.target.value)}>
-          <option value="default">Звичайна</option>
-          <option value="new">Нова (зел.)</option>
-          <option value="outdated">Застаріла (фіол.)</option>
-          <option value="problem">Проблемна (черв.)</option>
-        </select>
-        <input
-          type="text"
-          placeholder="Мітка (для IF)"
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-        />
-        <button
-          className="btn small"
-          onClick={() => {
-            onAdd(from, to, kind, label.trim());
-            setFrom(""); setTo(""); setKind("default"); setLabel("");
-          }}
-        >
-          + Додати стрілку
-        </button>
-      </div>
-
-      {schema.edges?.length ? (
-        <div className="edges-list">
-          {schema.edges.map((e) => (
-            <div key={e.id} className={`edge-item ${e.kind}`}>
-              <span>{e.label ? `${e.label}: ` : ""}{e.from} → {e.to}</span>
-              <button className="btn tiny ghost" onClick={() => onRemove(e.id)}>Видалити</button>
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </div>
   );
 }
 
