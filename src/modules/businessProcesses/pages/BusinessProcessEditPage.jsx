@@ -38,6 +38,9 @@ export default function BusinessProcessEditPage() {
   const canvasRef = useRef(null);
   const nodeRefs = useRef({});
   const [edgePaths, setEdgePaths] = useState([]);
+  const slotRefs = useRef({});
+  const [laneSlots, setLaneSlots] = useState({});
+  const [hoverSlot, setHoverSlot] = useState({ laneId: null, index: null });
 
   const [edgeFrom, setEdgeFrom] = useState(null);
 
@@ -810,5 +813,25 @@ function EdgesPanel({ schema, onAdd, onRemove }) {
     </div>
   );
 }
-
+function NotePopover({ value, onChange, onSave, onClose }) {
+  return (
+    <div className="comments-popover" role="dialog">
+      <div className="cp-header">
+        <div>Нотатка</div>
+        <button className="btn tiny ghost" onClick={onClose}>×</button>
+      </div>
+      <div className="cp-body">
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </div>
+      <div className="cp-footer">
+        <button className="btn small" onClick={onSave}>
+          Зберегти
+        </button>
+      </div>
+    </div>
+  );
+}
 
