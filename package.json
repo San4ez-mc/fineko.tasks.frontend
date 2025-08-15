@@ -10,19 +10,23 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.10.0",
     "date-fns": "^4.1.0",
+    "express": "^4.19.2",
     "react": "^19.1.0",
     "react-datepicker": "^8.4.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.7.0",
     "react-scripts": "5.0.1",
+    "sqlite3": "^5.1.6",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "telegram:webhook": "node scripts/telegram_webhook.js",
+    "telegram:logs": "node scripts/view_telegram_logs.js"
   },
   "eslintConfig": {
     "extends": [
