@@ -223,14 +223,14 @@
   pointer-events: none;
 }
 
-.bp-edges-svg line {
+.bp-edges-svg polyline {
   stroke: #9ca3af;
-  stroke-width: 2px;
+  stroke-width: 1px;
 }
 
-.bp-edges-svg line.new { stroke: #16a34a; }
-.bp-edges-svg line.outdated { stroke: #7c3aed; }
-.bp-edges-svg line.problem { stroke: #dc2626; }
+.bp-edges-svg polyline.new { stroke: #16a34a; }
+.bp-edges-svg polyline.outdated { stroke: #7c3aed; }
+.bp-edges-svg polyline.problem { stroke: #dc2626; }
 
 .edges-panel {
   margin-top: 8px;

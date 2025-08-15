@@ -85,12 +85,15 @@ export default function BusinessProcessEditPage() {
           const from = rects[e.from];
           const to = rects[e.to];
           if (!from || !to) return null;
+
+          const midX = (from.x + to.x) / 2;
           return {
             ...e,
             x1: from.x,
             y1: from.y,
             x2: to.x,
             y2: to.y,
+            points: `${from.x},${from.y} ${midX},${from.y} ${midX},${to.y} ${to.x},${to.y}`,
           };
         })
         .filter(Boolean);
@@ -471,14 +474,12 @@ export default function BusinessProcessEditPage() {
           </defs>
           {edgePaths.map((e) => (
             <g key={e.id} className={`edge ${e.kind}`}>
-              <line
+              <polyline
                 className={e.kind}
-                x1={e.x1}
-                y1={e.y1}
-                x2={e.x2}
-                y2={e.y2}
+                points={e.points}
+                fill="none"
                 stroke={EDGE_COLORS[e.kind] || EDGE_COLORS.default}
-                strokeWidth="2"
+                strokeWidth="1"
                 markerEnd={`url(#arrow-${e.kind})`}
               />
               {e.label ? (
