@@ -3,6 +3,7 @@ import Header from "./Header/Header";
 import Sidebar, { RightSidebar } from "./Sidebar/Sidebar";
 import Footer from "./Footer/Footer";
 import "./Layout.css";
+import api from "../../services/api";
 
 const LEFT_KEY = "layout:left";
 const RIGHT_KEY = "layout:right";
@@ -10,6 +11,7 @@ const RIGHT_KEY = "layout:right";
 export default function Layout({ children }) {
     const [leftOpen, setLeftOpen] = useState(false);
     const [rightOpen, setRightOpen] = useState(false);
+    const [telegramCount, setTelegramCount] = useState(0);
 
     const toggleLeft = useCallback(() => {
         setLeftOpen((prev) => {
@@ -57,13 +59,23 @@ export default function Layout({ children }) {
         };
     }, [toggleLeft, toggleRight]);
 
+    useEffect(() => {
+        api
+            .get("/telegram/pending")
+            .then((res) => {
+                const data = Array.isArray(res.data) ? res.data : [];
+                setTelegramCount(data.length);
+            })
+            .catch(() => {});
+    }, []);
+
     return (
         <div className={`layout ${leftOpen ? "left-open" : ""} ${rightOpen ? "right-open" : ""}`}>
             <Sidebar
                 isOpen={leftOpen}
                 onToggle={toggleLeft}
                 resultsCount={3}
-                telegramCount={2}
+                telegramCount={telegramCount}
             />
             <div className="layout-column">
                 <Header />

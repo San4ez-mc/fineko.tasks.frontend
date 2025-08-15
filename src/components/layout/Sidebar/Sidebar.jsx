@@ -189,9 +189,25 @@ export default function Sidebar({
                             >
                                 <FiSend className="menu-icon" />
                                 {isOpen && (
+                                    <span className="menu-text">
+                                        Телеграм
+                                    </span>
+                                )}
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                to="/telegram/pending"
+                                className={({ isActive }) =>
+                                    isActive ? "active" : ""
+                                }
+                                onClick={handleNavClick}
+                            >
+                                <FiGitBranch className="menu-icon" />
+                                {isOpen && (
                                     <>
                                         <span className="menu-text">
-                                            Телеграм
+                                            Заявки Telegram
                                         </span>
                                         <span className="badge menu-badge">
                                             {telegramCount}

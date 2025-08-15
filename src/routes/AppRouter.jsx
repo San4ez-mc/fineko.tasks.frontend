@@ -12,6 +12,7 @@ import BpEditorPage from "../modules/bp/pages/BpEditorPage";
 import OrgPage from "../modules/org/pages/OrgPage";
 import Layout from "../components/layout/Layout";
 import TelegramGroupPage from "../modules/telegram/pages/TelegramGroupPage";
+import PendingGroupsPage from "../modules/telegram/pages/PendingGroupsPage";
 import InstructionsPage from "../modules/instructions/pages/InstructionsPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
 import ForgotPasswordPage from "../modules/auth/pages/ForgotPasswordPage";
@@ -131,6 +132,14 @@ export default function AppRouter() {
                     element={
                         <RequireAuth>
                             <TelegramGroupPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/telegram/pending"
+                    element={
+                        <RequireAuth>
+                            <PendingGroupsPage />
                         </RequireAuth>
                     }
                 />
