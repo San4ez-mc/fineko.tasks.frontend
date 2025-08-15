@@ -35,12 +35,22 @@ export default function DailyTasksPage() {
     const [templates, setTemplates] = useState([]);
     const [selectedTemplate, setSelectedTemplate] = useState("");
     const [results, setResults] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [newTaskExecutorId, setNewTaskExecutorId] = useState("");
     const [titleError, setTitleError] = useState(false);
     const { user } = useAuth();
 
+    const userLabel = (u) => {
+        if (!u) return "";
+        if (u.first_name || u.last_name)
+            return [u.first_name, u.last_name].filter(Boolean).join(" ").trim();
+        return u.name || u.username || `ID ${u.id}`;
+    };
+
     useEffect(() => {
-        if (user?.name) {
-            setTaskManager(user.name);
+        if (user) {
+            setTaskManager(userLabel(user));
+            if (user.id) setNewTaskExecutorId(String(user.id));
         }
     }, [user]);
 
@@ -218,6 +228,10 @@ export default function DailyTasksPage() {
         getResults({ status: "active" })
             .then((data) => setResults(data.results || []))
             .catch(() => { });
+        api
+            .get("/users", { params: { active: 1 } })
+            .then((r) => setUsers(r.data || []))
+            .catch(() => { });
     }, []);
 
     const handleTemplateSelect = (id) => {
@@ -263,10 +277,11 @@ export default function DailyTasksPage() {
             expected_result: newTaskExpectedResult.trim(),
             description: newTaskDescription.trim(),
             manager: taskManager.trim(),
+            executor_id: newTaskExecutorId ? Number(newTaskExecutorId) : null,
             comments: newTaskComments
                 ? JSON.stringify([
                     {
-                        author: taskManager.trim() || user?.name || "Я",
+                        author: taskManager.trim() || userLabel(user) || "Я",
                         text: newTaskComments.trim(),
                         replies: [],
                     },
@@ -307,7 +322,8 @@ export default function DailyTasksPage() {
                 setPlannedTime("00:00");
                 setNewTaskExpectedResult("");
                 setNewTaskDescription("");
-                setTaskManager(user?.name || "");
+                setTaskManager(userLabel(user) || "");
+                setNewTaskExecutorId(user?.id ? String(user.id) : "");
                 setNewTaskComments("");
                 setNewTaskResultId("");
                 setSelectedTemplate("");
@@ -446,73 +462,102 @@ export default function DailyTasksPage() {
             {isFormOpen && (
                 <div className="add-task-form card">
                     <VoiceInput endpoint="/tasks/voice" onResult={handleVoiceTask} />
-                    <input
-                        type="text"
-                        className={`title-input ${titleError ? "error" : ""}`}
-                        placeholder="Назва задачі*"
-                        value={newTaskTitle}
-                        onChange={(e) => setNewTaskTitle(e.target.value)}
-                    />
-                    <textarea
-                        className="full-width"
-                        placeholder="Опис задачі"
-                        value={newTaskDescription}
-                        onChange={(e) => setNewTaskDescription(e.target.value)}
-                    />
-                    <textarea
-                        className="full-width"
-                        placeholder="Очікуваний результат"
-                        value={newTaskExpectedResult}
-                        onChange={(e) => setNewTaskExpectedResult(e.target.value)}
-                    />
-                    <select
-                        value={newTaskType}
-                        onChange={(e) => setNewTaskType(e.target.value)}
-                    >
-                        <option value="важлива термінова">Важлива - термінова</option>
-                        <option value="важлива нетермінова">Важлива - не термінова</option>
-                        <option value="неважлива термінова">Неважлива - термінова</option>
-                        <option value="неважлива нетермінова">Неважлива - нетермінова</option>
-                    </select>
-                    <input
-                        type="time"
-                        value={plannedTime}
-                        onChange={(e) => setPlannedTime(e.target.value)}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Хто назначив задачу"
-                        value={taskManager}
-                        disabled
-                    />
-                    <textarea
-                        className="full-width"
-                        placeholder="Коментарі"
-                        value={newTaskComments}
-                        onChange={(e) => setNewTaskComments(e.target.value)}
-                    />
-                    <select
-                        value={newTaskResultId}
-                        onChange={(e) => setNewTaskResultId(e.target.value)}
-                    >
-                        <option value="">Без результату</option>
-                        {results.map((r) => (
-                            <option key={r.id} value={r.id}>
-                                {r.title}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        value={selectedTemplate}
-                        onChange={(e) => handleTemplateSelect(e.target.value)}
-                    >
-                        <option value="">З шаблону…</option>
-                        {templates.map((t) => (
-                            <option key={t.id} value={t.id}>
-                                {t.title}
-                            </option>
-                        ))}
-                    </select>
+                    <label className="at-field">
+                        <span>Назва задачі*</span>
+                        <input
+                            type="text"
+                            className={`title-input ${titleError ? "error" : ""}`}
+                            value={newTaskTitle}
+                            onChange={(e) => setNewTaskTitle(e.target.value)}
+                        />
+                    </label>
+                    <label className="at-field full-width">
+                        <span>Опис задачі</span>
+                        <textarea
+                            value={newTaskDescription}
+                            onChange={(e) => setNewTaskDescription(e.target.value)}
+                        />
+                    </label>
+                    <label className="at-field full-width">
+                        <span>Очікуваний результат</span>
+                        <textarea
+                            value={newTaskExpectedResult}
+                            onChange={(e) => setNewTaskExpectedResult(e.target.value)}
+                        />
+                    </label>
+                    <label className="at-field">
+                        <span>Тип</span>
+                        <select
+                            value={newTaskType}
+                            onChange={(e) => setNewTaskType(e.target.value)}
+                        >
+                            <option value="важлива термінова">Важлива - термінова</option>
+                            <option value="важлива нетермінова">Важлива - не термінова</option>
+                            <option value="неважлива термінова">Неважлива - термінова</option>
+                            <option value="неважлива нетермінова">Неважлива - нетермінова</option>
+                        </select>
+                    </label>
+                    <label className="at-field">
+                        <span>Очікуваний час</span>
+                        <input
+                            type="time"
+                            value={plannedTime}
+                            onChange={(e) => setPlannedTime(e.target.value)}
+                        />
+                    </label>
+                    <label className="at-field">
+                        <span>Хто призначив</span>
+                        <input type="text" value={taskManager} disabled />
+                    </label>
+                    <label className="at-field">
+                        <span>Виконавець</span>
+                        <select
+                            value={newTaskExecutorId}
+                            onChange={(e) => setNewTaskExecutorId(e.target.value)}
+                        >
+                            <option value="">Оберіть виконавця</option>
+                            {users.map((u) => (
+                                <option key={u.id} value={u.id}>
+                                    {userLabel(u)}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                    <label className="at-field full-width">
+                        <span>Коментарі</span>
+                        <textarea
+                            value={newTaskComments}
+                            onChange={(e) => setNewTaskComments(e.target.value)}
+                        />
+                    </label>
+                    <label className="at-field">
+                        <span>Результат</span>
+                        <select
+                            value={newTaskResultId}
+                            onChange={(e) => setNewTaskResultId(e.target.value)}
+                        >
+                            <option value="">Без результату</option>
+                            {results.map((r) => (
+                                <option key={r.id} value={r.id}>
+                                    {r.title}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                    <label className="at-field">
+                        <span>Шаблон</span>
+                        <select
+                            value={selectedTemplate}
+                            onChange={(e) => handleTemplateSelect(e.target.value)}
+                        >
+                            <option value="">З шаблону…</option>
+                            {templates.map((t) => (
+                                <option key={t.id} value={t.id}>
+                                    {t.title}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
                     <button className="btn primary" onClick={handleCreateTask}>
                         Створити
                     </button>
