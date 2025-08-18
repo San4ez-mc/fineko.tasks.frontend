@@ -39,7 +39,7 @@ export default function DailyTasksPage() {
     const [newTaskExecutorId, setNewTaskExecutorId] = useState("");
     const [titleError, setTitleError] = useState(false);
 
-    // popover "перенести дату" для конкретної задачі
+    // popover перенесення
     const [rescheduleForId, setRescheduleForId] = useState(null);
     const [rescheduleValue, setRescheduleValue] = useState("");
     const rescheduleRef = useRef(null);
@@ -266,23 +266,26 @@ export default function DailyTasksPage() {
         if (data.resultId) setNewTaskResultId(String(data.resultId));
     };
 
+    // ✅ ВАЖЛИВО: правильні назви полів + правильний ендпоінт
     const handleCreateTask = async () => {
         if (!newTaskTitle.trim()) {
             setTitleError(true);
             return;
         }
         setTitleError(false);
+
         const [h, m] = plannedTime.split(":").map((n) => parseInt(n, 10) || 0);
         const payload = {
-            date: formatDateForApi(selectedDate),
+            planned_date: formatDateForApi(selectedDate), // <—
             title: newTaskTitle.trim(),
             type: newTaskType,
-            plannedMinutes: h * 60 + m,
-            actualMinutes: 0,
+            expected_time: h * 60 + m, // <—
+            actual_time: 0,            // <—
             expected_result: newTaskExpectedResult.trim(),
             description: newTaskDescription.trim(),
             manager: taskManager.trim(),
             executor_id: newTaskExecutorId ? Number(newTaskExecutorId) : null,
+            result_id: newTaskResultId || null, // <—
             comments: newTaskComments
                 ? JSON.stringify([
                     {
@@ -293,11 +296,11 @@ export default function DailyTasksPage() {
                 ])
                 : JSON.stringify([]),
         };
-        if (newTaskResultId) payload.resultId = newTaskResultId;
 
         try {
-            console.log("POST /tasks/daily →", payload);
-            await api.post(`/tasks/daily`, payload);
+            console.log("POST /task/daily →", payload);
+            await api.post(`/task/daily`, payload); // <— було /tasks/daily
+            // reset форми
             setIsFormOpen(false);
             setNewTaskTitle("");
             setNewTaskType("важлива термінова");
@@ -309,6 +312,7 @@ export default function DailyTasksPage() {
             setNewTaskComments("");
             setNewTaskResultId("");
             setSelectedTemplate("");
+            // перезавантажити список
             loadTasks(formatDateForApi(selectedDate), filters);
         } catch (err) {
             console.error("Помилка створення задачі", err);
@@ -356,7 +360,7 @@ export default function DailyTasksPage() {
                 </h1>
             </div>
 
-            {/* Кнопка додавання під заголовком, по центру */}
+            {/* Кнопка додавання по центру під заголовком */}
             <div className="page-header-actions">
                 <button
                     type="button"
@@ -681,7 +685,8 @@ export default function DailyTasksPage() {
                                                 className="btn primary small"
                                                 onClick={(ev) => {
                                                     ev.stopPropagation();
-                                                    updateTaskField(task.id, "dueDate", rescheduleValue);
+                                                    // ✅ бек чекає planned_date
+                                                    updateTaskField(task.id, "planned_date", rescheduleValue);
                                                     setRescheduleForId(null);
                                                 }}
                                                 disabled={!rescheduleValue}
@@ -839,15 +844,8 @@ export default function DailyTasksPage() {
                 </div>
             )}
 
-            {/* FAB у правому нижньому куті */}
-            <button
-                type="button"
-                className="fab-add"
-                aria-label="Додати задачу"
-                onClick={() => setIsFormOpen(true)}
-            >
-                <FiPlus size={24} />
-            </button>
+            {/* За бажанням можна повернути плаваючу FAB: */}
+            {/* <button type="button" className="fab-add" onClick={() => setIsFormOpen(true)}><FiPlus size={24} /></button> */}
         </Layout>
     );
 }
