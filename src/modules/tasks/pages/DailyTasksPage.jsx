@@ -845,7 +845,7 @@ export default function DailyTasksPage() {
             )}
 
             {/* За бажанням можна повернути плаваючу FAB: */}
-            {/* <button type="button" className="fab-add" onClick={() => setIsFormOpen(true)}><FiPlus size={24} /></button> */}
+            <button type="button" className="fab-add" onClick={() => setIsFormOpen(true)}><FiPlus size={24} /></button>
         </Layout>
     );
 }
