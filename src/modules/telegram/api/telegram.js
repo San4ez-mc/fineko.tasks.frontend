@@ -33,3 +33,23 @@ export const refreshGroupAdmins = async (id) => {
     const r = await api.post(`/telegram/groups/${id}/refresh-admins`);
     return r.data;
 };
+
+export const fetchGroup = async (id) => {
+    const r = await api.get(`/telegram/groups/${id}`);
+    return r.data;
+};
+
+export const updateGroup = async (id, payload) => {
+    const r = await api.patch(`/telegram/groups/${id}`, payload);
+    return r.data;
+};
+
+export const deleteGroup = async (id) => {
+    const r = await api.delete(`/telegram/groups/${id}`);
+    return r.data;
+};
+
+export const updateGroupMembers = async (id, members) => {
+    const r = await api.patch(`/telegram/groups/${id}/members`, { members });
+    return r.data;
+};

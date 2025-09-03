@@ -2,6 +2,26 @@
     margin-bottom: 40px;
 }
 
+.telegram-page__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.telegram-page__body {
+    display: flex;
+    gap: 24px;
+}
+
+.telegram-page__main {
+    flex: 1;
+}
+
+.telegram-page__aside {
+    width: 300px;
+}
+
 .telegram-page .link-form {
     display: flex;
     gap: 8px;
@@ -18,4 +38,21 @@
 .telegram-page table td {
     padding: 4px 8px;
     border-bottom: 1px solid #ddd;
+}
+
+.telegram-group-list__row {
+    cursor: pointer;
+}
+
+.fab {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
 }
