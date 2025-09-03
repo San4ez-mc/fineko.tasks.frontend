@@ -22,6 +22,7 @@ export default function TelegramGroupsPage() {
     const [companyId, setCompanyId] = useState(activeCompany?.id || "");
     const [groups, setGroups] = useState([]);
     const [pending, setPending] = useState([]);
+    const [showForm, setShowForm] = useState(false);
 
     const companies = user?.companies || [];
 
@@ -76,6 +77,16 @@ export default function TelegramGroupsPage() {
         }
     };
 
+    const handleCancel = () => {
+        setInviteCode("");
+        setShowForm(false);
+        window.dispatchEvent(
+            new CustomEvent("toast", {
+                detail: { type: "info", message: "Прив'язку скасовано" },
+            })
+        );
+    };
+
     const handleRefresh = async (id) => {
         try {
             await refreshGroupAdmins(id);
@@ -91,31 +102,25 @@ export default function TelegramGroupsPage() {
         <Layout>
             <div className="telegram-page">
                 <h2>Telegram групи</h2>
-                <section className="telegram-instructions">
-                    <p>
-                        Скануйте QR-код або перейдіть за
-                        {" "}
-                        <a
-                            href="https://t.me/finekobot"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            посиланням
-                        </a>
-                        , щоб відкрити бота Fineko в Telegram.
-                    </p>
-                    <div className="telegram-instructions__qr">
-                        <QRCodeSVG value="https://t.me/finekobot" />
+
+                {showForm ? (
+                    <TelegramInviteForm
+                        inviteCode={inviteCode}
+                        companyId={companyId}
+                        companies={companies}
+                        onInviteCodeChange={(v) => setInviteCode(v.toUpperCase())}
+                        onCompanyChange={onCompanyChange}
+                        onSubmit={handleLink}
+                        onCancel={handleCancel}
+                    />
+                ) : (
+                    <div className="link-form">
+                        <button className="btn primary" onClick={() => setShowForm(true)}>
+                            Підключити
+                        </button>
                     </div>
-                </section>
-                <TelegramInviteForm
-                    inviteCode={inviteCode}
-                    companyId={companyId}
-                    companies={companies}
-                    onInviteCodeChange={(v) => setInviteCode(v.toUpperCase())}
-                    onCompanyChange={onCompanyChange}
-                    onSubmit={handleLink}
-                />
+                )}
+
                 {companyId && (
                     <section>
                         <h3>Очікуючі групи</h3>
