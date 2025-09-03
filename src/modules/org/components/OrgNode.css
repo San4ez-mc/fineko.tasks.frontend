@@ -11,6 +11,8 @@
   margin:10px;
 }
 
+.org-node.is-division{ max-width:none; }
+
 .org-node .head{
   display:flex; align-items:center; gap:8px; margin-bottom:8px;
 }
@@ -42,7 +44,7 @@
 .unit-actions, .pos-actions{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
 
 .children{
-  display:flex; flex-wrap:wrap; align-items:flex-start; margin-top:6px; padding-left:18px;
+  display:flex; flex-wrap:nowrap; align-items:flex-start; margin-top:6px; padding-left:18px;
   border-left:2px dashed color-mix(in srgb, var(--navy) 20%, transparent);
 }
 

@@ -6,7 +6,8 @@ import React, { useState } from "react";
  */
 export default function OrgNode({
   node, level, expanded, onToggleExpand, highlightIds,
-  onUpdateUnit, onMove, onReplaceUser, employees = []
+  onUpdateUnit, onMove, onReplaceUser, onCreateDepartment,
+  employees = []
 }) {
   const key = node.id;
   const isOpen = expanded.has(key);
@@ -109,9 +110,25 @@ export default function OrgNode({
               </select>
             </div>
           </label>
-          <div className="unit-actions">
-            <button className="btn ghost">+</button>
-          </div>
+          {node.type === "division" && (
+            <div className="unit-actions">
+              <button
+                className="btn ghost"
+                onClick={() => {
+                  const name = prompt("Назва відділу");
+                  if (!name) return;
+                  onCreateDepartment && onCreateDepartment({
+                    name,
+                    divisionId: node.id,
+                    productValue: "",
+                    head: null,
+                  });
+                }}
+              >
+                + Відділ
+              </button>
+            </div>
+          )}
         </div>
       )}
 
