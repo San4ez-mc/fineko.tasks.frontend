@@ -291,7 +291,7 @@ function addPosition(tree, p) {
   const next = JSON.parse(JSON.stringify(tree));
   next.forEach(div => div.departments.forEach(dep => {
     if (dep.id === p.departmentId) {
-      dep.employees.push({ id: p.id, type: "position", title: p.title, user: p.user, isManager: p.isManager });
+      dep.employees.push({ id: p.id, type: "position", title: p.title, user: p.user, isManager: p.isManager, productValue: p.productValue || "" });
     }
   }));
   return next;
