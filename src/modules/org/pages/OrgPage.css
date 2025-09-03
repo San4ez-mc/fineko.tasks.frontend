@@ -6,6 +6,17 @@
   min-height: calc(100dvh - var(--header-h) - var(--footer-h));
 }
 
+.org-page-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.org-view-switch{ display:flex; gap:8px; }
+
+.org-table-view{ padding:12px; }
+
 .org-left{
   padding:12px;
   border-right:1px solid var(--border);
