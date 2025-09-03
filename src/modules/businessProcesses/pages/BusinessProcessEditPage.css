@@ -302,3 +302,51 @@
   padding: 6px 10px;
   resize: vertical;
 }
+
+.bp-details-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100%;
+  background: #fff;
+  border-left: 1px solid #e5e7eb;
+  box-shadow: -2px 0 4px rgba(0,0,0,0.05);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+}
+
+.bp-details-panel .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.bp-details-panel label {
+  font-size: 12px;
+  color: #374151;
+}
+
+.bp-details-panel input,
+.bp-details-panel select,
+.bp-details-panel textarea {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.bp-details-panel textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.bp-details-panel .panel-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+}
