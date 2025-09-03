@@ -6,11 +6,14 @@ import React, { useState } from "react";
  */
 export default function OrgNode({
   node, level, expanded, onToggleExpand, highlightIds,
-  onUpdateUnit, onMove, onReplaceUser
+  onUpdateUnit, onMove, onReplaceUser, employees = []
 }) {
   const key = node.id;
   const isOpen = expanded.has(key);
   const isHighlighted = highlightIds?.has(key);
+  const headInitials = node.head?.name
+    ? node.head.name.split(" ").map(n => n[0]).join("").toUpperCase()
+    : "";
 
   // DnD
   const [dragOverState, setDragOverState] = useState(null); // 'ok'|'deny'|null
@@ -87,11 +90,27 @@ export default function OrgNode({
               onBlur={(e)=>onUpdateUnit && onUpdateUnit(node.id, { productValue: e.target.value })}
             />
           </label>
+          <label className="line">
+            <span className="k">Відповідальний</span>
+            <div className="resp-select">
+              <div className="head-avatar">{headInitials || ""}</div>
+              <select
+                className="input"
+                defaultValue=""
+                onChange={(e)=>{
+                  const u = employees.find(u => String(u.id) === e.target.value);
+                  onUpdateUnit && onUpdateUnit(node.id, { head: u || null });
+                }}
+              >
+                <option value="">—</option>
+                {employees.map(u => (
+                  <option key={u.id} value={u.id}>{u.name}</option>
+                ))}
+              </select>
+            </div>
+          </label>
           <div className="unit-actions">
-            <button className="btn ghost">Додати відділ</button>
-            <button className="btn ghost">Додати посаду</button>
-            <button className="btn ghost">Редагувати</button>
-            <button className="btn ghost">Видалити</button>
+            <button className="btn ghost">+</button>
           </div>
         </div>
       )}
@@ -110,6 +129,7 @@ export default function OrgNode({
               onUpdateUnit={onUpdateUnit}
               onMove={onMove}
               onReplaceUser={onReplaceUser}
+              employees={employees}
             />
           ))}
           {node.type === "department" && (node.employees || []).map(p => (
@@ -123,6 +143,7 @@ export default function OrgNode({
               onUpdateUnit={onUpdateUnit}
               onMove={onMove}
               onReplaceUser={onReplaceUser}
+              employees={employees}
             />
           ))}
         </div>
