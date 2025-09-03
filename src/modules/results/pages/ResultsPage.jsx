@@ -13,7 +13,7 @@ export default function ResultsPage() {
   const [expanded, setExpanded] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [parentId, setParentId] = useState(null);
-  const [tasksLoading, setTasksLoading] = useState({});
+  const [, setTasksLoading] = useState({});
 
   const fetchResults = async () => {
     setLoading(true);

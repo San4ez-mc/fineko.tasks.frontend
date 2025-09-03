@@ -14,7 +14,6 @@ import {
     FiChevronDown,
     FiBook,
     FiExternalLink,
-    FiGitBranch,
     FiUsers,
 } from "react-icons/fi";
 import CheckToggle from "../../ui/CheckToggle";

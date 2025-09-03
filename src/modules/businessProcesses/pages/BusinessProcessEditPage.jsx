@@ -30,7 +30,6 @@ export default function BusinessProcessEditPage() {
   const [schema, setSchema] = useState({ lanes: [], nodes: [], edges: [] });
 
   const [users, setUsers] = useState([]);
-  const [positions, setPositions] = useState([]);
   const [activeNoteNode, setActiveNoteNode] = useState(null);
   const [noteText, setNoteText] = useState("");
 
@@ -144,12 +143,8 @@ export default function BusinessProcessEditPage() {
     const load = async () => {
       try {
         setLoading(true);
-        const [u, p] = await Promise.all([
-          api.get("/users?active=1"),
-          api.get("/positions"),
-        ]);
+        const u = await api.get("/users?active=1");
         setUsers(Array.isArray(u.data) ? u.data : u.data?.items || []);
-        setPositions(Array.isArray(p.data) ? p.data : p.data?.items || []);
 
         if (!isNew) {
           const { data } = await api.get(`/business-processes/${id}`);
@@ -325,10 +320,6 @@ export default function BusinessProcessEditPage() {
     }));
   };
 
-  const onNodeDragStart = (e, nodeId) => {
-    e.dataTransfer.setData("nodeId", nodeId);
-  };
-
   const onLaneDragOver = (e, laneId) => {
     e.preventDefault();
     const refs = slotRefs.current[laneId] || [];
@@ -379,13 +370,6 @@ export default function BusinessProcessEditPage() {
     setSchemaSafe((prev) => ({
       ...prev,
       edges: [...prev.edges, { id: uid("edge"), from: fromId, to: toId, kind, label }],
-    }));
-  };
-
-  const removeEdge = (edgeId) => {
-    setSchemaSafe((prev) => ({
-      ...prev,
-      edges: prev.edges.filter((e) => e.id !== edgeId),
     }));
   };
 
@@ -696,123 +680,6 @@ export default function BusinessProcessEditPage() {
 
 // ---------------- Subcomponents ----------------
 
-function AddSlot({ laneId, addNode, onNodeDropAfter }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleAdd = (type) => {
-    addNode(laneId, type, null);
-    setOpen(false);
-  };
-
-  return (
-    <div
-      className="bp-slot"
-      ref={ref}
-      onClick={() => setOpen(true)}
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => onNodeDropAfter(e, laneId, null)}
-    >
-      <span className="bp-slot-plus">+</span>
-      {open && (
-        <div className="bp-slot-popup" onClick={(e) => e.stopPropagation()}>
-          <button
-            className="btn tiny"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAdd("action");
-            }}
-          >
-            Створити дію
-          </button>
-          <button
-            className="btn tiny ghost"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAdd("if");
-            }}
-          >
-            Створити розгалуження (if)
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EdgesPanel({ schema, onAdd, onRemove }) {
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [kind, setKind] = useState("default");
-  const [label, setLabel] = useState("");
-
-  const nodes = schema.nodes;
-
-  return (
-    <div className="edges-panel">
-      <div className="edges-row">
-        <select value={from} onChange={(e) => setFrom(e.target.value)}>
-          <option value="">Звідки</option>
-          {nodes.map((n) => (
-            <option key={n.id} value={n.id}>
-              {n.title}
-            </option>
-          ))}
-        </select>
-        <select value={to} onChange={(e) => setTo(e.target.value)}>
-          <option value="">Куди</option>
-          {nodes.map((n) => (
-            <option key={n.id} value={n.id}>
-              {n.title}
-            </option>
-          ))}
-        </select>
-        <select value={kind} onChange={(e) => setKind(e.target.value)}>
-          <option value="default">Звичайна</option>
-          <option value="new">Нова (зел.)</option>
-          <option value="outdated">Застаріла (фіол.)</option>
-          <option value="problem">Проблемна (черв.)</option>
-        </select>
-        <input
-          type="text"
-          placeholder="Мітка (для IF)"
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-        />
-        <button
-          className="btn small"
-          onClick={() => {
-            onAdd(from, to, kind, label.trim());
-            setFrom(""); setTo(""); setKind("default"); setLabel("");
-          }}
-        >
-          + Додати стрілку
-        </button>
-      </div>
-
-      {schema.edges?.length ? (
-        <div className="edges-list">
-          {schema.edges.map((e) => (
-            <div key={e.id} className={`edge-item ${e.kind}`}>
-              <span>{e.label ? `${e.label}: ` : ""}{e.from} → {e.to}</span>
-              <button className="btn tiny ghost" onClick={() => onRemove(e.id)}>Видалити</button>
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
-}
 function NotePopover({ value, onChange, onSave, onClose }) {
   return (
     <div className="comments-popover" role="dialog">
