@@ -5,6 +5,7 @@ import { useCompany } from "../../../context/CompanyContext";
 import TelegramGroupList from "../components/TelegramGroupList";
 import TelegramInviteForm from "../components/TelegramInviteForm";
 import TelegramPendingList from "../components/TelegramPendingList";
+import { QRCodeSVG } from "qrcode.react";
 import {
     linkGroupByCode,
     fetchPendingGroups,
@@ -101,6 +102,7 @@ export default function TelegramGroupsPage() {
         <Layout>
             <div className="telegram-page">
                 <h2>Telegram групи</h2>
+
                 {showForm ? (
                     <TelegramInviteForm
                         inviteCode={inviteCode}
@@ -118,6 +120,7 @@ export default function TelegramGroupsPage() {
                         </button>
                     </div>
                 )}
+
                 {companyId && (
                     <section>
                         <h3>Очікуючі групи</h3>

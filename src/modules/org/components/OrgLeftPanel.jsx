@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import PositionForm from "./PositionForm";
+import DepartmentForm from "./DepartmentForm";
 
 /**
  * props:
@@ -20,45 +22,16 @@ export default function OrgLeftPanel({
 }) {
   const [showPosForm, setShowPosForm] = useState(false);
   const [showDepForm, setShowDepForm] = useState(false);
-  const [posForm, setPosForm] = useState({ title: "", departmentId: departments[0]?.id || "", managers: "" });
-  const [depForm, setDepForm] = useState({ name: "", divisionId: divisions[0]?.id || "", head: "" });
-  const [savingPos, setSavingPos] = useState(false);
-  const [savingDep, setSavingDep] = useState(false);
-
-  const submitPos = async (e) => {
-    e.preventDefault();
+  const handlePositionSubmit = async (data) => {
     if (!onCreatePosition) return;
-    setSavingPos(true);
-    try {
-      const managers = posForm.managers
-        .split(",")
-        .map((s, i) => s.trim())
-        .filter(Boolean)
-        .map((name, i) => ({ id: `tmp-${i}`, name }));
-      await onCreatePosition({ title: posForm.title, departmentId: posForm.departmentId, managers });
-      setPosForm({ title: "", departmentId: departments[0]?.id || "", managers: "" });
-      setShowPosForm(false);
-    } catch {
-      alert("Помилка створення посади");
-    } finally {
-      setSavingPos(false);
-    }
+    await onCreatePosition(data);
+    setShowPosForm(false);
   };
 
-  const submitDep = async (e) => {
-    e.preventDefault();
+  const handleDepartmentSubmit = async (data) => {
     if (!onCreateDepartment) return;
-    setSavingDep(true);
-    try {
-      const head = depForm.head ? { name: depForm.head } : null;
-      await onCreateDepartment({ name: depForm.name, divisionId: depForm.divisionId, head });
-      setDepForm({ name: "", divisionId: divisions[0]?.id || "", head: "" });
-      setShowDepForm(false);
-    } catch {
-      alert("Помилка створення відділу");
-    } finally {
-      setSavingDep(false);
-    }
+    await onCreateDepartment(data);
+    setShowDepForm(false);
   };
 
   return (
@@ -123,41 +96,19 @@ export default function OrgLeftPanel({
         </div>
 
         {showPosForm && (
-          <form className="olp-tr" onSubmit={submitPos}>
-            <div className="name">
-              <input className="input" required value={posForm.title} onChange={(e)=>setPosForm({...posForm,title:e.target.value})} />
-            </div>
-            <div className="managers">
-              <input className="input" placeholder="ПІБ керівників" value={posForm.managers} onChange={(e)=>setPosForm({...posForm,managers:e.target.value})} />
-            </div>
-            <div className="dept">
-              <select className="input" required value={posForm.departmentId} onChange={(e)=>setPosForm({...posForm,departmentId:e.target.value})}>
-                {departments.map(d=> <option key={d.id} value={d.id}>{d.name}</option>)}
-              </select>
-            </div>
-            <div className="actions">
-              <button className="btn" type="submit" disabled={savingPos}>{savingPos?"…":"Зберегти"}</button>
-            </div>
-          </form>
+          <PositionForm
+            departments={departments}
+            onSubmit={handlePositionSubmit}
+            onCancel={() => setShowPosForm(false)}
+          />
         )}
 
         {showDepForm && (
-          <form className="olp-tr" onSubmit={submitDep}>
-            <div className="name">
-              <input className="input" required value={depForm.name} onChange={(e)=>setDepForm({...depForm,name:e.target.value})} />
-            </div>
-            <div className="managers">
-              <input className="input" placeholder="Керівник" value={depForm.head} onChange={(e)=>setDepForm({...depForm,head:e.target.value})} />
-            </div>
-            <div className="dept">
-              <select className="input" required value={depForm.divisionId} onChange={(e)=>setDepForm({...depForm,divisionId:e.target.value})}>
-                {divisions.map(d=> <option key={d.id} value={d.id}>{d.name}</option>)}
-              </select>
-            </div>
-            <div className="actions">
-              <button className="btn" type="submit" disabled={savingDep}>{savingDep?"…":"Зберегти"}</button>
-            </div>
-          </form>
+          <DepartmentForm
+            divisions={divisions}
+            onSubmit={handleDepartmentSubmit}
+            onCancel={() => setShowDepForm(false)}
+          />
         )}
 
         {positions.map(p => (
