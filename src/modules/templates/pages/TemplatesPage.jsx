@@ -21,6 +21,11 @@ const FIELD_LABELS = {
   comments: "Коментарі",
   resultId: "Результат",
   repeat: "Повторення",
+  responsible: "Відповідальний",
+  start_date: "Дата початку",
+  end_date: "Дата завершення",
+  tags: "Теги",
+  enabled: "Активний",
 };
 
 const defaultFlags = {
@@ -34,6 +39,11 @@ const defaultFlags = {
   comments: true,
   resultId: true,
   repeat: true,
+  responsible: true,
+  start_date: true,
+  end_date: true,
+  tags: true,
+  enabled: true,
 };
 
 const defaultPayload = {
@@ -47,6 +57,11 @@ const defaultPayload = {
   comments: "",
   resultId: "",
   repeat: { type: "none", interval: 1 },
+  responsible: "",
+  start_date: "",
+  end_date: "",
+  tags: "",
+  enabled: true,
 };
 
 function FlagsBadge({ flags = {} }) {
@@ -158,6 +173,11 @@ export default function TemplatesPage() {
         comments: t.payload?.comments ?? "",
         resultId: t.payload?.resultId ?? "",
         repeat: t.payload?.repeat ?? { type: "none", interval: 1 },
+        responsible: t.payload?.responsible ?? "",
+        start_date: t.payload?.start_date ?? "",
+        end_date: t.payload?.end_date ?? "",
+        tags: t.payload?.tags ?? "",
+        enabled: t.payload?.enabled ?? true,
       },
     });
     setModalOpen(true);
@@ -181,6 +201,11 @@ export default function TemplatesPage() {
           comments: data.comments,
           resultId: data.resultId,
           repeat: data.repeat,
+          responsible: data.responsible,
+          start_date: data.start_date,
+          end_date: data.end_date,
+          tags: data.tags,
+          enabled: data.enabled,
         }),
       },
     }));
@@ -398,6 +423,56 @@ export default function TemplatesPage() {
                             value={form.payload.comments}
                             onChange={(e) => setPayload("comments", e.target.value)}
                           />
+                        </label>
+
+                        <label className="field">
+                          <span>Відповідальний</span>
+                          <input
+                            className="input"
+                            value={form.payload.responsible}
+                            onChange={(e) => setPayload("responsible", e.target.value)}
+                          />
+                        </label>
+
+                        <div className="row2">
+                          <label className="field">
+                            <span>Дата початку</span>
+                            <input
+                              className="input"
+                              type="date"
+                              value={form.payload.start_date}
+                              onChange={(e) => setPayload("start_date", e.target.value)}
+                            />
+                          </label>
+
+                          <label className="field">
+                            <span>Дата завершення</span>
+                            <input
+                              className="input"
+                              type="date"
+                              value={form.payload.end_date}
+                              onChange={(e) => setPayload("end_date", e.target.value)}
+                            />
+                          </label>
+                        </div>
+
+                        <label className="field">
+                          <span>Теги</span>
+                          <input
+                            className="input"
+                            value={form.payload.tags}
+                            onChange={(e) => setPayload("tags", e.target.value)}
+                            placeholder="tag1, tag2"
+                          />
+                        </label>
+
+                        <label className="field checkbox">
+                          <input
+                            type="checkbox"
+                            checked={form.payload.enabled}
+                            onChange={(e) => setPayload("enabled", e.target.checked)}
+                          />
+                          <span>Активний</span>
                         </label>
 
                         <label className="field">
