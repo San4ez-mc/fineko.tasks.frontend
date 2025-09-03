@@ -19,3 +19,18 @@
     padding: 4px 8px;
     border-bottom: 1px solid #ddd;
 }
+
+.telegram-instructions {
+    text-align: center;
+}
+
+.telegram-instructions__qr {
+    max-width: 200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.telegram-instructions__qr svg {
+    width: 100%;
+    height: auto;
+}
