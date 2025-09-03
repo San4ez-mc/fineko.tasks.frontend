@@ -5,7 +5,7 @@ import "./OrgPage.css";
 
 import OrgLeftPanel from "../components/OrgLeftPanel";
 import OrgCanvas from "../components/OrgCanvas";
-import { createPosition, createDepartment, updatePosition as apiUpdatePosition } from "../../../services/api/org";
+import { createPosition, createDepartment, updatePosition as apiUpdatePosition, moveNode as apiMoveNode } from "../../../services/api/org";
 
 /**
  * OrgPage – контейнер сторінки оргструктури.
@@ -67,9 +67,13 @@ export default function OrgPage() {
   };
 
   // DnD переміщення
-  const handleMove = ({ entity, id, targetId }) => {
+  const handleMove = async ({ entity, id, targetId }) => {
     setTree((prev) => moveEntity(prev, entity, id, targetId));
-    // TODO: PATCH /org/move { entity, id, targetId }
+    try {
+      await apiMoveNode({ entity, id, targetId });
+    } catch {
+      alert("Помилка переміщення");
+    }
   };
 
   // заміна працівника в позиції
@@ -100,6 +104,25 @@ export default function OrgPage() {
     return arr;
     }, [tree]);
 
+  const handleAddPosition = (parentId) => {
+    console.log("open add position form", parentId);
+  };
+  const handleAddDepartment = (parentId) => {
+    console.log("open add department form", parentId);
+  };
+  const handleEditUnit = (id) => {
+    console.log("open edit unit", id);
+  };
+  const handleDeleteUnit = (id) => {
+    console.log("delete unit", id);
+  };
+  const handleOpenTasks = (userId) => {
+    window.location.href = `/tasks?assignee_id=${userId || ""}`;
+  };
+  const handleOpenResults = (userId) => {
+    window.location.href = `/results?assignee_id=${userId || ""}`;
+  };
+
   return (
 
     <div className="org-layout">
@@ -126,6 +149,12 @@ export default function OrgPage() {
           onUpdateUnit={handleUpdateUnit}
           onMove={handleMove}
           onReplaceUser={handleReplaceUser}
+          onAddPosition={handleAddPosition}
+          onAddDepartment={handleAddDepartment}
+          onEditUnit={handleEditUnit}
+          onDeleteUnit={handleDeleteUnit}
+          onOpenTasks={handleOpenTasks}
+          onOpenResults={handleOpenResults}
         />
       </main>
     </div>

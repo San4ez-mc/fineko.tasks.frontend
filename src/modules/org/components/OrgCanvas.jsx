@@ -10,10 +10,18 @@ import OrgNode from "./OrgNode";
  * - onUpdateUnit(id, patch)
  * - onMove({ entity:'department'|'position', id, targetId })
  * - onReplaceUser(positionId, newUser)
+ * - onAddPosition(parentId)
+ * - onAddDepartment(parentId)
+ * - onEditUnit(id)
+ * - onDeleteUnit(id)
+ * - onOpenTasks(userId)
+ * - onOpenResults(userId)
  */
 export default function OrgCanvas({
   tree, expanded, onToggleExpand, highlightIds,
-  onUpdateUnit, onMove, onReplaceUser
+  onUpdateUnit, onMove, onReplaceUser,
+  onAddPosition, onAddDepartment, onEditUnit, onDeleteUnit,
+  onOpenTasks, onOpenResults
 }) {
   const viewportRef = useRef(null);
   const [zoom, setZoom] = useState(1);
@@ -61,6 +69,12 @@ export default function OrgCanvas({
               onUpdateUnit={onUpdateUnit}
               onMove={onMove}
               onReplaceUser={onReplaceUser}
+              onAddPosition={onAddPosition}
+              onAddDepartment={onAddDepartment}
+              onEditUnit={onEditUnit}
+              onDeleteUnit={onDeleteUnit}
+              onOpenTasks={onOpenTasks}
+              onOpenResults={onOpenResults}
             />
           </div>
         ))}

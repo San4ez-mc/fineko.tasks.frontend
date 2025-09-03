@@ -6,7 +6,9 @@ import React, { useState } from "react";
  */
 export default function OrgNode({
   node, level, expanded, onToggleExpand, highlightIds,
-  onUpdateUnit, onMove, onReplaceUser
+  onUpdateUnit, onMove, onReplaceUser,
+  onAddPosition, onAddDepartment, onEditUnit, onDeleteUnit,
+  onOpenTasks, onOpenResults
 }) {
   const key = node.id;
   const isOpen = expanded.has(key);
@@ -62,8 +64,8 @@ export default function OrgNode({
           <div className="muted">Працівник</div>
           <div className="user">{node.user?.name || "—"}</div>
           <div className="pos-actions">
-            <a className="btn ghost" href={`/tasks?assignee_id=${node.user?.id || ""}`}>Задачі</a>
-            <a className="btn ghost" href={`/results?assignee_id=${node.user?.id || ""}`}>Результати</a>
+            <button className="btn ghost" onClick={()=>onOpenTasks && onOpenTasks(node.user?.id)}>👤</button>
+            <button className="btn ghost" onClick={()=>onOpenResults && onOpenResults(node.user?.id)}>📈</button>
           </div>
           <label className="line">
             <span className="k">Старий</span>
@@ -88,10 +90,10 @@ export default function OrgNode({
             />
           </label>
           <div className="unit-actions">
-            <button className="btn ghost">Додати відділ</button>
-            <button className="btn ghost">Додати посаду</button>
-            <button className="btn ghost">Редагувати</button>
-            <button className="btn ghost">Видалити</button>
+            <button className="btn ghost" onClick={()=>onAddPosition && onAddPosition(node.id)}>+ Посада</button>
+            <button className="btn ghost" onClick={()=>onAddDepartment && onAddDepartment(node.id)}>+ Відділ</button>
+            <button className="btn ghost" onClick={()=>onEditUnit && onEditUnit(node.id)}>Редагувати</button>
+            <button className="btn ghost" onClick={()=>onDeleteUnit && onDeleteUnit(node.id)}>Видалити</button>
           </div>
         </div>
       )}
@@ -110,6 +112,12 @@ export default function OrgNode({
               onUpdateUnit={onUpdateUnit}
               onMove={onMove}
               onReplaceUser={onReplaceUser}
+              onAddPosition={onAddPosition}
+              onAddDepartment={onAddDepartment}
+              onEditUnit={onEditUnit}
+              onDeleteUnit={onDeleteUnit}
+              onOpenTasks={onOpenTasks}
+              onOpenResults={onOpenResults}
             />
           ))}
           {node.type === "department" && (node.employees || []).map(p => (
@@ -123,6 +131,12 @@ export default function OrgNode({
               onUpdateUnit={onUpdateUnit}
               onMove={onMove}
               onReplaceUser={onReplaceUser}
+              onAddPosition={onAddPosition}
+              onAddDepartment={onAddDepartment}
+              onEditUnit={onEditUnit}
+              onDeleteUnit={onDeleteUnit}
+              onOpenTasks={onOpenTasks}
+              onOpenResults={onOpenResults}
             />
           ))}
         </div>
