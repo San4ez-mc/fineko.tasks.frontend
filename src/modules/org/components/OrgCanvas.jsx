@@ -10,10 +10,11 @@ import OrgNode from "./OrgNode";
  * - onUpdateUnit(id, patch)
  * - onMove({ entity:'department'|'position', id, targetId })
  * - onReplaceUser(positionId, newUser)
+ * - onCreateDepartment(data)
  */
 export default function OrgCanvas({
   tree, expanded, onToggleExpand, highlightIds,
-  onUpdateUnit, onMove, onReplaceUser, employees
+  onUpdateUnit, onMove, onReplaceUser, onCreateDepartment, employees
 }) {
   const viewportRef = useRef(null);
   const [zoom, setZoom] = useState(1);
@@ -61,6 +62,7 @@ export default function OrgCanvas({
               onUpdateUnit={onUpdateUnit}
               onMove={onMove}
               onReplaceUser={onReplaceUser}
+              onCreateDepartment={onCreateDepartment}
               employees={employees}
             />
           </div>

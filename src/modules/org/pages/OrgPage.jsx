@@ -181,6 +181,7 @@ export default function OrgPage() {
               onUpdateUnit={handleUpdateUnit}
               onMove={handleMove}
               onReplaceUser={handleReplaceUser}
+              onCreateDepartment={handleCreateDepartment}
               employees={employees}
             />
           </main>
