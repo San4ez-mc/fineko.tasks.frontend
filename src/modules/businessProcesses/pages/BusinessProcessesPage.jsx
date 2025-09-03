@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../../components/layout/Layout";
 import "./BusinessProcessesPage.css";
-import api from "../../../services/api";
 
 export default function BusinessProcessesPage() {
   const navigate = useNavigate();

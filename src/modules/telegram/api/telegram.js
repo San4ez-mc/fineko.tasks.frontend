@@ -18,6 +18,13 @@ export const fetchGroups = async (companyId) => {
     return r.data || [];
 };
 
+export const fetchGroup = async (groupId, companyId) => {
+    const r = await api.get(`/telegram/groups/${groupId}`, {
+        params: { company_id: companyId },
+    });
+    return r.data;
+};
+
 
 export const fetchUsers = async (companyId, params = {}) => {
     const searchParams = new URLSearchParams();

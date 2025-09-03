@@ -8,5 +8,7 @@ export const updatePosition = (id, patch) => api.patch(`/org/position/${id}`, pa
 export const getFlat = (params = {}) => api.get("/org/flat", { params }).then(r => r.data);
 
 
-export default { createPosition, createDepartment, updatePosition, getFlat };
+const orgApi = { createPosition, createDepartment, updatePosition, getFlat };
+
+export default orgApi;
 
