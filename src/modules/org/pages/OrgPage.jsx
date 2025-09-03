@@ -1,11 +1,21 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "../components/OrgLeftPanel.css";
 import "../components/OrgCanvas.css";
 import "./OrgPage.css";
 
 import OrgLeftPanel from "../components/OrgLeftPanel";
 import OrgCanvas from "../components/OrgCanvas";
-import { createPosition, createDepartment, updatePosition as apiUpdatePosition } from "../../../services/api/org";
+import {
+  getTree,
+  getFlat,
+  createPosition,
+  createDepartment,
+  updatePosition as apiUpdatePosition,
+  updateUnit as apiUpdateUnit,
+  moveEntity as apiMoveEntity,
+  deleteEntity as apiDeleteEntity,
+  replaceUser as apiReplaceUser,
+} from "../../../services/api/org";
 
 /**
  * OrgPage – контейнер сторінки оргструктури.
@@ -22,6 +32,11 @@ export default function OrgPage() {
   const [highlightIds, setHighlightIds] = useState(new Set());
   const [expanded, setExpanded] = useState(() => loadExpanded());
 
+  useEffect(() => {
+    getTree().then(setTree).catch(() => {});
+    getFlat().then(setPositions).catch(() => {});
+  }, []);
+
   // пошук у лівій панелі -> підсвітити вузли на канвасі
   const handleSearch = (q) => {
     setFilters((f) => ({ ...f, q }));
@@ -32,7 +47,7 @@ export default function OrgPage() {
   // оновлення unit/position (inline-редагування, продукт, керівники тощо)
   const handleUpdateUnit = (id, patch) => {
     setTree((prev) => updateUnit(prev, id, patch));
-    // TODO: PATCH /org/unit/{id}
+    apiUpdateUnit(id, patch).catch(()=>{});
   };
   const handleUpdatePosition = (id, patch) => {
     setPositions((prev) => prev.map(p => p.id === id ? { ...p, ...patch } : p));
@@ -69,13 +84,13 @@ export default function OrgPage() {
   // DnD переміщення
   const handleMove = ({ entity, id, targetId }) => {
     setTree((prev) => moveEntity(prev, entity, id, targetId));
-    // TODO: PATCH /org/move { entity, id, targetId }
+    apiMoveEntity({ entity, id, targetId }).catch(()=>{});
   };
 
   // заміна працівника в позиції
   const handleReplaceUser = (positionId, newUser) => {
     setPositions((prev) => prev.map(p => p.id === positionId ? { ...p, user: newUser } : p));
-    // TODO: PATCH /org/position/{id}/replaceUser
+    apiReplaceUser(positionId, newUser).catch(()=>{});
   };
 
   // зберігати стан розгортання
