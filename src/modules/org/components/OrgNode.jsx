@@ -6,7 +6,8 @@ import React, { useState } from "react";
  */
 export default function OrgNode({
   node, level, expanded, onToggleExpand, highlightIds,
-  onUpdateUnit, onMove, onReplaceUser
+  onUpdateUnit, onMove, onReplaceUser,
+  canEdit = false
 }) {
   const key = node.id;
   const isOpen = expanded.has(key);
@@ -14,8 +15,12 @@ export default function OrgNode({
 
   // DnD
   const [dragOverState, setDragOverState] = useState(null); // 'ok'|'deny'|null
-  const dragStart = (e) => { e.dataTransfer.setData("text/plain", JSON.stringify({ entity: node.type, id: node.id })); };
+  const dragStart = (e) => {
+    if (!canEdit) return;
+    e.dataTransfer.setData("text/plain", JSON.stringify({ entity: node.type, id: node.id }));
+  };
   const dragOver = (e) => {
+    if (!canEdit) return;
     e.preventDefault();
     // allow drop: position -> department; department -> division
     const data = JSON.parse(e.dataTransfer.getData("text/plain") || "{}");
@@ -24,6 +29,7 @@ export default function OrgNode({
     setDragOverState(ok ? "ok" : "deny");
   };
   const drop = (e) => {
+    if (!canEdit) return;
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("text/plain") || "{}");
     const ok = (data.entity === "position" && node.type === "department")
@@ -43,7 +49,7 @@ export default function OrgNode({
         (isHighlighted ? "is-highlighted " : "") +
         (dragOverState === "ok" ? "droppable-ok " : dragOverState === "deny" ? "droppable-deny " : "")
       }
-      draggable={node.type !== "division"}
+      draggable={canEdit && node.type !== "division"}
       onDragStart={dragStart}
       onDragOver={dragOver}
       onDrop={drop}
@@ -65,14 +71,18 @@ export default function OrgNode({
             <a className="btn ghost" href={`/tasks?assignee_id=${node.user?.id || ""}`}>Задачі</a>
             <a className="btn ghost" href={`/results?assignee_id=${node.user?.id || ""}`}>Результати</a>
           </div>
-          <label className="line">
-            <span className="k">Старий</span>
-            <input className="input" disabled value={node.user?.name || ""} />
-          </label>
-          <label className="line">
-            <span className="k">Новий</span>
-            <input className="input" placeholder="вибрати (демо)" onBlur={(e)=>onReplaceUser && onReplaceUser(node.id, { id: -1, name: e.target.value })} />
-          </label>
+          {canEdit && (
+            <>
+              <label className="line">
+                <span className="k">Старий</span>
+                <input className="input" disabled value={node.user?.name || ""} />
+              </label>
+              <label className="line">
+                <span className="k">Новий</span>
+                <input className="input" placeholder="вибрати (демо)" onBlur={(e)=>onReplaceUser && onReplaceUser(node.id, { id: -1, name: e.target.value })} />
+              </label>
+            </>
+          )}
         </div>
       )}
 
@@ -85,14 +95,17 @@ export default function OrgNode({
               rows={2}
               defaultValue={node.productValue || ""}
               onBlur={(e)=>onUpdateUnit && onUpdateUnit(node.id, { productValue: e.target.value })}
+              disabled={!canEdit}
             />
           </label>
-          <div className="unit-actions">
-            <button className="btn ghost">Додати відділ</button>
-            <button className="btn ghost">Додати посаду</button>
-            <button className="btn ghost">Редагувати</button>
-            <button className="btn ghost">Видалити</button>
-          </div>
+          {canEdit && (
+            <div className="unit-actions">
+              <button className="btn ghost">Додати відділ</button>
+              <button className="btn ghost">Додати посаду</button>
+              <button className="btn ghost">Редагувати</button>
+              <button className="btn ghost">Видалити</button>
+            </div>
+          )}
         </div>
       )}
 
@@ -110,6 +123,7 @@ export default function OrgNode({
               onUpdateUnit={onUpdateUnit}
               onMove={onMove}
               onReplaceUser={onReplaceUser}
+              canEdit={canEdit}
             />
           ))}
           {node.type === "department" && (node.employees || []).map(p => (
@@ -123,6 +137,7 @@ export default function OrgNode({
               onUpdateUnit={onUpdateUnit}
               onMove={onMove}
               onReplaceUser={onReplaceUser}
+              canEdit={canEdit}
             />
           ))}
         </div>

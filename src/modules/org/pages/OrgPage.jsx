@@ -6,6 +6,7 @@ import "./OrgPage.css";
 import OrgLeftPanel from "../components/OrgLeftPanel";
 import OrgCanvas from "../components/OrgCanvas";
 import { createPosition, createDepartment, updatePosition as apiUpdatePosition } from "../../../services/api/org";
+import { useAuth } from "../../../context/AuthContext";
 
 /**
  * OrgPage – контейнер сторінки оргструктури.
@@ -15,6 +16,10 @@ import { createPosition, createDepartment, updatePosition as apiUpdatePosition }
  *   - PATCH/POST/DELETE ... -> передати у хендлери нижче
  */
 export default function OrgPage() {
+  const { user } = useAuth();
+  const role = user?.role || "guest";
+  const canEdit = role === "admin";
+
   // ----- demo state (замінити на дані API)
   const [tree, setTree] = useState(() => demoTree());
   const [positions, setPositions] = useState(() => demoPositions(tree));
@@ -111,10 +116,11 @@ export default function OrgPage() {
           filters={filters}
           onFiltersChange={setFilters}
           onSearch={handleSearch}
-          onUpdatePosition={handleUpdatePosition}
-          onCreatePosition={handleCreatePosition}
-          onCreateDepartment={handleCreateDepartment}
+          onUpdatePosition={canEdit ? handleUpdatePosition : undefined}
+          onCreatePosition={canEdit ? handleCreatePosition : undefined}
+          onCreateDepartment={canEdit ? handleCreateDepartment : undefined}
           onFocusPosition={handleFocusPosition}
+          canEdit={canEdit}
         />
       </aside>
       <main className="org-canvas">
@@ -123,9 +129,10 @@ export default function OrgPage() {
           expanded={expanded}
           onToggleExpand={toggleExpand}
           highlightIds={highlightIds}
-          onUpdateUnit={handleUpdateUnit}
-          onMove={handleMove}
-          onReplaceUser={handleReplaceUser}
+          onUpdateUnit={canEdit ? handleUpdateUnit : undefined}
+          onMove={canEdit ? handleMove : undefined}
+          onReplaceUser={canEdit ? handleReplaceUser : undefined}
+          canEdit={canEdit}
         />
       </main>
     </div>

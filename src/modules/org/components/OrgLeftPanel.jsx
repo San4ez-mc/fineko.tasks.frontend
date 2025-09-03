@@ -16,7 +16,8 @@ import React, { useState } from "react";
 export default function OrgLeftPanel({
   positions, divisions, departments, filters,
   onFiltersChange, onSearch, onUpdatePosition,
-  onCreatePosition, onCreateDepartment, onFocusPosition
+  onCreatePosition, onCreateDepartment, onFocusPosition,
+  canEdit = false
 }) {
   const [showPosForm, setShowPosForm] = useState(false);
   const [showDepForm, setShowDepForm] = useState(false);
@@ -109,10 +110,12 @@ export default function OrgLeftPanel({
         </div>
       </div>
 
-      <div className="olp-actions">
-        <button className="btn ghost" onClick={()=>{ setShowPosForm(p=>!p); setShowDepForm(false); }}>Додати посаду</button>
-        <button className="btn ghost" onClick={()=>{ setShowDepForm(p=>!p); setShowPosForm(false); }}>Додати відділ</button>
-      </div>
+      {canEdit && (
+        <div className="olp-actions">
+          <button className="btn ghost" onClick={()=>{ setShowPosForm(p=>!p); setShowDepForm(false); }}>Додати посаду</button>
+          <button className="btn ghost" onClick={()=>{ setShowDepForm(p=>!p); setShowPosForm(false); }}>Додати відділ</button>
+        </div>
+      )}
 
       <div className="olp-table">
         <div className="olp-th">
@@ -122,7 +125,7 @@ export default function OrgLeftPanel({
           <div>Дії</div>
         </div>
 
-        {showPosForm && (
+        {canEdit && showPosForm && (
           <form className="olp-tr" onSubmit={submitPos}>
             <div className="name">
               <input className="input" required value={posForm.title} onChange={(e)=>setPosForm({...posForm,title:e.target.value})} />
@@ -141,7 +144,7 @@ export default function OrgLeftPanel({
           </form>
         )}
 
-        {showDepForm && (
+        {canEdit && showDepForm && (
           <form className="olp-tr" onSubmit={submitDep}>
             <div className="name">
               <input className="input" required value={depForm.name} onChange={(e)=>setDepForm({...depForm,name:e.target.value})} />
@@ -169,11 +172,11 @@ export default function OrgLeftPanel({
 
             <div className="managers">
               <input className="input" placeholder="введіть ПІБ (демо)" defaultValue={(p.managers||[]).map(m=>m.name).join(", ")}
-                onBlur={(e)=>onUpdatePosition && onUpdatePosition(p.id, { managersText: e.target.value })} />
+                onBlur={(e)=>onUpdatePosition && onUpdatePosition(p.id, { managersText: e.target.value })} disabled={!canEdit} />
             </div>
 
             <div className="dept">
-              <select className="input" defaultValue={p.departmentId} onChange={(e)=>onUpdatePosition && onUpdatePosition(p.id, { departmentId: e.target.value })}>
+              <select className="input" defaultValue={p.departmentId} onChange={(e)=>onUpdatePosition && onUpdatePosition(p.id, { departmentId: e.target.value })} disabled={!canEdit}>
                 {departments.map(d=> <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </div>
