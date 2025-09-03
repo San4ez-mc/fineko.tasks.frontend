@@ -7,6 +7,15 @@ import OrgLeftPanel from "../components/OrgLeftPanel";
 import OrgCanvas from "../components/OrgCanvas";
 import { createPosition, createDepartment, updatePosition as apiUpdatePosition, getOrgTree, getOrgPositions } from "../../../services/api/org";
 
+const DEFAULT_TREE = [
+  { id: 1, type: "division", name: "Відділення 1. Зв’язки", head: null, productValue: "", order: 1, departments: [] },
+  { id: 2, type: "division", name: "Відділення 2. Розповсюдження", head: null, productValue: "", order: 2, departments: [] },
+  { id: 3, type: "division", name: "Відділення 3. Виробництво", head: null, productValue: "", order: 3, departments: [] },
+  { id: 4, type: "division", name: "Відділення 4. Технічне забезпечення / Кваліфікація", head: null, productValue: "", order: 4, departments: [] },
+  { id: 5, type: "division", name: "Відділення 5. Фінанси", head: null, productValue: "", order: 5, departments: [] },
+  { id: 6, type: "division", name: "Відділення 6. Управління / Організація", head: null, productValue: "", order: 6, departments: [] },
+  { id: 7, type: "division", name: "Відділення 7. Виконавче керівництво", head: null, productValue: "", order: 7, departments: [] },
+];
 /**
  * OrgPage – контейнер сторінки оргструктури.
  * TODO: PATCH/POST/DELETE ... -> передати у хендлери нижче
@@ -28,7 +37,8 @@ export default function OrgPage() {
           getOrgPositions(),
         ]);
         if (cancelled) return;
-        setTree(parseTree(treeData));
+        const parsedTree = parseTree(treeData);
+        setTree(parsedTree.length ? parsedTree : DEFAULT_TREE);
         setPositions(parsePositions(posData));
       } catch (e) {
         console.error(e);
@@ -118,6 +128,12 @@ export default function OrgPage() {
     return arr;
     }, [tree]);
 
+  const employees = useMemo(() => {
+    const map = new Map();
+    positions.forEach(p => { if (p.user) map.set(p.user.id, p.user); });
+    return [...map.values()];
+  }, [positions]);
+
   const leftPanel = (
     <OrgLeftPanel
       positions={filteredPositions}
@@ -165,6 +181,7 @@ export default function OrgPage() {
               onUpdateUnit={handleUpdateUnit}
               onMove={handleMove}
               onReplaceUser={handleReplaceUser}
+              employees={employees}
             />
           </main>
         </div>

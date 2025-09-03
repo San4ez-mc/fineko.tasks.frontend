@@ -10,10 +10,11 @@
   position:relative; width:max-content; min-width:100%; min-height:100%;
   transform-origin: 0 0;
   cursor: grab;
+  display:flex;
 }
 
 .org-canvas-controls{
   position:absolute; top:12px; right:12px; display:flex; gap:6px; z-index:2;
 }
 
-.org-column{ margin:20px; }
+.org-column{ margin:20px; display:flex; flex-direction:column; }

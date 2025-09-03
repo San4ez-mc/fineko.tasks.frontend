@@ -13,7 +13,7 @@ import OrgNode from "./OrgNode";
  */
 export default function OrgCanvas({
   tree, expanded, onToggleExpand, highlightIds,
-  onUpdateUnit, onMove, onReplaceUser
+  onUpdateUnit, onMove, onReplaceUser, employees
 }) {
   const viewportRef = useRef(null);
   const [zoom, setZoom] = useState(1);
@@ -61,6 +61,7 @@ export default function OrgCanvas({
               onUpdateUnit={onUpdateUnit}
               onMove={onMove}
               onReplaceUser={onReplaceUser}
+              employees={employees}
             />
           </div>
         ))}
