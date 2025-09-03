@@ -1,26 +1,43 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "../components/OrgLeftPanel.css";
 import "../components/OrgCanvas.css";
 import "./OrgPage.css";
 
 import OrgLeftPanel from "../components/OrgLeftPanel";
 import OrgCanvas from "../components/OrgCanvas";
-import { createPosition, createDepartment, updatePosition as apiUpdatePosition } from "../../../services/api/org";
+import { createPosition, createDepartment, updatePosition as apiUpdatePosition, getOrgTree, getOrgPositions } from "../../../services/api/org";
 
 /**
  * OrgPage – контейнер сторінки оргструктури.
- * TODO: Підключити реальні дані через API:
- *   - GET /org/tree         -> setTree(...)
- *   - GET /org/positions    -> setPositions(...)
- *   - PATCH/POST/DELETE ... -> передати у хендлери нижче
+ * TODO: PATCH/POST/DELETE ... -> передати у хендлери нижче
  */
 export default function OrgPage() {
-  // ----- demo state (замінити на дані API)
-  const [tree, setTree] = useState(() => demoTree());
-  const [positions, setPositions] = useState(() => demoPositions(tree));
+  const [tree, setTree] = useState([]);
+  const [positions, setPositions] = useState([]);
   const [filters, setFilters] = useState({ q: "", divisionId: "any", departmentId: "any", role: "any" });
   const [highlightIds, setHighlightIds] = useState(new Set());
   const [expanded, setExpanded] = useState(() => loadExpanded());
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [treeData, posData] = await Promise.all([
+          getOrgTree(),
+          getOrgPositions(),
+        ]);
+        if (cancelled) return;
+        setTree(parseTree(treeData));
+        setPositions(parsePositions(posData));
+      } catch (e) {
+        console.error(e);
+        if (!cancelled) alert("Не вдалося завантажити оргструктуру");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // пошук у лівій панелі -> підсвітити вузли на канвасі
   const handleSearch = (q) => {
@@ -132,31 +149,43 @@ export default function OrgPage() {
   );
 }
 
-/* ----------------- helpers / demo data (замінити API) ----------------- */
-function demoTree() {
-  // Попередня структура для демонстрації – реальні дані будуть отримані з API
-  return [
-    { id: "div-admin", type: "division", name: "Адміністративне відділення", head: null, productValue: "", order: 1, departments: [] },
-    { id: "div-build-1", type: "division", name: "Відділення побудови", head: null, productValue: "", order: 2, departments: [] },
-    { id: "div-build-2", type: "division", name: "Відділення побудови", head: null, productValue: "", order: 3, departments: [] },
-    { id: "div-spread", type: "division", name: "Відділення поширення", head: null, productValue: "", order: 4, departments: [] },
-    { id: "div-finance", type: "division", name: "Фінансове відділення", head: null, productValue: "", order: 5, departments: [] },
-    { id: "div-tech", type: "division", name: "Технічне відділення", head: null, productValue: "", order: 6, departments: [] },
-    { id: "div-qual", type: "division", name: "Відділення кваліфікації", head: null, productValue: "", order: 7, departments: [] },
-    { id: "div-public", type: "division", name: "Відділення по роботі з публікою", head: null, productValue: "", order: 8, departments: [] }
-  ];
+/* ----------------- helpers ----------------- */
+function parseTree(data) {
+  return (data || []).map(div => ({
+    id: div.id,
+    type: "division",
+    name: div.name,
+    head: div.head || null,
+    productValue: div.productValue || "",
+    order: div.order,
+    departments: (div.departments || []).map(dep => ({
+      id: dep.id,
+      type: "department",
+      name: dep.name,
+      head: dep.head || null,
+      productValue: dep.productValue || "",
+      order: dep.order,
+      employees: (dep.positions || dep.employees || []).map(p => ({
+        id: p.id,
+        type: "position",
+        title: p.title,
+        user: p.user || null,
+      })),
+    })),
+  }));
 }
-function demoPositions(tree) {
-  const out = [];
-  tree.forEach(div => {
-    div.departments.forEach(dep => {
-      dep.employees.forEach(p => out.push({
-        id: p.id, title: p.title, user: p.user, managers: dep.head ? [dep.head] : [],
-        departmentId: dep.id, divisionId: div.id, departmentName: dep.name, divisionName: div.name
-      }));
-    });
-  });
-  return out;
+function parsePositions(list) {
+  return (list || []).map(p => ({
+    id: p.id,
+    title: p.title,
+    user: p.user || null,
+    managers: p.managers || [],
+    departmentId: p.department?.id || null,
+    divisionId: p.department?.division?.id || null,
+    departmentName: p.department?.name || "",
+    divisionName: p.department?.division?.name || "",
+    isManager: p.isManager ?? p.is_manager ?? false,
+  }));
 }
 function findNodeIdsByQuery(tree, q) {
   if (!q) return [];
