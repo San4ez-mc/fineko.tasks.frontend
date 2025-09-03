@@ -7,6 +7,7 @@ export default function TelegramInviteForm({
     onInviteCodeChange,
     onCompanyChange,
     onSubmit,
+    onCancel,
 }) {
     return (
         <form onSubmit={onSubmit} className="link-form">
@@ -26,8 +27,13 @@ export default function TelegramInviteForm({
                 ))}
             </select>
             <button className="btn primary" type="submit">
-                Прив'язати
+                Підключити
             </button>
+            {onCancel && (
+                <button type="button" className="btn" onClick={onCancel}>
+                    Скасувати
+                </button>
+            )}
         </form>
     );
 }
