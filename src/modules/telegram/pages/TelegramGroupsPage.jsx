@@ -3,15 +3,24 @@ import Layout from "../../../components/layout/Layout";
 import { useAuth } from "../../../context/AuthContext";
 import { useCompany } from "../../../context/CompanyContext";
 import TelegramGroupList from "../components/TelegramGroupList";
-import { fetchGroups, refreshGroupAdmins } from "../api/telegram";
+import TelegramInviteForm from "../components/TelegramInviteForm";
+import TelegramPendingList from "../components/TelegramPendingList";
+import {
+    linkGroupByCode,
+    fetchPendingGroups,
+    fetchGroups,
+    refreshGroupAdmins,
+} from "../api/telegram";
 import "./TelegramGroupPage.css";
 
 export default function TelegramGroupsPage() {
     const { user } = useAuth();
     const { activeCompany, setActiveCompany } = useCompany();
 
+    const [inviteCode, setInviteCode] = useState("");
     const [companyId, setCompanyId] = useState(activeCompany?.id || "");
     const [groups, setGroups] = useState([]);
+    const [pending, setPending] = useState([]);
 
     const companies = user?.companies || [];
 
@@ -22,6 +31,7 @@ export default function TelegramGroupsPage() {
     useEffect(() => {
         if (!companyId) return;
         loadGroups(companyId);
+        loadPending(companyId);
     }, [companyId]);
 
     const loadGroups = async (cid) => {
@@ -33,10 +43,36 @@ export default function TelegramGroupsPage() {
         }
     };
 
+    const loadPending = async (cid) => {
+        try {
+            const data = await fetchPendingGroups(cid);
+            setPending(data || []);
+        } catch (e) {
+            console.error("Помилка завантаження pending groups", e);
+        }
+    };
+
     const onCompanyChange = (id) => {
         setCompanyId(id);
         const company = companies.find((c) => String(c.id) === id);
         setActiveCompany(company || null);
+    };
+
+    const handleLink = async (e) => {
+        e.preventDefault();
+        try {
+            const data = await linkGroupByCode({ inviteCode, companyId });
+            window.dispatchEvent(
+                new CustomEvent("toast", {
+                    detail: { type: "success", message: `Групу прив'язано: ${data.title}` },
+                })
+            );
+            setInviteCode("");
+            loadGroups(companyId);
+            loadPending(companyId);
+        } catch (err) {
+            console.error("Помилка прив'язки групи", err);
+        }
     };
 
     const handleRefresh = async (id) => {
@@ -54,16 +90,20 @@ export default function TelegramGroupsPage() {
         <Layout>
             <div className="telegram-page">
                 <h2>Telegram групи</h2>
-                <div className="link-form">
-                    <select value={companyId} onChange={(e) => onCompanyChange(e.target.value)} required>
-                        <option value="">Оберіть компанію</option>
-                        {companies.map((c) => (
-                            <option key={c.id} value={c.id}>
-                                {c.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                <TelegramInviteForm
+                    inviteCode={inviteCode}
+                    companyId={companyId}
+                    companies={companies}
+                    onInviteCodeChange={(v) => setInviteCode(v.toUpperCase())}
+                    onCompanyChange={onCompanyChange}
+                    onSubmit={handleLink}
+                />
+                {companyId && (
+                    <section>
+                        <h3>Очікуючі групи</h3>
+                        <TelegramPendingList groups={pending} />
+                    </section>
+                )}
                 {companyId && (
                     <section>
                         <TelegramGroupList groups={groups} onRefreshAdmins={handleRefresh} />
