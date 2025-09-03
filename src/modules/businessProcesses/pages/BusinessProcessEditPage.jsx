@@ -32,6 +32,7 @@ export default function BusinessProcessEditPage() {
   const [users, setUsers] = useState([]);
   const [activeNoteNode, setActiveNoteNode] = useState(null);
   const [noteText, setNoteText] = useState("");
+  const [activeNodeId, setActiveNodeId] = useState(null);
 
   const autosaveTimer = useRef(null);
   const canvasRef = useRef(null);
@@ -42,6 +43,7 @@ export default function BusinessProcessEditPage() {
   const [hoverSlot, setHoverSlot] = useState({ laneId: null, index: null });
 
   const [edgeFrom, setEdgeFrom] = useState(null);
+  const activeNode = schema.nodes.find((n) => n.id === activeNodeId);
 
 
   useEffect(() => {
@@ -264,6 +266,10 @@ export default function BusinessProcessEditPage() {
       assignee_user_id: undefined,
       flags: {},
       comment: "",
+      inputs: "",
+      actions: "",
+      outputs: "",
+      result: "",
     };
     setSchemaSafe((prev) => ({ ...prev, nodes: [...prev.nodes, newNode] }));
     setLaneSlots((prev) => {
@@ -318,6 +324,32 @@ export default function BusinessProcessEditPage() {
         return { ...n, flags };
       }),
     }));
+  };
+
+  const openNodeDetails = (nodeId) => {
+    setActiveNodeId(nodeId);
+  };
+
+  const closeNodeDetails = () => {
+    setActiveNodeId(null);
+  };
+
+  const deleteNode = (nodeId) => {
+    setSchemaSafe((prev) => ({
+      ...prev,
+      nodes: prev.nodes.filter((n) => n.id !== nodeId),
+      edges: prev.edges.filter((e) => e.from !== nodeId && e.to !== nodeId),
+    }));
+    setLaneSlots((prev) => {
+      const next = {};
+      Object.keys(prev).forEach((lid) => {
+        next[lid] = prev[lid].map((s) =>
+          s.nodeId === nodeId ? { ...s, nodeId: null } : { ...s }
+        );
+      });
+      return next;
+    });
+    closeNodeDetails();
   };
 
   const onLaneDragOver = (e, laneId) => {
@@ -556,6 +588,7 @@ export default function BusinessProcessEditPage() {
                           if (!slotRefs.current[lane.id]) slotRefs.current[lane.id] = [];
                           slotRefs.current[lane.id][slotIdx] = el;
                         }}
+                        onClick={() => node && openNodeDetails(node.id)}
                       >
 
                         <div
@@ -565,7 +598,7 @@ export default function BusinessProcessEditPage() {
                             handleEdgeHandleClick(node.id);
                           }}
                         />
-                        <div className="bp-node-top">
+                        <div className="bp-node-top" onClick={(e) => e.stopPropagation()}>
                           <input
                             className="bp-node-title"
                             value={node.title}
@@ -592,7 +625,7 @@ export default function BusinessProcessEditPage() {
                           </div>
                         </div>
 
-                        <div className="bp-node-bottom">
+                        <div className="bp-node-bottom" onClick={(e) => e.stopPropagation()}>
                           <select
                             className="bp-node-assignee"
                             value={node.assignee_user_id || ""}
@@ -617,6 +650,15 @@ export default function BusinessProcessEditPage() {
                           </select>
 
                           <div className="bp-node-actions">
+                            <button
+                              className="btn tiny ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openNodeDetails(node.id);
+                              }}
+                            >
+                              Деталі
+                            </button>
                             <button
                               className="btn tiny ghost"
                               onClick={() => addNode(lane.id, "action", node.id)}
@@ -670,9 +712,17 @@ export default function BusinessProcessEditPage() {
               </div>
             );
           })}
+        </div>
+        {activeNode && (
+          <NodeDetailsPanel
+            node={activeNode}
+            users={users}
+            onChange={(patch) => updateNode(activeNode.id, patch)}
+            onClose={closeNodeDetails}
+            onDelete={deleteNode}
+          />
+        )}
       </div>
-
-    </div>
     </Layout>
   );
 }
@@ -680,7 +730,7 @@ export default function BusinessProcessEditPage() {
 
 // ---------------- Subcomponents ----------------
 
-function NotePopover({ value, onChange, onSave, onClose }) {
+  function NotePopover({ value, onChange, onSave, onClose }) {
   return (
     <div className="comments-popover" role="dialog">
       <div className="cp-header">
@@ -699,6 +749,69 @@ function NotePopover({ value, onChange, onSave, onClose }) {
         </button>
       </div>
     </div>
-  );
-}
+    );
+  }
+
+  function NodeDetailsPanel({ node, users, onChange, onClose, onDelete }) {
+    return (
+      <div className="bp-details-panel" role="dialog">
+        <div className="panel-header">
+          <div>Деталі кроку</div>
+          <button className="btn tiny ghost" onClick={onClose}>×</button>
+        </div>
+        <label>Назва</label>
+        <input
+          value={node.title}
+          onChange={(e) => onChange({ title: e.target.value })}
+        />
+        <label>Відповідальний</label>
+        <select
+          value={node.assignee_user_id || ""}
+          onChange={(e) =>
+            onChange({
+              assignee_user_id: e.target.value ? Number(e.target.value) : undefined,
+            })
+          }
+        >
+          <option value="">Обрати користувача</option>
+          {users.map((u) => {
+            const label =
+              [u.first_name, u.last_name].filter(Boolean).join(" ") ||
+              u.username ||
+              `ID ${u.id}`;
+            return (
+              <option key={u.id} value={u.id}>
+                {label}
+              </option>
+            );
+          })}
+        </select>
+        <label>Входи</label>
+        <input
+          value={node.inputs || ""}
+          onChange={(e) => onChange({ inputs: e.target.value })}
+        />
+        <label>Опис дій</label>
+        <textarea
+          value={node.actions || ""}
+          onChange={(e) => onChange({ actions: e.target.value })}
+        />
+        <label>Виходи</label>
+        <input
+          value={node.outputs || ""}
+          onChange={(e) => onChange({ outputs: e.target.value })}
+        />
+        <label>Прив'язка до результатів</label>
+        <input
+          value={node.result || ""}
+          onChange={(e) => onChange({ result: e.target.value })}
+        />
+        <div className="panel-actions">
+          <button className="btn small ghost" onClick={() => onDelete(node.id)}>
+            Видалити
+          </button>
+        </div>
+      </div>
+    );
+  }
 
