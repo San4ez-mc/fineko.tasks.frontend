@@ -15,6 +15,7 @@ import Layout from "../components/layout/Layout";
 import TelegramGroupPage from "../modules/telegram/pages/TelegramGroupPage";
 import TelegramLinkPage from "../modules/telegram/pages/TelegramLinkPage";
 import TelegramGroupsPage from "../modules/telegram/pages/TelegramGroupsPage";
+import TelegramGroupDetails from "../modules/telegram/pages/TelegramGroupDetails";
 import TelegramUsersPage from "../modules/telegram/pages/TelegramUsersPage";
 import InstructionsPage from "../modules/instructions/pages/InstructionsPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
@@ -161,6 +162,14 @@ export default function AppRouter() {
                     element={
                         <RequireAuth>
                             <TelegramGroupsPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/telegram/groups/:id"
+                    element={
+                        <RequireAuth>
+                            <TelegramGroupDetails />
                         </RequireAuth>
                     }
                 />

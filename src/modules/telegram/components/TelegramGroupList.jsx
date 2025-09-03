@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function TelegramGroupList({ groups = [], onRefreshAdmins }) {
     return (
@@ -15,7 +16,9 @@ export default function TelegramGroupList({ groups = [], onRefreshAdmins }) {
             <tbody>
                 {groups.map((g) => (
                     <tr key={g.id}>
-                        <td>{g.title}</td>
+                        <td>
+                            <Link to={`/telegram/groups/${g.id}`}>{g.title}</Link>
+                        </td>
                         <td>{g.chat_id}</td>
                         <td>{g.is_active ? "активна" : ""}</td>
                         <td>{g.linked_at}</td>
