@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "../components/OrgLeftPanel.css";
 import "../components/OrgCanvas.css";
 import "./OrgPage.css";
 
 import OrgLeftPanel from "../components/OrgLeftPanel";
 import OrgCanvas from "../components/OrgCanvas";
-import { createPosition, createDepartment, updatePosition as apiUpdatePosition } from "../../../services/api/org";
+import { createPosition, createDepartment, updatePosition as apiUpdatePosition, getDivisions, seed7Divisions, getTree } from "../../../services/api/org";
 
 /**
  * OrgPage – контейнер сторінки оргструктури.
@@ -21,6 +21,21 @@ export default function OrgPage() {
   const [filters, setFilters] = useState({ q: "", divisionId: "any", departmentId: "any", role: "any" });
   const [highlightIds, setHighlightIds] = useState(new Set());
   const [expanded, setExpanded] = useState(() => loadExpanded());
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const divisions = await getDivisions();
+        if (!divisions.length) {
+          await seed7Divisions();
+        }
+        const freshTree = await getTree();
+        setTree(freshTree);
+        setPositions(demoPositions(freshTree));
+      } catch {}
+    };
+    init();
+  }, []);
 
   // пошук у лівій панелі -> підсвітити вузли на канвасі
   const handleSearch = (q) => {
