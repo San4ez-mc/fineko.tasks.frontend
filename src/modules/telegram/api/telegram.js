@@ -18,6 +18,11 @@ export const fetchGroups = async (companyId) => {
     return r.data || [];
 };
 
+export const fetchGroup = async (id, companyId) => {
+    const r = await api.get(`/telegram/groups/${id}?company_id=${companyId}`);
+    return r.data;
+};
+
 export const fetchUsers = async (companyId) => {
     const r = await api.get(`/telegram/users?company_id=${companyId}`);
     const items = r.data?.items || r.data || [];
