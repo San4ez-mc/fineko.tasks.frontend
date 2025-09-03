@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
-import api from "../../../services/api";
+import { useCompany } from "../../../context/CompanyContext";
+import { fetchGroups } from "../api/telegram";
 
 export default function useTelegramCounts() {
+    const { activeCompany } = useCompany();
     const [counts, setCounts] = useState({ groups: 0, users: 0 });
 
     useEffect(() => {
         let ignore = false;
 
         const fetchCounts = async () => {
+            if (!activeCompany?.id) {
+                if (!ignore) setCounts({ groups: 0, users: 0 });
+                return;
+            }
             try {
-                const { data } = await api.get("/telegram/groups");
+                const data = await fetchGroups(activeCompany.id);
 
                 let groups = 0;
                 let users = 0;
@@ -43,7 +49,7 @@ export default function useTelegramCounts() {
         return () => {
             ignore = true;
         };
-    }, []);
+    }, [activeCompany]);
 
     return counts;
 }
