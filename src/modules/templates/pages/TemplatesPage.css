@@ -1,9 +1,43 @@
 @import "../../../styles/variables.css";
 
+
 .templates-page {
   display: grid;
-  gap: 12px;
+  grid-template-columns: 1fr 260px;
+  gap: 16px;
   padding: 16px;
+  align-items: flex-start;
+}
+
+.tp-main {
+  display: grid;
+  gap: 12px;
+}
+
+.tp-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tp-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.tp-result {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  cursor: pointer;
+}
+
+.tp-result:hover {
+  background: var(--bg-soft);
 }
 
 .tp-head {
@@ -142,6 +176,9 @@
 }
 
 @media (max-width: 860px) {
+  .templates-page {
+    grid-template-columns: 1fr;
+  }
   .tp-row {
     grid-template-columns: 1.5fr 1.5fr 1fr auto;
   }
