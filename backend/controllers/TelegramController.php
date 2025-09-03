@@ -6,6 +6,8 @@ use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\TooManyRequestsHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
+use yii\db\Query;
 use yii\helpers\Json;
 use app\models\TelegramGroups;
 use app\models\TelegramPendingGroups;
@@ -26,6 +28,7 @@ class TelegramController extends Controller
             'pending' => ['GET'],
             'groups' => ['GET'],
             'users' => ['GET'],
+            'group' => ['GET'],
         ];
     }
 
@@ -45,6 +48,25 @@ class TelegramController extends Controller
     {
         $this->checkCompanyAccess($company_id);
         return TelegramGroups::find()->where(['company_id' => $company_id])->asArray()->all();
+    }
+
+    public function actionGroup($id)
+    {
+        $companyId = Yii::$app->request->get('company_id');
+        $this->checkCompanyAccess($companyId);
+        $group = TelegramGroups::find()->where(['id' => $id, 'company_id' => $companyId])->asArray()->one();
+        if (!$group) {
+            throw new NotFoundHttpException('Group not found');
+        }
+        $activities = (new Query())
+            ->from('telegram_tasks')
+            ->where(['group_id' => $id])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->limit(20)
+            ->select(['date' => 'created_at', 'type', 'responsible'])
+            ->all();
+        $group['activities'] = $activities;
+        return $group;
     }
 
     public function actionUsers($company_id, $q = null)

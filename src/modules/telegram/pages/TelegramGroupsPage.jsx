@@ -5,6 +5,7 @@ import { useCompany } from "../../../context/CompanyContext";
 import TelegramGroupList from "../components/TelegramGroupList";
 import TelegramInviteForm from "../components/TelegramInviteForm";
 import TelegramPendingList from "../components/TelegramPendingList";
+import { QRCodeSVG } from "qrcode.react";
 import {
     linkGroupByCode,
     fetchPendingGroups,
@@ -90,6 +91,23 @@ export default function TelegramGroupsPage() {
         <Layout>
             <div className="telegram-page">
                 <h2>Telegram групи</h2>
+                <section className="telegram-instructions">
+                    <p>
+                        Скануйте QR-код або перейдіть за
+                        {" "}
+                        <a
+                            href="https://t.me/finekobot"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            посиланням
+                        </a>
+                        , щоб відкрити бота Fineko в Telegram.
+                    </p>
+                    <div className="telegram-instructions__qr">
+                        <QRCodeSVG value="https://t.me/finekobot" />
+                    </div>
+                </section>
                 <TelegramInviteForm
                     inviteCode={inviteCode}
                     companyId={companyId}
