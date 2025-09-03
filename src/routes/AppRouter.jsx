@@ -10,6 +10,7 @@ import BusinessProcessEditPage from "../modules/businessProcesses/pages/Business
 import BpListPage from "../modules/bp/pages/BpListPage";
 import BpEditorPage from "../modules/bp/pages/BpEditorPage";
 import OrgPage from "../modules/org/pages/OrgPage";
+import CompanyPage from "../modules/company/pages/CompanyPage";
 import Layout from "../components/layout/Layout";
 import TelegramGroupPage from "../modules/telegram/pages/TelegramGroupPage";
 import TelegramLinkPage from "../modules/telegram/pages/TelegramLinkPage";
@@ -123,6 +124,14 @@ export default function AppRouter() {
                 <Route element={<RequireAuth><Layout><Outlet /></Layout></RequireAuth>}>
                     <Route path="/org" element={<OrgPage />} />
                 </Route>
+                <Route
+                    path="/company"
+                    element={
+                        <RequireAuth>
+                            <CompanyPage />
+                        </RequireAuth>
+                    }
+                />
                 <Route
                     path="/instructions"
                     element={
