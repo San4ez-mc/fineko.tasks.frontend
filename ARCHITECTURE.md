@@ -44,9 +44,9 @@ frontend/
 │  │  ├─ tasks/
 │  │  │  └─ pages/
 │  │  │     └─ DailyTasksPage.jsx
-│  │  ├─ orgStructure/
+│  │  ├─ org/
 │  │  │  └─ pages/
-│  │  │     └─ OrgStructurePage.jsx
+│  │  │     └─ OrgPage.jsx
 │  │  └─ telegram/
 │  │     └─ pages/
 │  │        └─ TelegramGroupPage.jsx
