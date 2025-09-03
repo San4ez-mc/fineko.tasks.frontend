@@ -17,6 +17,7 @@ export default function OrgPage() {
   const [filters, setFilters] = useState({ q: "", divisionId: "any", departmentId: "any", role: "any" });
   const [highlightIds, setHighlightIds] = useState(new Set());
   const [expanded, setExpanded] = useState(() => loadExpanded());
+  const [view, setView] = useState("scheme");
 
   useEffect(() => {
     let cancelled = false;
@@ -117,34 +118,59 @@ export default function OrgPage() {
     return arr;
     }, [tree]);
 
-  return (
+  const leftPanel = (
+    <OrgLeftPanel
+      positions={filteredPositions}
+      divisions={divisions}
+      departments={departments}
+      filters={filters}
+      onFiltersChange={setFilters}
+      onSearch={handleSearch}
+      onUpdatePosition={handleUpdatePosition}
+      onCreatePosition={handleCreatePosition}
+      onCreateDepartment={handleCreateDepartment}
+      onFocusPosition={handleFocusPosition}
+    />
+  );
 
-    <div className="org-layout">
-      <aside className="org-left card">
-        <OrgLeftPanel
-          positions={filteredPositions}
-          divisions={divisions}
-          departments={departments}
-          filters={filters}
-          onFiltersChange={setFilters}
-          onSearch={handleSearch}
-          onUpdatePosition={handleUpdatePosition}
-          onCreatePosition={handleCreatePosition}
-          onCreateDepartment={handleCreateDepartment}
-          onFocusPosition={handleFocusPosition}
-        />
-      </aside>
-      <main className="org-canvas">
-        <OrgCanvas
-          tree={tree}
-          expanded={expanded}
-          onToggleExpand={toggleExpand}
-          highlightIds={highlightIds}
-          onUpdateUnit={handleUpdateUnit}
-          onMove={handleMove}
-          onReplaceUser={handleReplaceUser}
-        />
-      </main>
+  return (
+    <div>
+      <div className="org-page-header">
+        <h2>Оргструктура</h2>
+        <div className="org-view-switch">
+          <button
+            className={view === "scheme" ? "btn" : "btn ghost"}
+            onClick={() => setView("scheme")}
+          >
+            Схема
+          </button>
+          <button
+            className={view === "table" ? "btn" : "btn ghost"}
+            onClick={() => setView("table")}
+          >
+            Таблиця
+          </button>
+        </div>
+      </div>
+
+      {view === "scheme" ? (
+        <div className="org-layout">
+          <aside className="org-left card">{leftPanel}</aside>
+          <main className="org-canvas">
+            <OrgCanvas
+              tree={tree}
+              expanded={expanded}
+              onToggleExpand={toggleExpand}
+              highlightIds={highlightIds}
+              onUpdateUnit={handleUpdateUnit}
+              onMove={handleMove}
+              onReplaceUser={handleReplaceUser}
+            />
+          </main>
+        </div>
+      ) : (
+        <div className="org-table-view">{leftPanel}</div>
+      )}
     </div>
   );
 }
