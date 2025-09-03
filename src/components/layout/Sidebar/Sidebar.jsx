@@ -197,7 +197,7 @@ export default function Sidebar({
                         </li>
                         <li>
                             <NavLink
-                                to="/telegram-group"
+                                to="/telegram/groups"
                                 className={({ isActive }) =>
                                     isActive ? "active" : ""
                                 }
