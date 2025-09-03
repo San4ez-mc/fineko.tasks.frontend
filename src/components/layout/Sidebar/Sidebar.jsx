@@ -15,6 +15,7 @@ import {
     FiBook,
     FiExternalLink,
     FiGitBranch,
+    FiUsers,
 } from "react-icons/fi";
 import CheckToggle from "../../ui/CheckToggle";
 import api from "../../../services/api";
@@ -159,6 +160,22 @@ export default function Sidebar({
                                 {isOpen && (
                                     <span className="menu-text">
                                         Орг. структура
+                                    </span>
+                                )}
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                to="/company"
+                                className={({ isActive }) =>
+                                    isActive ? "active" : ""
+                                }
+                                onClick={handleNavClick}
+                            >
+                                <FiUsers className="menu-icon" />
+                                {isOpen && (
+                                    <span className="menu-text">
+                                        Компанія
                                     </span>
                                 )}
                             </NavLink>
