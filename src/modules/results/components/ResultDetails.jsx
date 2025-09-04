@@ -23,6 +23,9 @@ export default function ResultDetails({ result, tasksLoading, onAddSubresult, on
           <div className="rd-line"><span className="k">Відповідальний:</span><span className="v">{result.assigneeName || "—"}</span></div>
           <div className="rd-line"><span className="k">Статус:</span><span className="v">{humanStatus(result.status)}</span></div>
           <div className="rd-line"><span className="k">Терміновість:</span><span className="v">{result.urgent ? "Так" : "Ні"}</span></div>
+          {result.deadline && (
+            <div className="rd-line"><span className="k">Дедлайн:</span><span className="v">{result.deadline}</span></div>
+          )}
           {typeof result.points === "number" && (
             <div className="rd-line"><span className="k">Бали:</span><span className="v">+{result.points}</span></div>
           )}

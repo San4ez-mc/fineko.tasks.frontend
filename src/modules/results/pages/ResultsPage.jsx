@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../../../components/layout/Layout.jsx';
 import { getResults, getResultTasks } from '../api/results';
 import ResultItem from '../components/ResultItem.jsx';
+
+import ResultPanel from '../components/ResultPanel.jsx';
+
 import ResultRow from '../components/ResultRow.jsx';
 import ResultDetails from '../components/ResultDetails.jsx';
+
 import ResultsEmpty from '../components/ResultsEmpty.jsx';
 import ResultForm from '../components/ResultForm.jsx';
 import './ResultsPage.css';
@@ -11,12 +15,16 @@ import './ResultsPage.css';
 export default function ResultsPage() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [expanded, setExpanded] = useState(null);
+  const [activeId, setActiveId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [parentId, setParentId] = useState(null);
+
+  const [tasksLoading, setTasksLoading] = useState({});
+
   const [mode, setMode] = useState('my');
   const [view, setView] = useState('table');
   const [, setTasksLoading] = useState({});
+
 
   const fetchResults = async (currentMode = mode) => {
     setLoading(true);
@@ -55,15 +63,14 @@ export default function ResultsPage() {
     }
   };
 
-  const toggleExpand = (id) => {
-    setExpanded((prev) => {
-      const next = prev === id ? null : id;
-      if (next && !(results.find((r) => r.id === id) || {}).tasks) {
-        fetchTasks(id);
-      }
-      return next;
-    });
+  const openPanel = (id) => {
+    if (!(results.find((r) => r.id === id) || {}).tasks) {
+      fetchTasks(id);
+    }
+    setActiveId(id);
   };
+
+  const closePanel = () => setActiveId(null);
 
   const handleAddSubresult = (id) => {
     setParentId(id);
@@ -148,44 +155,27 @@ export default function ResultsPage() {
         )}
 
         {!loading && results.length > 0 && (
-          view === 'cards' ? (
-            <div className="results-list">
-              {results.map((r) => (
-                <React.Fragment key={r.id}>
-                  <ResultItem
-                    result={r}
-                    expanded={expanded === r.id}
-                    onToggleExpand={toggleExpand}
-                  />
-                  {expanded === r.id && (
-                    <ResultDetails
-                      result={r}
-                      onAddSubresult={handleAddSubresult}
-                    />
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          ) : (
-            <div className="results-table">
-              {results.map((r) => (
-                <React.Fragment key={r.id}>
-                  <ResultRow
-                    result={r}
-                    expanded={expanded === r.id}
-                    onToggleExpand={toggleExpand}
-                  />
-                  {expanded === r.id && (
-                    <ResultDetails
-                      result={r}
-                      onAddSubresult={handleAddSubresult}
-                    />
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          )
+
+          <div className="results-list">
+            {results.map((r) => (
+              <ResultItem
+                key={r.id}
+                result={r}
+                expanded={activeId === r.id}
+                onToggleExpand={openPanel}
+              />
+            ))}
+          </div>
+
         )}
+
+        <ResultPanel
+          result={results.find((r) => r.id === activeId)}
+          open={!!activeId}
+          onClose={closePanel}
+          tasksLoading={tasksLoading[activeId]}
+          onAddSubresult={handleAddSubresult}
+        />
       </div>
     </Layout>
   );
