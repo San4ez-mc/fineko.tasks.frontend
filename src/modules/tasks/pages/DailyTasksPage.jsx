@@ -84,14 +84,13 @@ export default function DailyTasksPage() {
     const formatDateForApi = (date) => date.toISOString().split("T")[0];
 
     const loadTasks = (dateStr, flt = {}) => {
-        const params = new URLSearchParams();
-        params.append("date", dateStr);
+        const params = { date: dateStr, mode: "mine" };
         Object.entries(flt).forEach(([key, value]) => {
-            if (value && value !== "any") params.append(key, value);
+            if (value && value !== "any") params[key] = value;
         });
 
         api
-            .get(`/task/filter?${params.toString()}`)
+            .get("/tasks", { params })
             .then((res) => {
                 const backendTasks = res.data?.tasks || [];
                 const mapped = backendTasks.map((t) => ({
@@ -150,10 +149,7 @@ export default function DailyTasksPage() {
         if (!task) return;
         const newStatus = task.status === "done" ? "new" : "done";
         api
-            .patch(`/task/update-field?id=${id}`, {
-                field: "status",
-                value: newStatus,
-            })
+            .patch(`/tasks/${id}/status`, { status: newStatus })
             .catch(() => { });
         setTasks((prev) =>
             sortTasks(
@@ -199,8 +195,17 @@ export default function DailyTasksPage() {
 
     const updateTaskField = (id, field, value) => {
         const payloadValue = field === "comments" ? JSON.stringify(value) : value;
+        let url = `/tasks/${id}`;
+        let body = { [field]: payloadValue };
+        if (field === "status") {
+            url = `/tasks/${id}/status`;
+            body = { status: payloadValue };
+        } else if (field === "planned_date") {
+            url = `/tasks/${id}/date`;
+            body = { date: payloadValue };
+        }
         api
-            .patch(`/task/update-field?id=${id}`, { field, value: payloadValue })
+            .patch(url, body)
             .then(() => {
                 setTasks((prev) =>
                     sortTasks(
@@ -298,8 +303,8 @@ export default function DailyTasksPage() {
         };
 
         try {
-            console.log("POST /task/daily →", payload);
-            await api.post(`/task/daily`, payload); // <— було /tasks/daily
+            console.log("POST /tasks →", payload);
+            await api.post(`/tasks`, payload);
             // reset форми
             setIsFormOpen(false);
             setNewTaskTitle("");

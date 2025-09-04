@@ -17,9 +17,8 @@ export default function TaskComments({
         if (!newComment.trim()) return;
         const updated = [...comments, { author, text: newComment, replies: [] }];
         try {
-            await api.patch(`/task/update-field?id=${taskId}`, {
-                field: "comments",
-                value: JSON.stringify(updated),
+            await api.patch(`/tasks/${taskId}`, {
+                comments: JSON.stringify(updated),
             });
             onCommentsChange?.(updated);
             setNewComment("");
@@ -40,9 +39,8 @@ export default function TaskComments({
             };
         }
         try {
-            await api.patch(`/task/update-field?id=${taskId}`, {
-                field: "comments",
-                value: JSON.stringify(updated),
+            await api.patch(`/tasks/${taskId}`, {
+                comments: JSON.stringify(updated),
             });
             onCommentsChange?.(updated);
             setReplyText("");

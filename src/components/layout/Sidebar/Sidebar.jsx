@@ -245,7 +245,7 @@ export function RightSidebar() {
     useEffect(() => {
         const today = new Date().toISOString().split("T")[0];
         api
-            .get(`/task/filter?date=${today}`)
+            .get("/tasks", { params: { date: today, mode: "mine" } })
             .then((res) => {
                 const backendTasks = res.data?.tasks || [];
                 const mapped = backendTasks.map((t) => ({
@@ -304,10 +304,7 @@ export function RightSidebar() {
             )
         );
         try {
-            await api.patch(
-                `/task/update-field?id=${id}`,
-                { field: "status", value: newStatus }
-            );
+            await api.patch(`/tasks/${id}/status`, { status: newStatus });
         } catch (e) {
             setTasks((prev) =>
                 prev.map((t) =>

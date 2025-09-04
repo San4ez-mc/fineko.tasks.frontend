@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createDailyTask } from "../../../services/api/tasks";
+import { createTask } from "../../../services/api/tasks";
 
 /**
  * Компонент для додавання задачі
@@ -22,7 +22,7 @@ export default function AddTaskRow({
     const handleAddNew = async () => {
         if (!newTaskTitle.trim()) return;
         try {
-            await createDailyTask({
+            await createTask({
                 title: newTaskTitle.trim(),
                 date: new Date().toISOString().split("T")[0],
             });
