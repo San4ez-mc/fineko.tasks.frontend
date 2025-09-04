@@ -38,6 +38,7 @@ export default function DailyTasksPage() {
     const [users, setUsers] = useState([]);
     const [newTaskExecutorId, setNewTaskExecutorId] = useState("");
     const [titleError, setTitleError] = useState(false);
+    const [quickTaskTitle, setQuickTaskTitle] = useState("");
 
     // popover перенесення
     const [rescheduleForId, setRescheduleForId] = useState(null);
@@ -319,6 +320,30 @@ export default function DailyTasksPage() {
         }
     };
 
+    const handleQuickTaskKeyDown = async (e) => {
+        if (e.key !== "Enter" || !quickTaskTitle.trim()) return;
+        const payload = {
+            planned_date: formatDateForApi(selectedDate),
+            title: quickTaskTitle.trim(),
+            type: "важлива нетермінова",
+            expected_time: 30,
+            actual_time: 0,
+            expected_result: "",
+            description: "",
+            manager: userLabel(user) || "",
+            executor_id: user?.id || null,
+            result_id: null,
+            comments: JSON.stringify([]),
+        };
+        try {
+            await api.post(`/tasks`, payload);
+            setQuickTaskTitle("");
+            loadTasks(formatDateForApi(selectedDate), filters);
+        } catch (err) {
+            console.error("Помилка створення задачі", err);
+        }
+    };
+
     // закриття поповера “перенести” по кліку поза ним
     useEffect(() => {
         const onDocClick = (e) => {
@@ -575,6 +600,15 @@ export default function DailyTasksPage() {
                     </div>
                 </div>
             )}
+
+            <input
+                type="text"
+                className="input new-task-input"
+                placeholder="Нова задача…"
+                value={quickTaskTitle}
+                onChange={(e) => setQuickTaskTitle(e.target.value)}
+                onKeyDown={handleQuickTaskKeyDown}
+            />
 
             {tasks.length === 0 ? (
                 <div className="tasks-empty">Задач на сьогодні не додано</div>
