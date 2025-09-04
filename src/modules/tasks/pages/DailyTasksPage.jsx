@@ -9,6 +9,7 @@ import { getResults } from "../../results/api/results";
 import { useAuth } from "../../../context/AuthContext";
 import TaskComments from "../components/TaskComments";
 import VoiceInput from "../../../shared/components/VoiceInput";
+import ResultsSidebar from "../../results/components/ResultsSidebar";
 
 export default function DailyTasksPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -226,6 +227,11 @@ export default function DailyTasksPage() {
         setSelectedDate((d) => new Date(d.getTime() + 86400000));
     const openDatePicker = () => dateInputRef.current?.showPicker();
 
+    const handleResultSelect = (id) => {
+        setNewTaskResultId(String(id));
+        setIsFormOpen(true);
+    };
+
     useEffect(() => {
         api
             .get(`/tasks/templates`)
@@ -361,6 +367,8 @@ export default function DailyTasksPage() {
 
     return (
         <Layout>
+            <div className="daily-tasks-layout">
+                <div className="daily-tasks-main">
             {/* Заголовок + календар по центру */}
             <div className="page-header">
                 <h1 className="tasks-title">
@@ -880,6 +888,12 @@ export default function DailyTasksPage() {
 
             {/* За бажанням можна повернути плаваючу FAB: */}
             <button type="button" className="fab-add" onClick={() => setIsFormOpen(true)}><FiPlus size={24} /></button>
+                </div>
+                <ResultsSidebar
+                    results={results}
+                    onSelectResult={handleResultSelect}
+                />
+            </div>
         </Layout>
     );
 }
