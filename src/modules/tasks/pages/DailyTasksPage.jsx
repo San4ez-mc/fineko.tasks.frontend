@@ -38,6 +38,9 @@ export default function DailyTasksPage() {
     const [users, setUsers] = useState([]);
     const [newTaskExecutorId, setNewTaskExecutorId] = useState("");
     const [titleError, setTitleError] = useState(false);
+    const [completionTask, setCompletionTask] = useState(null);
+    const [actualResult, setActualResult] = useState("");
+    const [actualMinutes, setActualMinutes] = useState("");
 
     // popover перенесення
     const [rescheduleForId, setRescheduleForId] = useState(null);
@@ -145,21 +148,57 @@ export default function DailyTasksPage() {
         loadTasks(formatDateForApi(selectedDate), base);
     };
 
-    const toggleTaskCompletion = (id) => {
-        const task = tasks.find((t) => t.id === id);
-        if (!task) return;
-        const newStatus = task.status === "done" ? "new" : "done";
-        api
-            .patch(`/task/update-field?id=${id}`, {
-                field: "status",
-                value: newStatus,
-            })
-            .catch(() => { });
-        setTasks((prev) =>
-            sortTasks(
-                prev.map((t) => (t.id === id ? { ...t, status: newStatus } : t))
-            )
-        );
+    const handleTaskCheckbox = (task) => {
+        if (task.status === "done") {
+            api
+                .patch(`/task/update-field?id=${task.id}`, {
+                    field: "status",
+                    value: "new",
+                })
+                .catch(() => {});
+            setTasks((prev) =>
+                sortTasks(
+                    prev.map((t) =>
+                        t.id === task.id ? { ...t, status: "new" } : t
+                    )
+                )
+            );
+        } else {
+            setCompletionTask(task);
+            setActualResult("");
+            setActualMinutes("");
+        }
+    };
+
+    const closeCompletionModal = () => {
+        setCompletionTask(null);
+    };
+
+    const confirmCompletion = async () => {
+        if (!completionTask) return;
+        try {
+            const res = await api.patch(
+                `/tasks/${completionTask.id}/complete`,
+                {
+                    actual_result: actualResult,
+                    actual_minutes: Number(actualMinutes),
+                }
+            );
+            const updated = res.data?.task || {
+                ...completionTask,
+                status: "done",
+                actual_result: actualResult,
+                actual_minutes: Number(actualMinutes),
+            };
+            setTasks((prev) =>
+                sortTasks(
+                    prev.map((t) =>
+                        t.id === completionTask.id ? updated : t
+                    )
+                )
+            );
+        } catch (e) {}
+        closeCompletionModal();
     };
 
     useEffect(() => {
@@ -594,7 +633,7 @@ export default function DailyTasksPage() {
                                     checked={task.status === "done"}
                                     onChange={(e) => {
                                         e.stopPropagation();
-                                        toggleTaskCompletion(task.id);
+                                        handleTaskCheckbox(task);
                                     }}
                                 />
 
@@ -841,6 +880,48 @@ export default function DailyTasksPage() {
                             <div className="actions"></div>
                         </div>
                     )}
+                </div>
+            )}
+
+            {completionTask && (
+                <div className="complete-modal" onClick={closeCompletionModal}>
+                    <div
+                        className="complete-modal__dialog card"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3>Завершити задачу</h3>
+                        <label>
+                            Фактичний результат
+                            <textarea
+                                value={actualResult}
+                                onChange={(e) => setActualResult(e.target.value)}
+                            />
+                        </label>
+                        <label>
+                            Фактичні хвилини
+                            <input
+                                type="number"
+                                value={actualMinutes}
+                                onChange={(e) => setActualMinutes(e.target.value)}
+                            />
+                        </label>
+                        <div className="complete-modal__foot">
+                            <button
+                                type="button"
+                                className="btn ghost"
+                                onClick={closeCompletionModal}
+                            >
+                                Скасувати
+                            </button>
+                            <button
+                                type="button"
+                                className="btn primary"
+                                onClick={confirmCompletion}
+                            >
+                                Підтвердити
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
