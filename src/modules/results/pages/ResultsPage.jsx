@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../../../components/layout/Layout.jsx';
 import { getResults, getResultTasks } from '../api/results';
 import ResultItem from '../components/ResultItem.jsx';
+
 import ResultPanel from '../components/ResultPanel.jsx';
+
+import ResultRow from '../components/ResultRow.jsx';
+import ResultDetails from '../components/ResultDetails.jsx';
+
 import ResultsEmpty from '../components/ResultsEmpty.jsx';
 import ResultForm from '../components/ResultForm.jsx';
 import './ResultsPage.css';
@@ -13,12 +18,18 @@ export default function ResultsPage() {
   const [activeId, setActiveId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [parentId, setParentId] = useState(null);
+
   const [tasksLoading, setTasksLoading] = useState({});
 
-  const fetchResults = async () => {
+  const [mode, setMode] = useState('my');
+  const [view, setView] = useState('table');
+  const [, setTasksLoading] = useState({});
+
+
+  const fetchResults = async (currentMode = mode) => {
     setLoading(true);
     try {
-      const data = await getResults({ page: 1 });
+      const data = await getResults({ page: 1, mode: currentMode });
       const items = data.items || data || [];
       setResults(items);
     } finally {
@@ -27,8 +38,8 @@ export default function ResultsPage() {
   };
 
   useEffect(() => {
-    fetchResults();
-  }, []);
+    fetchResults(mode);
+  }, [mode]);
 
   const handleSaved = () => {
     setShowAddForm(false);
@@ -84,6 +95,43 @@ export default function ResultsPage() {
           )}
         </div>
 
+        <div className="results-page__controls">
+          <div className="results-modes">
+            <button
+              className={`btn ${mode === 'my' ? 'primary' : 'ghost'}`}
+              onClick={() => setMode('my')}
+            >
+              Мої
+            </button>
+            <button
+              className={`btn ${mode === 'delegated' ? 'primary' : 'ghost'}`}
+              onClick={() => setMode('delegated')}
+            >
+              Делеговані
+            </button>
+            <button
+              className={`btn ${mode === 'subordinates' ? 'primary' : 'ghost'}`}
+              onClick={() => setMode('subordinates')}
+            >
+              Підлеглих
+            </button>
+          </div>
+          <div className="results-view">
+            <button
+              className={`btn ${view === 'table' ? 'primary' : 'ghost'}`}
+              onClick={() => setView('table')}
+            >
+              Таблиця
+            </button>
+            <button
+              className={`btn ${view === 'cards' ? 'primary' : 'ghost'}`}
+              onClick={() => setView('cards')}
+            >
+              Картки
+            </button>
+          </div>
+        </div>
+
         {showAddForm && (
           <ResultForm
             parentId={parentId}
@@ -107,6 +155,7 @@ export default function ResultsPage() {
         )}
 
         {!loading && results.length > 0 && (
+
           <div className="results-list">
             {results.map((r) => (
               <ResultItem
@@ -117,6 +166,7 @@ export default function ResultsPage() {
               />
             ))}
           </div>
+
         )}
 
         <ResultPanel
