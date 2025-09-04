@@ -13,9 +13,27 @@
   justify-content:space-between;
 }
 
+.results-page__controls{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.results-modes,
+.results-view{
+  display:flex;
+  gap:8px;
+}
+
 .results-list{
   display:grid;
   gap:0;
+}
+
+.results-table{
+  display:flex;
+  flex-direction:column;
 }
 
 .results-group + .results-group{
