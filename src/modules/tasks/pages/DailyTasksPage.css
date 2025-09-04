@@ -25,6 +25,11 @@
   justify-content: center;
 }
 
+.new-task-input {
+  width: 100%;
+  margin: 16px 0;
+}
+
 .muted {
   color: var(--text-muted);
 }
