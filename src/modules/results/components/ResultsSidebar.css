@@ -1,0 +1,39 @@
+@import "../../../styles/variables.css";
+
+.results-sidebar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rs-title {
+  margin: 0;
+  font-size: var(--fz-base);
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.rs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rs-item {
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.rs-item:hover {
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  box-shadow: var(--shadow-sm);
+}

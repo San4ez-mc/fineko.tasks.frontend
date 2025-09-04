@@ -9,6 +9,7 @@ import { getResults } from "../../results/api/results";
 import { useAuth } from "../../../context/AuthContext";
 import TaskComments from "../components/TaskComments";
 import VoiceInput from "../../../shared/components/VoiceInput";
+import ResultsSidebar from "../../results/components/ResultsSidebar";
 
 export default function DailyTasksPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -38,9 +39,12 @@ export default function DailyTasksPage() {
     const [users, setUsers] = useState([]);
     const [newTaskExecutorId, setNewTaskExecutorId] = useState("");
     const [titleError, setTitleError] = useState(false);
+
     const [completionTask, setCompletionTask] = useState(null);
     const [actualResult, setActualResult] = useState("");
     const [actualMinutes, setActualMinutes] = useState("");
+    const [quickTaskTitle, setQuickTaskTitle] = useState("");
+
 
     // popover перенесення
     const [rescheduleForId, setRescheduleForId] = useState(null);
@@ -264,6 +268,11 @@ export default function DailyTasksPage() {
         setSelectedDate((d) => new Date(d.getTime() + 86400000));
     const openDatePicker = () => dateInputRef.current?.showPicker();
 
+    const handleResultSelect = (id) => {
+        setNewTaskResultId(String(id));
+        setIsFormOpen(true);
+    };
+
     useEffect(() => {
         api
             .get(`/tasks/templates`)
@@ -358,6 +367,30 @@ export default function DailyTasksPage() {
         }
     };
 
+    const handleQuickTaskKeyDown = async (e) => {
+        if (e.key !== "Enter" || !quickTaskTitle.trim()) return;
+        const payload = {
+            planned_date: formatDateForApi(selectedDate),
+            title: quickTaskTitle.trim(),
+            type: "важлива нетермінова",
+            expected_time: 30,
+            actual_time: 0,
+            expected_result: "",
+            description: "",
+            manager: userLabel(user) || "",
+            executor_id: user?.id || null,
+            result_id: null,
+            comments: JSON.stringify([]),
+        };
+        try {
+            await api.post(`/tasks`, payload);
+            setQuickTaskTitle("");
+            loadTasks(formatDateForApi(selectedDate), filters);
+        } catch (err) {
+            console.error("Помилка створення задачі", err);
+        }
+    };
+
     // закриття поповера “перенести” по кліку поза ним
     useEffect(() => {
         const onDocClick = (e) => {
@@ -375,6 +408,8 @@ export default function DailyTasksPage() {
 
     return (
         <Layout>
+            <div className="daily-tasks-layout">
+                <div className="daily-tasks-main">
             {/* Заголовок + календар по центру */}
             <div className="page-header">
                 <h1 className="tasks-title">
@@ -614,6 +649,15 @@ export default function DailyTasksPage() {
                     </div>
                 </div>
             )}
+
+            <input
+                type="text"
+                className="input new-task-input"
+                placeholder="Нова задача…"
+                value={quickTaskTitle}
+                onChange={(e) => setQuickTaskTitle(e.target.value)}
+                onKeyDown={handleQuickTaskKeyDown}
+            />
 
             {tasks.length === 0 ? (
                 <div className="tasks-empty">Задач на сьогодні не додано</div>
@@ -927,6 +971,12 @@ export default function DailyTasksPage() {
 
             {/* За бажанням можна повернути плаваючу FAB: */}
             <button type="button" className="fab-add" onClick={() => setIsFormOpen(true)}><FiPlus size={24} /></button>
+                </div>
+                <ResultsSidebar
+                    results={results}
+                    onSelectResult={handleResultSelect}
+                />
+            </div>
         </Layout>
     );
 }

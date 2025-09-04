@@ -8,6 +8,19 @@
   width: 100%;
 }
 
+.daily-tasks-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+  .daily-tasks-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Заголовок з кнопками навігації дати */
 .tasks-title {
   display: inline-flex;
@@ -23,6 +36,11 @@
   margin: 8px auto 12px;
   /* по центру нижче заголовка */
   justify-content: center;
+}
+
+.new-task-input {
+  width: 100%;
+  margin: 16px 0;
 }
 
 .muted {
