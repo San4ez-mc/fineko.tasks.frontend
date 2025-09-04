@@ -32,4 +32,9 @@
 .rd-comment .c-head{ font-size: var(--fz-sm); color: var(--text-muted); }
 .rd-comment .c-text{ margin-top:4px; }
 
+.rd-replies{ margin-left:12px; padding-left:8px; border-left:2px dashed var(--border); display:grid; gap:8px; margin-top:8px; }
+.rd-reply-btn{ background:none; border:none; color:var(--blue); cursor:pointer; padding:0; font-size:var(--fz-sm); margin-top:4px; }
+.rd-reply-form{ margin-top:4px; display:flex; gap:8px; }
+.rd-reply-form .input{ flex:1; }
+
 .rd-add-comment{ margin-top:8px; display:flex; gap:8px; }

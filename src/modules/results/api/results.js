@@ -23,3 +23,6 @@ export const toggleResultComplete = async (id, isCompleted) =>
 
 export const getResultTasks = async (id) =>
     (await api.get(`/results/${id}/tasks`)).data;
+
+export const replyToComment = async (resultId, commentId, text) =>
+    (await api.post(`/results/${resultId}/comments/${commentId}/reply`, { text })).data;
