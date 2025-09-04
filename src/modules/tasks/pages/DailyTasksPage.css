@@ -368,3 +368,34 @@
     margin-left: 0;
   }
 }
+
+.complete-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.complete-modal__dialog {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.complete-modal__dialog label {
+  display: grid;
+  gap: 4px;
+}
+
+.complete-modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
