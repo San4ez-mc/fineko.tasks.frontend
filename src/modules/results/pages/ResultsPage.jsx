@@ -20,10 +20,8 @@ export default function ResultsPage() {
   const [parentId, setParentId] = useState(null);
 
   const [tasksLoading, setTasksLoading] = useState({});
-
   const [mode, setMode] = useState('my');
   const [view, setView] = useState('table');
-  const [, setTasksLoading] = useState({});
 
 
   const fetchResults = async (currentMode = mode) => {

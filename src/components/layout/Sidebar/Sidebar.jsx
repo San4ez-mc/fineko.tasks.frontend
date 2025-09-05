@@ -73,9 +73,8 @@ export default function Sidebar({
                                     <>
                                         <span className="menu-text">Задачі</span>
                                         <FiChevronDown
-                                            className={`submenu-arrow ${
-                                                isTasksOpen ? "open" : ""
-                                            }`}
+                                            className={`submenu-arrow ${isTasksOpen ? "open" : ""
+                                                }`}
                                         />
                                     </>
                                 )}
@@ -241,6 +240,8 @@ export function RightSidebar() {
 
     const [tasks, setTasks] = useState([]);
     const [search, setSearch] = useState("");
+    const [newTaskTitle, setNewTaskTitle] = useState("");
+    const [adding, setAdding] = useState(false);
 
     useEffect(() => {
         const today = new Date().toISOString().split("T")[0];
@@ -317,6 +318,40 @@ export function RightSidebar() {
         }
     };
 
+    const handleAddTask = async () => {
+        const title = newTaskTitle.trim();
+        if (!title) return;
+        setAdding(true);
+        try {
+            // Example API call, adjust fields as needed
+            const today = new Date().toISOString().split("T")[0];
+            const res = await api.post("/task/create", {
+                title,
+                date: today,
+                type: "важлива нетермінова", // default type, adjust as needed
+                expected_time: 30, // default planned time, adjust as needed
+            });
+            const t = res.data?.task;
+            if (t) {
+                setTasks(prev => [
+                    ...prev,
+                    {
+                        id: t.id,
+                        title: t.title,
+                        type: mapType(t.type),
+                        planned: Number(t.expected_time || 0),
+                        status: t.status || "new",
+                        timer: Number(t.actual_time || 0),
+                    }
+                ]);
+            }
+            setNewTaskTitle("");
+        } catch (e) {
+            // handle error
+        }
+        setAdding(false);
+    };
+
     const priority = (type) => {
         if (type === "critical") return 0;
         if (type === "important") return 1;
@@ -368,9 +403,8 @@ export function RightSidebar() {
                 {filtered.map((task) => (
                     <div
                         key={task.id}
-                        className={`today-task ${
-                            task.status === "done" ? "completed" : ""
-                        }`}
+                        className={`today-task ${task.status === "done" ? "completed" : ""
+                            }`}
                     >
                         <CheckToggle
                             checked={task.status === "done"}
@@ -388,13 +422,12 @@ export function RightSidebar() {
                             </span>
                         )}
                         <span
-                            className={`task-type-badge ${
-                                task.type === "critical"
+                            className={`task-type-badge ${task.type === "critical"
                                     ? "critical"
                                     : task.type === "important"
-                                    ? "important"
-                                    : "other"
-                            }`}
+                                        ? "important"
+                                        : "other"
+                                }`}
                         >
                             {task.type}
                         </span>
@@ -409,6 +442,27 @@ export function RightSidebar() {
                         </button>
                     </div>
                 ))}
+                {/* Inline new task input */}
+                <div className="today-task new-task-input">
+                    <input
+                        type="text"
+                        placeholder="Нова задача..."
+                        value={newTaskTitle}
+                        onChange={e => setNewTaskTitle(e.target.value)}
+                        onKeyDown={e => {
+                            if (e.key === "Enter" && !adding) handleAddTask();
+                        }}
+                        disabled={adding}
+                        style={{ flex: 1, marginRight: 8 }}
+                    />
+                    <button
+                        onClick={handleAddTask}
+                        disabled={adding || !newTaskTitle.trim()}
+                        style={{ minWidth: 32 }}
+                    >
+                        +
+                    </button>
+                </div>
             </div>
             <div className="right-sidebar-summary">
                 Плановано: {formatMinutes(totalPlanned)}
